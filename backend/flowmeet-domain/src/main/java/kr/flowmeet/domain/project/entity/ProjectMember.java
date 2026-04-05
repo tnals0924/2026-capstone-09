@@ -11,12 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.flowmeet.domain.common.BaseTimeEntity;
-import kr.flowmeet.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import kr.flowmeet.domain.common.BaseTimeEntity;
+import kr.flowmeet.domain.user.entity.User;
 
 @Entity
 @Table(name = "project_members")
@@ -52,5 +52,13 @@ public class ProjectMember extends BaseTimeEntity {
         this.projectId = projectId;
         this.userId = userId;
         this.role = role;
+    }
+
+    public void updateRole(final ProjectMemberRole role) {
+        this.role = role;
+    }
+
+    public boolean isOwner() {
+        return this.role == ProjectMemberRole.OWNER;
     }
 }

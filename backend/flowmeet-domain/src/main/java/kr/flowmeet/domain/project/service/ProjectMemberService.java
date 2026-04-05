@@ -1,0 +1,68 @@
+package kr.flowmeet.domain.project.service;
+
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import kr.flowmeet.domain.exception.BusinessException;
+import kr.flowmeet.domain.project.entity.ProjectMember;
+import kr.flowmeet.domain.project.entity.ProjectMemberRole;
+import kr.flowmeet.domain.project.exception.ProjectErrorCode;
+import kr.flowmeet.domain.project.repository.ProjectMemberRepository;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ProjectMemberService {
+
+    private final ProjectMemberRepository projectMemberRepository;
+
+    public ProjectMember findByProjectIdAndUserId(final Long projectId, final Long userId) {
+        return projectMemberRepository.findByProjectIdAndUserIdAndDeletedAtIsNull(projectId, userId)
+                .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public ProjectMember findById(final Long memberId) {
+        return projectMemberRepository.findByIdAndDeletedAtIsNull(memberId)
+                .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public ProjectMember findByIdAndProjectId(final Long memberId, final Long projectId) {
+        return projectMemberRepository.findByIdAndProjectIdAndDeletedAtIsNull(memberId, projectId)
+                .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    public List<ProjectMember> findAllByProjectId(final Long projectId) {
+        return projectMemberRepository.findAllByProjectIdAndDeletedAtIsNull(projectId);
+    }
+
+    public List<ProjectMember> findAllByProjectIdOrderByRole(final Long projectId) {
+        return projectMemberRepository.findAllByProjectIdOrderByRole(projectId);
+    }
+
+    public List<ProjectMember> findAllByUserId(final Long userId) {
+        return projectMemberRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+    }
+
+    public boolean existsByProjectIdAndUserId(final Long projectId, final Long userId) {
+        return projectMemberRepository.existsByProjectIdAndUserIdAndDeletedAtIsNull(projectId, userId);
+    }
+
+    public boolean existsOwnerProject(final Long userId) {
+        return projectMemberRepository.existsByUserIdAndRoleAndDeletedAtIsNull(userId, ProjectMemberRole.OWNER);
+    }
+
+    public int countByProjectId(final Long projectId) {
+        return projectMemberRepository.countByProjectIdAndDeletedAtIsNull(projectId);
+    }
+
+    @Transactional
+    public ProjectMember save(final ProjectMember projectMember) {
+        return projectMemberRepository.save(projectMember);
+    }
+
+    @Transactional
+    public void delete(final ProjectMember projectMember) {
+        projectMember.softDelete();
+    }
+}
