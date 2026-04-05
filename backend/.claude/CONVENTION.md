@@ -63,7 +63,7 @@ public class DomainFacade { ... }
 - `BaseTimeEntity` 상속 (createdAt, updatedAt, deletedAt + soft delete)
 - `BaseCreatedTimeEntity` — createdAt만 필요한 엔티티용
 - PK 전략: `GenerationType.IDENTITY`
-- 필드 접근 제한자: package-private (Lombok @Getter로 읽기 제공)
+- 필드 접근 제한자: `private` (Lombok @Getter로 읽기 제공)
 - 연관관계: `@ManyToOne(fetch = FetchType.LAZY)` 고정
 - FK 이중 매핑 패턴 — Long ID 컬럼 + JPA 관계 객체 분리:
 
