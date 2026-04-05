@@ -13,12 +13,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import kr.flowmeet.domain.common.BaseTimeEntity;
 
 @Entity
 @Table(name = "project_urls")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProjectUrl {
+public class ProjectUrl extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,10 @@ public class ProjectUrl {
     @Builder
     public ProjectUrl(Long projectId, String url) {
         this.projectId = projectId;
+        this.url = url;
+    }
+
+    public void updateUrl(final String url) {
         this.url = url;
     }
 }
