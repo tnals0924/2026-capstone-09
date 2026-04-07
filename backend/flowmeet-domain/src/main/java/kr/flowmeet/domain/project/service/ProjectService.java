@@ -2,6 +2,7 @@ package kr.flowmeet.domain.project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,9 @@ public class ProjectService {
     }
 
     public Page<ProjectWithMemberCountProjection> findAllByUserId(final Long userId, final String search,
-                                                                  final Pageable pageable) {
+                                                                  final ProjectSortType sort,
+                                                                  final int page, final int size) {
+        Pageable pageable = PageRequest.of(page, size, sort.toSort());
         return projectRepository.findAllByUserId(userId, search, pageable);
     }
 

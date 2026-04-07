@@ -2,10 +2,6 @@ package kr.flowmeet.api.project;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -16,12 +12,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
+import kr.flowmeet.api.common.dto.PageResponse;
 import kr.flowmeet.api.project.dto.CreateProjectRequest;
 import kr.flowmeet.api.project.dto.CreateProjectResponse;
-import kr.flowmeet.api.project.dto.GetAllProjectsResponse;
 import kr.flowmeet.api.project.dto.GetProjectResponse;
+import kr.flowmeet.api.project.dto.ProjectSummary;
 import kr.flowmeet.api.project.dto.UpdateProjectRequest;
 import kr.flowmeet.auth.annotation.UserId;
+import kr.flowmeet.domain.project.service.ProjectSortType;
 
 @RestController
 @RequestMapping("/v1/projects")
@@ -39,11 +37,13 @@ public class ProjectController implements ProjectApi {
 
     @Override
     @GetMapping
-    public CommonResponse<GetAllProjectsResponse> getAllProjects(
+    public CommonResponse<PageResponse<ProjectSummary>> getAllProjects(
             @UserId Long userId,
             @RequestParam(required = false) String search,
-            @ParameterObject @PageableDefault(sort = "updatedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return CommonResponse.ok(projectFacade.getAllProjects(userId, search, pageable));
+            @RequestParam(defaultValue = "LATEST") ProjectSortType sort,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return CommonResponse.ok(projectFacade.getAllProjects(userId, search, sort, page, size));
     }
 
     @Override

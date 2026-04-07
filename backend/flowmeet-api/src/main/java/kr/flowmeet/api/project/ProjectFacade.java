@@ -3,13 +3,13 @@ package kr.flowmeet.api.project;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import kr.flowmeet.api.common.dto.PageResponse;
 import kr.flowmeet.api.project.dto.CreateProjectRequest;
 import kr.flowmeet.api.project.dto.CreateProjectResponse;
-import kr.flowmeet.api.project.dto.GetAllProjectsResponse;
 import kr.flowmeet.api.project.dto.GetProjectResponse;
+import kr.flowmeet.api.project.dto.ProjectSummary;
 import kr.flowmeet.api.project.dto.UpdateProjectRequest;
 import kr.flowmeet.domain.exception.BusinessException;
 import kr.flowmeet.domain.project.entity.Project;
@@ -20,6 +20,7 @@ import kr.flowmeet.domain.project.exception.ProjectErrorCode;
 import kr.flowmeet.domain.project.repository.projection.ProjectWithMemberCountProjection;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.project.service.ProjectService;
+import kr.flowmeet.domain.project.service.ProjectSortType;
 import kr.flowmeet.domain.project.service.ProjectUrlService;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.service.UserService;
@@ -55,16 +56,12 @@ public class ProjectFacade {
         return CreateProjectResponse.from(project);
     }
 
-    public GetAllProjectsResponse getAllProjects(final Long userId, final String search, final Pageable pageable) {
-        Page<ProjectWithMemberCountProjection> results = projectService.findAllByUserId(userId, search, pageable);
+    public PageResponse<ProjectSummary> getAllProjects(final Long userId, final String search,
+                                                        final ProjectSortType sort,
+                                                        final int page, final int size) {
+        Page<ProjectWithMemberCountProjection> results = projectService.findAllByUserId(userId, search, sort, page, size);
 
-        List<GetAllProjectsResponse.ProjectItem> projects = results.getContent().stream()
-                .map(projection -> GetAllProjectsResponse.ProjectItem.of(
-                        projection.project(), projection.memberCount().intValue()))
-                .toList();
-
-        return GetAllProjectsResponse.of(projects, results.getTotalElements(), results.getTotalPages(),
-                results.getNumber(), results.getSize());
+        return PageResponse.from(results).map(ProjectSummary::from);
     }
 
     public GetProjectResponse getProject(final Long userId, final Long projectId) {
