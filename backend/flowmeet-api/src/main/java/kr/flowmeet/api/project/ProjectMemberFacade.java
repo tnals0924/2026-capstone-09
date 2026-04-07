@@ -39,17 +39,12 @@ public class ProjectMemberFacade {
     @Transactional
     public void inviteMember(final Long userId, final Long projectId, final InviteProjectMemberRequest request) {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (requesterMember.getRole() == ProjectMemberRole.VIEWER) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_INVITE_FORBIDDEN);
-        }
+        validateProjectMemberIsViewer(requesterMember);
 
         User invitee = userService.findByPrimaryEmail(request.email())
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
 
-        if (projectMemberService.existsByProjectIdAndUserId(projectId, invitee.getId())) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_ALREADY_EXISTS);
-        }
+        validateProjectMemberAlreadyExists(projectId, invitee.getId());
 
         projectMemberService.save(
                 ProjectMember.builder()
@@ -64,20 +59,11 @@ public class ProjectMemberFacade {
     public void updateMemberRole(final Long userId, final Long projectId, final Long memberId,
                                  final UpdateProjectMemberRoleRequest request) {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (!requesterMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_ROLE_CHANGE_FORBIDDEN);
-        }
+        validateRequesterCanChangeRole(requesterMember);
 
         ProjectMember targetMember = projectMemberService.findByIdAndProjectId(memberId, projectId);
-
-        if (targetMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_CHANGE_OWNER);
-        }
-
-        if (request.role() == ProjectMemberRole.OWNER) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_CHANGE_OWNER);
-        }
+        validateTargetIsNotOwnerForRoleChange(targetMember);
+        validateNewRoleIsNotOwner(request.role());
 
         targetMember.updateRole(request.role());
     }
@@ -85,16 +71,10 @@ public class ProjectMemberFacade {
     @Transactional
     public void deleteMember(final Long userId, final Long projectId, final Long memberId) {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (!requesterMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_DELETE_FORBIDDEN);
-        }
+        validateRequesterCanDeleteMember(requesterMember);
 
         ProjectMember targetMember = projectMemberService.findByIdAndProjectId(memberId, projectId);
-
-        if (targetMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_DELETE_OWNER);
-        }
+        validateTargetIsNotOwnerForDelete(targetMember);
 
         projectMemberService.delete(targetMember);
     }
@@ -102,11 +82,56 @@ public class ProjectMemberFacade {
     @Transactional
     public void leaveProject(final Long userId, final Long projectId) {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (requesterMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_OWNER_CANNOT_LEAVE);
-        }
+        validateRequesterIsNotOwner(requesterMember);
 
         projectMemberService.delete(requesterMember);
+    }
+
+    private void validateProjectMemberIsViewer(final ProjectMember member) {
+        if (member.getRole() == ProjectMemberRole.VIEWER) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_INVITE_FORBIDDEN);
+        }
+    }
+
+    private void validateProjectMemberAlreadyExists(final Long projectId, final Long userId) {
+        if (projectMemberService.existsByProjectIdAndUserId(projectId, userId)) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_ALREADY_EXISTS);
+        }
+    }
+
+    private void validateRequesterCanChangeRole(final ProjectMember requester) {
+        if (!requester.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_ROLE_CHANGE_FORBIDDEN);
+        }
+    }
+
+    private void validateTargetIsNotOwnerForRoleChange(final ProjectMember target) {
+        if (target.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_CHANGE_OWNER);
+        }
+    }
+
+    private void validateNewRoleIsNotOwner(final ProjectMemberRole role) {
+        if (role == ProjectMemberRole.OWNER) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_CHANGE_OWNER);
+        }
+    }
+
+    private void validateRequesterCanDeleteMember(final ProjectMember requester) {
+        if (!requester.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_DELETE_FORBIDDEN);
+        }
+    }
+
+    private void validateTargetIsNotOwnerForDelete(final ProjectMember target) {
+        if (target.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_DELETE_OWNER);
+        }
+    }
+
+    private void validateRequesterIsNotOwner(final ProjectMember requester) {
+        if (requester.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.PROJECT_OWNER_CANNOT_LEAVE);
+        }
     }
 }

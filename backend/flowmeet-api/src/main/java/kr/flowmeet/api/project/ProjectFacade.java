@@ -82,11 +82,7 @@ public class ProjectFacade {
 
     @Transactional
     public void updateProject(final Long userId, final Long projectId, final UpdateProjectRequest request) {
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (requesterMember.getRole() == ProjectMemberRole.VIEWER) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
-        }
+        validateMemberCanEdit(projectId, userId);
 
         Project project = projectService.findById(projectId);
         project.updateName(request.name());
@@ -94,11 +90,7 @@ public class ProjectFacade {
 
     @Transactional
     public void deleteProject(final Long userId, final Long projectId) {
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (!requesterMember.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_DELETE_FORBIDDEN);
-        }
+        validateMemberCanDeleteProject(projectId, userId);
 
         Project project = projectService.findById(projectId);
         projectService.delete(project);
@@ -108,5 +100,21 @@ public class ProjectFacade {
 
         List<ProjectUrl> urls = projectUrlService.findAllByProjectId(project.getId());
         urls.forEach(projectUrlService::delete);
+    }
+
+    private void validateMemberCanEdit(final Long projectId, final Long userId) {
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+
+        if (requesterMember.getRole() == ProjectMemberRole.VIEWER) {
+            throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
+        }
+    }
+
+    private void validateMemberCanDeleteProject(final Long projectId, final Long userId) {
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+
+        if (!requesterMember.isOwner()) {
+            throw new BusinessException(ProjectErrorCode.PROJECT_DELETE_FORBIDDEN);
+        }
     }
 }
