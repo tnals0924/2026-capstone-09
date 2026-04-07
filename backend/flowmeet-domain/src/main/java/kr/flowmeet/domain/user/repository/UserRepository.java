@@ -6,9 +6,7 @@ import kr.flowmeet.domain.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByIdAndDeletedAtIsNull(Long id);
+    boolean existsByNickname(String nickname);
 
-    boolean existsByNicknameAndDeletedAtIsNull(String nickname);
-
-    Optional<User> findByPrimaryEmailAndDeletedAtIsNull(String primaryEmail);
+    Optional<User> findByPrimaryEmail(String primaryEmail);
 }

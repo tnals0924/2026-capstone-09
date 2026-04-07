@@ -18,7 +18,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
 
     public Project findById(final Long projectId) {
-        return projectRepository.findByIdAndDeletedAtIsNull(projectId)
+        return projectRepository.findById(projectId)
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.PROJECT_NOT_FOUND));
     }
 
@@ -33,6 +33,6 @@ public class ProjectService {
 
     @Transactional
     public void delete(final Project project) {
-        project.softDelete();
+        projectRepository.delete(project);
     }
 }

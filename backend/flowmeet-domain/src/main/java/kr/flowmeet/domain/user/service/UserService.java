@@ -16,23 +16,23 @@ public class UserService {
     private final UserRepository userRepository;
 
     public User findById(final Long userId) {
-        return userRepository.findByIdAndDeletedAtIsNull(userId)
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 
     public User findByPrimaryEmail(final String email) {
-        return userRepository.findByPrimaryEmailAndDeletedAtIsNull(email)
+        return userRepository.findByPrimaryEmail(email)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 
     public void validateNicknameNotDuplicated(final String nickname, final String currentNickname) {
-        if (!nickname.equals(currentNickname) && userRepository.existsByNicknameAndDeletedAtIsNull(nickname)) {
+        if (!nickname.equals(currentNickname) && userRepository.existsByNickname(nickname)) {
             throw new BusinessException(UserErrorCode.USER_NICKNAME_DUPLICATED);
         }
     }
 
     @Transactional
     public void delete(final User user) {
-        user.softDelete();
+        userRepository.delete(user);
     }
 }

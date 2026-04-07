@@ -7,7 +7,7 @@ import kr.flowmeet.domain.project.entity.ProjectUrl;
 
 public interface ProjectUrlRepository extends JpaRepository<ProjectUrl, Long> {
 
-    List<ProjectUrl> findAllByProjectIdAndDeletedAtIsNull(Long projectId);
+    List<ProjectUrl> findAllByProjectId(Long projectId);
 
-    Optional<ProjectUrl> findByIdAndProjectIdAndDeletedAtIsNull(Long id, Long projectId);
+    Optional<ProjectUrl> findByIdAndProjectId(Long id, Long projectId);
 }

@@ -18,22 +18,22 @@ public class ProjectMemberService {
     private final ProjectMemberRepository projectMemberRepository;
 
     public ProjectMember findByProjectIdAndUserId(final Long projectId, final Long userId) {
-        return projectMemberRepository.findByProjectIdAndUserIdAndDeletedAtIsNull(projectId, userId)
+        return projectMemberRepository.findByProjectIdAndUserId(projectId, userId)
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
     }
 
     public ProjectMember findById(final Long memberId) {
-        return projectMemberRepository.findByIdAndDeletedAtIsNull(memberId)
+        return projectMemberRepository.findById(memberId)
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
     }
 
     public ProjectMember findByIdAndProjectId(final Long memberId, final Long projectId) {
-        return projectMemberRepository.findByIdAndProjectIdAndDeletedAtIsNull(memberId, projectId)
+        return projectMemberRepository.findByIdAndProjectId(memberId, projectId)
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
     }
 
     public List<ProjectMember> findAllByProjectId(final Long projectId) {
-        return projectMemberRepository.findAllByProjectIdAndDeletedAtIsNull(projectId);
+        return projectMemberRepository.findAllByProjectId(projectId);
     }
 
     public List<ProjectMember> findAllByProjectIdOrderByRole(final Long projectId) {
@@ -41,19 +41,19 @@ public class ProjectMemberService {
     }
 
     public List<ProjectMember> findAllByUserId(final Long userId) {
-        return projectMemberRepository.findAllByUserIdAndDeletedAtIsNull(userId);
+        return projectMemberRepository.findAllByUserId(userId);
     }
 
     public boolean existsByProjectIdAndUserId(final Long projectId, final Long userId) {
-        return projectMemberRepository.existsByProjectIdAndUserIdAndDeletedAtIsNull(projectId, userId);
+        return projectMemberRepository.existsByProjectIdAndUserId(projectId, userId);
     }
 
     public boolean existsOwnerProject(final Long userId) {
-        return projectMemberRepository.existsByUserIdAndRoleAndDeletedAtIsNull(userId, ProjectMemberRole.OWNER);
+        return projectMemberRepository.existsByUserIdAndRole(userId, ProjectMemberRole.OWNER);
     }
 
     public int countByProjectId(final Long projectId) {
-        return projectMemberRepository.countByProjectIdAndDeletedAtIsNull(projectId);
+        return projectMemberRepository.countByProjectId(projectId);
     }
 
     @Transactional
@@ -63,6 +63,6 @@ public class ProjectMemberService {
 
     @Transactional
     public void delete(final ProjectMember projectMember) {
-        projectMember.softDelete();
+        projectMemberRepository.delete(projectMember);
     }
 }

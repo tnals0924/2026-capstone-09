@@ -15,6 +15,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import kr.flowmeet.domain.common.BaseTimeEntity;
 import kr.flowmeet.domain.user.entity.User;
 
@@ -22,6 +24,8 @@ import kr.flowmeet.domain.user.entity.User;
 @Table(name = "project_members")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE project_members SET deleted_at = CURRENT_TIMESTAMP WHERE project_member_id = ?")
+@SQLRestriction("deleted_at IS NULL")
 public class ProjectMember extends BaseTimeEntity {
 
     @Id
