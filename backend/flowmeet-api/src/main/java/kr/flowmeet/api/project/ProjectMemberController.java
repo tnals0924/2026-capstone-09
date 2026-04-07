@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
-import kr.flowmeet.api.project.dto.GetAllMembersResponse;
-import kr.flowmeet.api.project.dto.InviteMemberRequest;
-import kr.flowmeet.api.project.dto.UpdateMemberRoleRequest;
+import kr.flowmeet.api.project.dto.GetAllProjectMembersResponse;
+import kr.flowmeet.api.project.dto.InviteProjectMemberRequest;
+import kr.flowmeet.api.project.dto.UpdateProjectMemberRoleRequest;
 import kr.flowmeet.auth.annotation.UserId;
 
 @RestController
@@ -25,14 +25,14 @@ public class ProjectMemberController implements ProjectMemberApi {
 
     @Override
     @GetMapping
-    public CommonResponse<GetAllMembersResponse> getAllMembers(@UserId Long userId, @PathVariable Long projectId) {
+    public CommonResponse<GetAllProjectMembersResponse> getAllMembers(@UserId Long userId, @PathVariable Long projectId) {
         return CommonResponse.ok(projectMemberFacade.getAllMembers(userId, projectId));
     }
 
     @Override
     @PostMapping
     public CommonResponse<?> inviteMember(@UserId Long userId, @PathVariable Long projectId,
-                                          @Valid @RequestBody InviteMemberRequest request) {
+                                          @Valid @RequestBody InviteProjectMemberRequest request) {
         projectMemberFacade.inviteMember(userId, projectId, request);
         return CommonResponse.ok();
     }
@@ -41,7 +41,7 @@ public class ProjectMemberController implements ProjectMemberApi {
     @PatchMapping("/{memberId}/role")
     public CommonResponse<?> updateMemberRole(@UserId Long userId, @PathVariable Long projectId,
                                               @PathVariable Long memberId,
-                                              @Valid @RequestBody UpdateMemberRoleRequest request) {
+                                              @Valid @RequestBody UpdateProjectMemberRoleRequest request) {
         projectMemberFacade.updateMemberRole(userId, projectId, memberId, request);
         return CommonResponse.ok();
     }

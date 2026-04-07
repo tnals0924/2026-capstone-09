@@ -1,3 +1,4 @@
+
 package kr.flowmeet.api.project.dto;
 
 import java.util.List;
@@ -5,14 +6,14 @@ import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.user.entity.User;
 
-public record GetAllMembersResponse(
-        List<MemberInfo> members
+public record GetAllProjectMembersResponse(
+        List<ProjectMemberInfo> members
 ) {
-    public static GetAllMembersResponse of(final List<MemberInfo> members) {
-        return new GetAllMembersResponse(members);
+    public static GetAllProjectMembersResponse of(final List<ProjectMemberInfo> members) {
+        return new GetAllProjectMembersResponse(members);
     }
 
-    public record MemberInfo(
+    public record ProjectMemberInfo(
             Long memberId,
             Long userId,
             String nickname,
@@ -20,8 +21,8 @@ public record GetAllMembersResponse(
             String profileImageUrl,
             ProjectMemberRole role
     ) {
-        public static MemberInfo of(final ProjectMember member, final User user) {
-            return new MemberInfo(
+        public static ProjectMemberInfo of(final ProjectMember member, final User user) {
+            return new ProjectMemberInfo(
                     member.getId(),
                     user.getId(),
                     user.getNickname(),

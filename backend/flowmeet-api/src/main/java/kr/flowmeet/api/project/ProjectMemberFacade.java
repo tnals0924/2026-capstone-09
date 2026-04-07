@@ -4,9 +4,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import kr.flowmeet.api.project.dto.GetAllMembersResponse;
-import kr.flowmeet.api.project.dto.InviteMemberRequest;
-import kr.flowmeet.api.project.dto.UpdateMemberRoleRequest;
+import kr.flowmeet.api.project.dto.GetAllProjectMembersResponse;
+import kr.flowmeet.api.project.dto.InviteProjectMemberRequest;
+import kr.flowmeet.api.project.dto.UpdateProjectMemberRoleRequest;
 import kr.flowmeet.domain.exception.BusinessException;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
@@ -24,20 +24,20 @@ public class ProjectMemberFacade {
     private final UserService userService;
     private final ProjectMemberService projectMemberService;
 
-    public GetAllMembersResponse getAllMembers(final Long userId, final Long projectId) {
+    public GetAllProjectMembersResponse getAllMembers(final Long userId, final Long projectId) {
         projectMemberService.findByProjectIdAndUserId(projectId, userId);
 
         List<ProjectMember> members = projectMemberService.findAllByProjectIdOrderByRole(projectId);
 
-        List<GetAllMembersResponse.MemberInfo> memberInfos = members.stream()
-                .map(member -> GetAllMembersResponse.MemberInfo.of(member, member.getUser()))
+        List<GetAllProjectMembersResponse.ProjectMemberInfo> memberInfos = members.stream()
+                .map(member -> GetAllProjectMembersResponse.ProjectMemberInfo.of(member, member.getUser()))
                 .toList();
 
-        return GetAllMembersResponse.of(memberInfos);
+        return GetAllProjectMembersResponse.of(memberInfos);
     }
 
     @Transactional
-    public void inviteMember(final Long userId, final Long projectId, final InviteMemberRequest request) {
+    public void inviteMember(final Long userId, final Long projectId, final InviteProjectMemberRequest request) {
         ProjectMember myMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
 
         if (myMember.getRole() == ProjectMemberRole.VIEWER) {
@@ -62,7 +62,7 @@ public class ProjectMemberFacade {
 
     @Transactional
     public void updateMemberRole(final Long userId, final Long projectId, final Long memberId,
-                                 final UpdateMemberRoleRequest request) {
+                                 final UpdateProjectMemberRoleRequest request) {
         ProjectMember myMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
 
         if (!myMember.isOwner()) {
