@@ -9,8 +9,11 @@ import kr.flowmeet.domain.user.entity.User;
 public record GetAllProjectMembersResponse(
         List<ProjectMemberInfo> members
 ) {
-    public static GetAllProjectMembersResponse of(final List<ProjectMemberInfo> members) {
-        return new GetAllProjectMembersResponse(members);
+    public static GetAllProjectMembersResponse from(final List<ProjectMember> members) {
+        List<ProjectMemberInfo> memberInfos = members.stream()
+                .map(member -> ProjectMemberInfo.of(member, member.getUser()))
+                .toList();
+        return new GetAllProjectMembersResponse(memberInfos);
     }
 
     public record ProjectMemberInfo(

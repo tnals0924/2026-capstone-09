@@ -29,11 +29,7 @@ public class ProjectMemberFacade {
 
         List<ProjectMember> members = projectMemberService.findAllByProjectIdOrderByRole(requesterMember.getProjectId());
 
-        List<GetAllProjectMembersResponse.ProjectMemberInfo> memberInfos = members.stream()
-                .map(member -> GetAllProjectMembersResponse.ProjectMemberInfo.of(member, member.getUser()))
-                .toList();
-
-        return GetAllProjectMembersResponse.of(memberInfos);
+        return GetAllProjectMembersResponse.from(members);
     }
 
     @Transactional
