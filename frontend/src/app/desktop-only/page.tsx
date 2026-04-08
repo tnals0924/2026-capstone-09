@@ -1,4 +1,15 @@
+'use client';
+
+import { useEffect } from 'react';
+
 export default function DesktopOnlyPage() {
+  useEffect(() => {
+    document.body.classList.add('desktop-only-page');
+    return () => {
+      document.body.classList.remove('desktop-only-page');
+    };
+  }, []);
+
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center gap-6 p-8 text-center">
       <svg
