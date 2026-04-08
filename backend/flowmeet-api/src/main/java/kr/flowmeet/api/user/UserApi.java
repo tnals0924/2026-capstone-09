@@ -14,6 +14,7 @@ import kr.flowmeet.api.user.dto.UpdateUserRequest;
 import kr.flowmeet.api.user.dto.UpdateUserResponse;
 import kr.flowmeet.auth.annotation.UserId;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
+import kr.flowmeet.external.file.exception.FileStorageErrorCode;
 
 @Tag(name = "User")
 public interface UserApi {
@@ -26,7 +27,7 @@ public interface UserApi {
     CommonResponse<UpdateUserResponse> updateMe(@UserId Long userId, @Valid @RequestBody UpdateUserRequest request);
 
     @Operation(summary = "프로필 이미지 변경", description = "png, jpeg, webp만 허용 (최대 5MB)")
-    @ApiErrorCode(code = UserErrorCode.class, names = {"FILE_SIZE_EXCEEDED", "FILE_INVALID_TYPE"})
+    @ApiErrorCode(code = FileStorageErrorCode.class, names = {"FILE_SIZE_EXCEEDED", "FILE_INVALID_TYPE"})
     CommonResponse<UpdateProfileImageResponse> updateProfileImage(@UserId Long userId, @RequestPart MultipartFile file);
 
     @Operation(summary = "회원 탈퇴", description = "소유 중인 프로젝트가 있으면 탈퇴할 수 없습니다.")
