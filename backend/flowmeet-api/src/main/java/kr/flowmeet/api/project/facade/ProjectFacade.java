@@ -1,4 +1,4 @@
-package kr.flowmeet.api.project;
+package kr.flowmeet.api.project.facade;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;

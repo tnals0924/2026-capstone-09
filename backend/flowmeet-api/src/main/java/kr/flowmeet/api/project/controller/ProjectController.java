@@ -1,4 +1,4 @@
-package kr.flowmeet.api.project;
+package kr.flowmeet.api.project.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.common.dto.PageResponse;
+import kr.flowmeet.api.project.api.ProjectApi;
 import kr.flowmeet.api.project.dto.CreateProjectRequest;
+import kr.flowmeet.api.project.facade.ProjectFacade;
 import kr.flowmeet.api.project.dto.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.GetProjectResponse;
 import kr.flowmeet.api.project.dto.ProjectSummary;
