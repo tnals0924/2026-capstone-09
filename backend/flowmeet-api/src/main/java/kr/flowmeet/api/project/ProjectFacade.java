@@ -77,7 +77,8 @@ public class ProjectFacade {
 
     @Transactional
     public void updateProject(final Long userId, final Long projectId, final UpdateProjectRequest request) {
-        validateMemberCanEdit(projectId, userId);
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanEdit(requesterMember);
 
         Project project = projectService.findById(projectId);
         project.updateName(request.name());
@@ -85,7 +86,8 @@ public class ProjectFacade {
 
     @Transactional
     public void deleteProject(final Long userId, final Long projectId) {
-        validateMemberCanDeleteProject(projectId, userId);
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanDeleteProject(requesterMember);
 
         Project project = projectService.findById(projectId);
         projectService.delete(project);
@@ -97,18 +99,14 @@ public class ProjectFacade {
         urls.forEach(projectUrlService::delete);
     }
 
-    private void validateMemberCanEdit(final Long projectId, final Long userId) {
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (requesterMember.getRole() == ProjectMemberRole.VIEWER) {
+    private void validateMemberCanEdit(final ProjectMember member) {
+        if (member.getRole() == ProjectMemberRole.VIEWER) {
             throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
         }
     }
 
-    private void validateMemberCanDeleteProject(final Long projectId, final Long userId) {
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (!requesterMember.isOwner()) {
+    private void validateMemberCanDeleteProject(final ProjectMember member) {
+        if (!member.isOwner()) {
             throw new BusinessException(ProjectErrorCode.PROJECT_DELETE_FORBIDDEN);
         }
     }

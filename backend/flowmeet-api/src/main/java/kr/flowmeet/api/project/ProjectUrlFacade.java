@@ -23,7 +23,8 @@ public class ProjectUrlFacade {
 
     @Transactional
     public ProjectUrlResponse addUrl(final Long userId, final Long projectId, final ProjectUrlRequest request) {
-        validateMemberCanEdit(projectId, userId);
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanEdit(requesterMember);
 
         ProjectUrl projectUrl = projectUrlService.create(
                 ProjectUrl.builder()
@@ -38,7 +39,8 @@ public class ProjectUrlFacade {
     @Transactional
     public ProjectUrlResponse updateUrl(final Long userId, final Long projectId, final Long urlId,
                                         final ProjectUrlRequest request) {
-        validateMemberCanEdit(projectId, userId);
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanEdit(requesterMember);
 
         ProjectUrl projectUrl = projectUrlService.findByIdAndProjectId(urlId, projectId);
         projectUrl.updateUrl(request.url());
@@ -48,16 +50,15 @@ public class ProjectUrlFacade {
 
     @Transactional
     public void deleteUrl(final Long userId, final Long projectId, final Long urlId) {
-        validateMemberCanEdit(projectId, userId);
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanEdit(requesterMember);
 
         ProjectUrl projectUrl = projectUrlService.findByIdAndProjectId(urlId, projectId);
         projectUrlService.delete(projectUrl);
     }
 
-    private void validateMemberCanEdit(final Long projectId, final Long userId) {
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
-
-        if (requesterMember.getRole() == ProjectMemberRole.VIEWER) {
+    private void validateMemberCanEdit(final ProjectMember member) {
+        if (member.getRole() == ProjectMemberRole.VIEWER) {
             throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
         }
     }
