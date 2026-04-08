@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const MOBILE_UA = /android|iphone|ipad|ipod|blackberry|windows phone/i;
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const ua = request.headers.get('user-agent') ?? '';
 
   if (MOBILE_UA.test(ua) && !ua.includes('Electron')) {
