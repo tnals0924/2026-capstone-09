@@ -27,11 +27,11 @@ export default function TokenCheckPage() {
           <div className="bg-theme---primary-60 flex h-24 w-24 items-end rounded-lg p-2">
             <span className="text-xs font-medium text-white">primary</span>
           </div>
-          <div className="bg-secondary flex h-24 w-24 items-end rounded-lg p-2">
-            <span className="text-secondary-foreground text-xs font-medium">secondary</span>
+          <div className="bg-atomic---neutral---40 flex h-24 w-24 items-end rounded-lg p-2">
+            <span className="text-xs font-medium text-white">atomic neutral</span>
           </div>
-          <div className="bg-muted flex h-24 w-24 items-end rounded-lg p-2">
-            <span className="text-muted-foreground text-xs font-medium">muted</span>
+          <div className="bg-theme---label---normal flex h-24 w-24 items-end rounded-lg p-2">
+            <span className="text-xs font-medium text-white">label</span>
           </div>
         </div>
         <p className="text-muted-foreground text-sm">
