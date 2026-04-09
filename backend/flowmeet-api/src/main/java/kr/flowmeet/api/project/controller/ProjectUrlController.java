@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
-import kr.flowmeet.api.project.api.ProjectUrlApi;
 import kr.flowmeet.api.project.dto.ProjectUrlRequest;
 import kr.flowmeet.api.project.facade.ProjectUrlFacade;
 import kr.flowmeet.api.project.dto.ProjectUrlResponse;

@@ -1,4 +1,4 @@
-package kr.flowmeet.api.project.api;
+package kr.flowmeet.api.project.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

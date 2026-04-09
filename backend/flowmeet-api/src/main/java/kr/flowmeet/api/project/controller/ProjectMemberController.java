@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
-import kr.flowmeet.api.project.api.ProjectMemberApi;
 import kr.flowmeet.api.project.dto.GetAllProjectMembersResponse;
 import kr.flowmeet.api.project.facade.ProjectMemberFacade;
 import kr.flowmeet.api.project.dto.InviteProjectMemberRequest;

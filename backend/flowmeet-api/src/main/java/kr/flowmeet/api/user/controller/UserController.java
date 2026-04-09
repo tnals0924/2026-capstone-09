@@ -1,6 +1,7 @@
-package kr.flowmeet.api.user;
+package kr.flowmeet.api.user.controller;
 
 import jakarta.validation.Valid;
+import kr.flowmeet.api.user.facade.UserFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;

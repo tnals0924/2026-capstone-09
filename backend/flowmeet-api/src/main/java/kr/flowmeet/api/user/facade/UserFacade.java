@@ -1,4 +1,4 @@
-package kr.flowmeet.api.user;
+package kr.flowmeet.api.user.facade;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
