@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import '@/styles/globals.css';
+import { rootVariablesCss } from '@/styles/tokens';
 
 export const metadata: Metadata = {
   title: 'FlowMeet',
@@ -13,6 +14,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <style>{rootVariablesCss}</style>
+      </head>
       <body className="antialiased">{children}</body>
     </html>
   );
