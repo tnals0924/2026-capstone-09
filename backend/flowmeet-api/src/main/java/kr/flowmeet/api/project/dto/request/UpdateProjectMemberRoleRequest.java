@@ -1,4 +1,4 @@
-package kr.flowmeet.api.project.dto;
+package kr.flowmeet.api.project.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;

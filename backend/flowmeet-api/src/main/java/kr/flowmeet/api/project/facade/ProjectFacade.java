@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.api.common.dto.PageResponse;
 import kr.flowmeet.api.common.exception.ApiException;
-import kr.flowmeet.api.project.dto.CreateProjectRequest;
-import kr.flowmeet.api.project.dto.CreateProjectResponse;
-import kr.flowmeet.api.project.dto.GetProjectResponse;
-import kr.flowmeet.api.project.dto.ProjectSummary;
-import kr.flowmeet.api.project.dto.UpdateProjectRequest;
+import kr.flowmeet.api.project.dto.request.CreateProjectRequest;
+import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
+import kr.flowmeet.api.project.dto.response.GetProjectResponse;
+import kr.flowmeet.api.project.dto.response.ProjectSummaryResponse;
+import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
@@ -56,12 +56,12 @@ public class ProjectFacade {
         return CreateProjectResponse.from(project);
     }
 
-    public PageResponse<ProjectSummary> getAllProjects(final Long userId, final String search,
-                                                        final ProjectSortType sort,
-                                                        final int page, final int size) {
+    public PageResponse<ProjectSummaryResponse> getAllProjects(final Long userId, final String search,
+                                                               final ProjectSortType sort,
+                                                               final int page, final int size) {
         Page<ProjectWithMemberCountProjection> results = projectService.findAllByUserId(userId, search, sort, page, size);
 
-        return PageResponse.from(results).map(ProjectSummary::from);
+        return PageResponse.from(results).map(ProjectSummaryResponse::from);
     }
 
     public GetProjectResponse getProject(final Long userId, final Long projectId) {

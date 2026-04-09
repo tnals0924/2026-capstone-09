@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.common.swagger.ApiErrorCode;
-import kr.flowmeet.api.project.dto.GetAllProjectMembersResponse;
-import kr.flowmeet.api.project.dto.InviteProjectMemberRequest;
-import kr.flowmeet.api.project.dto.UpdateProjectMemberRoleRequest;
+import kr.flowmeet.api.project.dto.response.GetAllProjectMembersResponse;
+import kr.flowmeet.api.project.dto.request.InviteProjectMemberRequest;
+import kr.flowmeet.api.project.dto.request.UpdateProjectMemberRoleRequest;
 import kr.flowmeet.auth.annotation.UserId;
 import kr.flowmeet.domain.project.exception.ProjectErrorCode;
 

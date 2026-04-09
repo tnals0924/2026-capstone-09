@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.common.dto.PageResponse;
 import kr.flowmeet.api.common.swagger.ApiErrorCode;
-import kr.flowmeet.api.project.dto.CreateProjectRequest;
-import kr.flowmeet.api.project.dto.CreateProjectResponse;
-import kr.flowmeet.api.project.dto.GetProjectResponse;
-import kr.flowmeet.api.project.dto.ProjectSummary;
-import kr.flowmeet.api.project.dto.UpdateProjectRequest;
+import kr.flowmeet.api.project.dto.request.CreateProjectRequest;
+import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
+import kr.flowmeet.api.project.dto.response.GetProjectResponse;
+import kr.flowmeet.api.project.dto.response.ProjectSummaryResponse;
+import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
 import kr.flowmeet.auth.annotation.UserId;
 import kr.flowmeet.domain.project.exception.ProjectErrorCode;
 import kr.flowmeet.domain.project.service.ProjectSortType;
@@ -26,7 +26,7 @@ public interface ProjectApi {
                                                         @Valid @RequestBody CreateProjectRequest request);
 
     @Operation(summary = "프로젝트 목록 조회", description = "검색어, 정렬(LATEST/NAME), 페이징을 지원합니다.")
-    CommonResponse<PageResponse<ProjectSummary>> getAllProjects(
+    CommonResponse<PageResponse<ProjectSummaryResponse>> getAllProjects(
             @UserId Long userId,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "LATEST") ProjectSortType sort,

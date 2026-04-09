@@ -1,4 +1,4 @@
-package kr.flowmeet.api.user.dto;
+package kr.flowmeet.api.user.dto.response;
 
 import kr.flowmeet.domain.user.entity.User;
 

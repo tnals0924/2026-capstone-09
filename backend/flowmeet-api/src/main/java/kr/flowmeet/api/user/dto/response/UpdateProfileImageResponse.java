@@ -1,4 +1,4 @@
-package kr.flowmeet.api.user.dto;
+package kr.flowmeet.api.user.dto.response;
 
 public record UpdateProfileImageResponse(
         String profileImageUrl

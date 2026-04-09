@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.common.dto.PageResponse;
-import kr.flowmeet.api.project.dto.CreateProjectRequest;
+import kr.flowmeet.api.project.dto.request.CreateProjectRequest;
 import kr.flowmeet.api.project.facade.ProjectFacade;
-import kr.flowmeet.api.project.dto.CreateProjectResponse;
-import kr.flowmeet.api.project.dto.GetProjectResponse;
-import kr.flowmeet.api.project.dto.ProjectSummary;
-import kr.flowmeet.api.project.dto.UpdateProjectRequest;
+import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
+import kr.flowmeet.api.project.dto.response.GetProjectResponse;
+import kr.flowmeet.api.project.dto.response.ProjectSummaryResponse;
+import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
 import kr.flowmeet.auth.annotation.UserId;
 import kr.flowmeet.domain.project.service.ProjectSortType;
 
@@ -38,7 +38,7 @@ public class ProjectController implements ProjectApi {
 
     @Override
     @GetMapping
-    public CommonResponse<PageResponse<ProjectSummary>> getAllProjects(
+    public CommonResponse<PageResponse<ProjectSummaryResponse>> getAllProjects(
             @UserId Long userId,
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "LATEST") ProjectSortType sort,

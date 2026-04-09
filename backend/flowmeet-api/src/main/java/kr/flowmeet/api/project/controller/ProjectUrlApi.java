@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.common.swagger.ApiErrorCode;
-import kr.flowmeet.api.project.dto.ProjectUrlRequest;
-import kr.flowmeet.api.project.dto.ProjectUrlResponse;
+import kr.flowmeet.api.project.dto.request.ProjectUrlRequest;
+import kr.flowmeet.api.project.dto.response.ProjectUrlResponse;
 import kr.flowmeet.auth.annotation.UserId;
 import kr.flowmeet.domain.project.exception.ProjectErrorCode;
 

@@ -1,5 +1,5 @@
 
-package kr.flowmeet.api.project.dto;
+package kr.flowmeet.api.project.dto.response;
 
 import java.util.List;
 import kr.flowmeet.domain.project.entity.ProjectMember;

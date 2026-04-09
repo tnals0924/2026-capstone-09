@@ -1,4 +1,4 @@
-package kr.flowmeet.api.project.dto;
+package kr.flowmeet.api.project.dto.response;
 
 import kr.flowmeet.domain.project.entity.ProjectUrl;
 

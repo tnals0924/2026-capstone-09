@@ -1,4 +1,4 @@
-package kr.flowmeet.api.user.dto;
+package kr.flowmeet.api.user.dto.response;
 
 import java.time.LocalDateTime;
 import kr.flowmeet.domain.user.entity.User;
