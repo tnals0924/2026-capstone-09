@@ -24,8 +24,8 @@ export default function TokenCheckPage() {
       <section className="space-y-4">
         <h2 className="text-foreground text-2xl font-bold">2. 색상 토큰</h2>
         <div className="flex flex-wrap gap-3">
-          <div className="bg-primary flex h-24 w-24 items-end rounded-lg p-2">
-            <span className="text-primary-foreground text-xs font-medium">primary</span>
+          <div className="bg-theme---primary-60 flex h-24 w-24 items-end rounded-lg p-2">
+            <span className="text-xs font-medium text-white">primary</span>
           </div>
           <div className="bg-secondary flex h-24 w-24 items-end rounded-lg p-2">
             <span className="text-secondary-foreground text-xs font-medium">secondary</span>
@@ -50,14 +50,39 @@ export default function TokenCheckPage() {
 
       {/* ── 3. 타이포그래피 토큰 확인 ── */}
       <section className="space-y-2">
-        <h2 className="text-foreground text-2xl font-bold">3. 타이포그래피 토큰</h2>
-        <p className="text-foreground text-xs">text-xs (12px) — 작은 보조 텍스트</p>
-        <p className="text-foreground text-sm">text-sm (14px) — 캡션, 레이블</p>
-        <p className="text-foreground text-base">text-base (16px) — 본문 기본</p>
-        <p className="text-foreground text-lg">text-lg (18px) — 서브헤딩</p>
-        <p className="text-foreground text-xl">text-xl (20px) — 헤딩</p>
-        <p className="text-foreground text-2xl">text-2xl (24px) — 큰 헤딩</p>
-        <p className="text-foreground text-3xl">text-3xl (30px) — 디스플레이</p>
+        <h2 className="text-display-1">타이포 확인</h2>
+        {/* Display */}
+        <p className="text-display-1">디스플레이 1</p>
+        <p className="text-display-2">디스플레이 2</p>
+        <p className="text-display-3">디스플레이 3</p>
+
+        {/* Title */}
+        <p className="text-title-1">타이틀 1</p>
+        <p className="text-title-2">타이틀 2</p>
+        <p className="text-title-3">타이틀 3</p>
+
+        {/* Heading */}
+        <p className="text-heading-1">헤딩 1</p>
+        <p className="text-heading-2">헤딩 2</p>
+
+        {/* Headline */}
+        <p className="text-headline-1">헤드라인 1</p>
+        <p className="text-headline-2">헤드라인 2</p>
+
+        {/* Body */}
+        <p className="text-body-1">바디 1</p>
+        <p className="text-body-1-reading">바디 1 리딩</p>
+        <p className="text-body-2">바디 2</p>
+        <p className="text-body-2-reading">바디 2 리딩</p>
+
+        {/* Label */}
+        <p className="text-label-1">라벨 1</p>
+        <p className="text-label-1-reading">라벨 1 리딩</p>
+        <p className="text-label-2">라벨 2</p>
+
+        {/* Caption */}
+        <p className="text-caption-1">캡션 1</p>
+        <p className="text-caption-2">캡션 2</p>
         <p className="text-muted-foreground mt-2 text-sm">
           ✅ 크기 단계가 일정하게 구분되면 타이포그래피 토큰 정상 적용
         </p>
