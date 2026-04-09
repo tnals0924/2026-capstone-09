@@ -82,6 +82,8 @@ private Node node;
 ## DTO (record)
 
 - 모든 DTO는 `record`로 선언
+- `dto` 패키지 하위에 `request` / `response` 패키지를 둔다
+- DTO 이름 접미사는 요청/응답에 맞게 `Request` / `Response`를 붙인다
 - 정적 팩토리 메서드: `of()` (컬렉션/복합 변환), `from()` (단일 변환)
 - 중첩 record 지원:
 
