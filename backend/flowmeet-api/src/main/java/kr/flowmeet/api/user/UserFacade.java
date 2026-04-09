@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.user.dto.GetUserResponse;
 import kr.flowmeet.api.user.dto.UpdateProfileImageResponse;
 import kr.flowmeet.api.user.dto.UpdateUserRequest;
 import kr.flowmeet.api.user.dto.UpdateUserResponse;
-import kr.flowmeet.domain.exception.BusinessException;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
@@ -58,7 +58,7 @@ public class UserFacade {
     @Transactional
     public void deleteMe(final Long userId) {
         if (projectMemberService.existsOwnerProject(userId)) {
-            throw new BusinessException(UserErrorCode.USER_IS_PROJECT_OWNER);
+            throw new ApiException(UserErrorCode.USER_IS_PROJECT_OWNER);
         }
 
         User user = userService.findById(userId);

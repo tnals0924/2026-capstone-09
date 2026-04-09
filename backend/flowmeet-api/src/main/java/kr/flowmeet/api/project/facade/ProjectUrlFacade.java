@@ -3,9 +3,9 @@ package kr.flowmeet.api.project.facade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.project.dto.ProjectUrlRequest;
 import kr.flowmeet.api.project.dto.ProjectUrlResponse;
-import kr.flowmeet.domain.exception.BusinessException;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.project.entity.ProjectUrl;
@@ -59,7 +59,7 @@ public class ProjectUrlFacade {
 
     private void validateMemberCanEdit(final ProjectMember member) {
         if (member.getRole() == ProjectMemberRole.VIEWER) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
+            throw new ApiException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
         }
     }
 }

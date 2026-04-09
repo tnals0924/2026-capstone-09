@@ -6,12 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.api.common.dto.PageResponse;
+import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.project.dto.CreateProjectRequest;
 import kr.flowmeet.api.project.dto.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.GetProjectResponse;
 import kr.flowmeet.api.project.dto.ProjectSummary;
 import kr.flowmeet.api.project.dto.UpdateProjectRequest;
-import kr.flowmeet.domain.exception.BusinessException;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
@@ -101,13 +101,13 @@ public class ProjectFacade {
 
     private void validateMemberCanEdit(final ProjectMember member) {
         if (member.getRole() == ProjectMemberRole.VIEWER) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
+            throw new ApiException(ProjectErrorCode.PROJECT_ACCESS_DENIED);
         }
     }
 
     private void validateMemberCanDeleteProject(final ProjectMember member) {
         if (!member.isOwner()) {
-            throw new BusinessException(ProjectErrorCode.PROJECT_DELETE_FORBIDDEN);
+            throw new ApiException(ProjectErrorCode.PROJECT_DELETE_FORBIDDEN);
         }
     }
 }
