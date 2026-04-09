@@ -4,16 +4,14 @@ import java.time.LocalDateTime;
 import kr.flowmeet.domain.user.entity.User;
 
 public record GetUserResponse(
-        String primaryEmail,
-        String secondaryEmail,
+        String email,
         String nickname,
         String profileImageUrl,
         LocalDateTime createdAt
 ) {
     public static GetUserResponse from(final User user) {
         return new GetUserResponse(
-                user.getPrimaryEmail(),
-                user.getSecondEmail(),
+                user.getEmail(),
                 user.getNickname(),
                 user.getProfileImageUrl(),
                 user.getCreatedAt()

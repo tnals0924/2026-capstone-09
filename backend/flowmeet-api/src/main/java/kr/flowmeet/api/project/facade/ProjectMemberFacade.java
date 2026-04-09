@@ -36,7 +36,7 @@ public class ProjectMemberFacade {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
         validateProjectMemberIsViewer(requesterMember);
 
-        User invitee = userService.findByPrimaryEmail(request.email());
+        User invitee = userService.findByEmail(request.email());
 
         validateProjectMemberAlreadyExists(projectId, invitee.getId());
 

@@ -10,6 +10,6 @@ public record UpdateUserRequest(
         @NotBlank(message = "닉네임은 필수로 입력해 주세요.")
         String nickname,
         @Email(message = "유효하지 않은 이메일 형식입니다.")
-        String secondaryEmail
+        String email
 ) {
 }

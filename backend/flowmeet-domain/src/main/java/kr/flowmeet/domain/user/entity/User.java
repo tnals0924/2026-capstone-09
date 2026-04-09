@@ -27,11 +27,11 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "primary_email", nullable = false, unique = true)
-    private String primaryEmail;
+    @Column(name = "social_email", nullable = false, unique = true)
+    private String socialEmail;
 
-    @Column(name = "second_email")
-    private String secondEmail;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
 
     @Column(name = "social_id", nullable = false)
     private String socialId;
@@ -43,10 +43,10 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
 
     @Builder
-    public User(String primaryEmail, String secondEmail,
+    public User(String socialEmail, String email,
                 String socialId, String nickname, String profileImageUrl) {
-        this.primaryEmail = primaryEmail;
-        this.secondEmail = secondEmail;
+        this.socialEmail = socialEmail;
+        this.email = email;
         this.socialId = socialId;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -56,8 +56,8 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
     }
 
-    public void updateSecondEmail(final String secondEmail) {
-        this.secondEmail = secondEmail;
+    public void updateEmail(final String email) {
+        this.email = email;
     }
 
     public void updateProfileImageUrl(final String profileImageUrl) {

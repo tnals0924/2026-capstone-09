@@ -38,8 +38,8 @@ public class UserFacade {
             user.updateNickname(request.nickname());
         }
 
-        if (request.secondaryEmail() != null) {
-            user.updateSecondEmail(request.secondaryEmail());
+        if (request.email() != null) {
+            user.updateEmail(request.email());
         }
 
         return UpdateUserResponse.from(user);

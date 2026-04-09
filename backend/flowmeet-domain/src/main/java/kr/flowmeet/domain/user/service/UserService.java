@@ -20,8 +20,13 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    public User findByPrimaryEmail(final String email) {
-        return userRepository.findByPrimaryEmail(email)
+    public User findBySocialEmail(final String socialEmail) {
+        return userRepository.findBySocialEmail(socialEmail)
+                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    public User findByEmail(final String email) {
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 

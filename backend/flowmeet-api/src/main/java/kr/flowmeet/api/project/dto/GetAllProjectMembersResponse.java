@@ -29,7 +29,7 @@ public record GetAllProjectMembersResponse(
                     member.getId(),
                     user.getId(),
                     user.getNickname(),
-                    user.getPrimaryEmail(),
+                    user.getEmail(),
                     user.getProfileImageUrl(),
                     member.getRole()
             );
