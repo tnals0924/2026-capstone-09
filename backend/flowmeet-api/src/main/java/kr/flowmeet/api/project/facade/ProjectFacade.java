@@ -12,6 +12,8 @@ import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.response.GetProjectResponse;
 import kr.flowmeet.api.project.dto.response.ProjectSummaryResponse;
 import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
+import kr.flowmeet.domain.notification.entity.NotificationSetting;
+import kr.flowmeet.domain.notification.service.NotificationSettingService;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
@@ -34,6 +36,7 @@ public class ProjectFacade {
     private final ProjectService projectService;
     private final ProjectMemberService projectMemberService;
     private final ProjectUrlService projectUrlService;
+    private final NotificationSettingService notificationSettingService;
 
     @Transactional
     public CreateProjectResponse createProject(final Long userId, final CreateProjectRequest request) {
@@ -50,6 +53,13 @@ public class ProjectFacade {
                         .projectId(project.getId())
                         .userId(user.getId())
                         .role(ProjectMemberRole.OWNER)
+                        .build()
+        );
+
+        notificationSettingService.create(
+                NotificationSetting.builder()
+                        .userId(user.getId())
+                        .projectId(project.getId())
                         .build()
         );
 
@@ -97,6 +107,9 @@ public class ProjectFacade {
 
         List<ProjectUrl> urls = projectUrlService.findAllByProjectId(project.getId());
         urls.forEach(projectUrlService::delete);
+
+        List<NotificationSetting> settings = notificationSettingService.findAllByProjectId(project.getId());
+        settings.forEach(notificationSettingService::delete);
     }
 
     private void validateMemberCanEdit(final ProjectMember member) {

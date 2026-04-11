@@ -4,14 +4,23 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
 import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.project.dto.response.GetAllProjectMembersResponse;
 import kr.flowmeet.api.project.dto.request.InviteProjectMemberRequest;
 import kr.flowmeet.api.project.dto.request.UpdateProjectMemberRoleRequest;
+import kr.flowmeet.domain.notification.entity.Notification;
+import kr.flowmeet.domain.notification.entity.NotificationSetting;
+import kr.flowmeet.domain.notification.entity.NotificationType;
+import kr.flowmeet.domain.notification.event.NotificationCreatedEvent;
+import kr.flowmeet.domain.notification.service.NotificationService;
+import kr.flowmeet.domain.notification.service.NotificationSettingService;
+import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.project.exception.ProjectErrorCode;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
+import kr.flowmeet.domain.project.service.ProjectService;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.service.UserService;
 
@@ -21,7 +30,11 @@ import kr.flowmeet.domain.user.service.UserService;
 public class ProjectMemberFacade {
 
     private final UserService userService;
+    private final ProjectService projectService;
     private final ProjectMemberService projectMemberService;
+    private final NotificationService notificationService;
+    private final NotificationSettingService notificationSettingService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public GetAllProjectMembersResponse getAllMembers(final Long userId, final Long projectId) {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
@@ -36,7 +49,9 @@ public class ProjectMemberFacade {
         ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
         validateProjectMemberIsViewer(requesterMember);
 
+        User requester = userService.findById(userId);
         User invitee = userService.findByEmail(request.email());
+        Project project = projectService.findById(projectId);
 
         validateProjectMemberAlreadyExists(projectId, invitee.getId());
 
@@ -47,6 +62,24 @@ public class ProjectMemberFacade {
                         .role(ProjectMemberRole.MEMBER)
                         .build()
         );
+
+        notificationSettingService.create(
+                NotificationSetting.builder()
+                        .userId(invitee.getId())
+                        .projectId(projectId)
+                        .build()
+        );
+
+        Notification notification = notificationService.create(
+                Notification.builder()
+                        .userId(invitee.getId())
+                        .type(NotificationType.MEMBER_INVITE)
+                        .content(NotificationType.MEMBER_INVITE.formatContent(requester.getNickname(), project.getName()))
+                        .projectId(projectId)
+                        .build()
+        );
+
+        eventPublisher.publishEvent(new NotificationCreatedEvent(notification));
     }
 
     @Transactional
