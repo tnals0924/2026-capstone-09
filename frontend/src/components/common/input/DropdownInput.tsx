@@ -273,7 +273,9 @@ export const DropdownInput = ({
             sx={{ width: triggerWidth, minWidth: '140px' }}
           >
             <MenuList>
-              {options.map((option) => (
+              {options.map((option) => {
+                const isSelected = selectedValues.includes(option.value);
+                return (
                 <MenuItem
                   key={option.value}
                   value={option.value}
@@ -298,9 +300,16 @@ export const DropdownInput = ({
                     )
                   }
                 >
-                  {option.label}
+                  <span
+                    style={{
+                      color: isSelected ? '#33EBC3' : 'inherit',
+                    }}
+                  >
+                    {option.label}
+                  </span>
                 </MenuItem>
-              ))}
+              );
+              })}
             </MenuList>
           </MenuContent>
         </Menu>

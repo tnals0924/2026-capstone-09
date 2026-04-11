@@ -24,7 +24,7 @@ export function useVisibleBadgeCount(
   iconRef: RefObject<HTMLDivElement | null>,
   plusBadgeRef: RefObject<HTMLDivElement | null>
 ) {
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [visibleCount, setVisibleCount] = useState(selectedOptions.length);
 
   const calculateCount = useCallback(() => {
     // selectedOptions가 없으면 0으로 설정
