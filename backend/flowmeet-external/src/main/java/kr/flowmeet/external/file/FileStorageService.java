@@ -1,8 +1,14 @@
 package kr.flowmeet.external.file;
 
-import org.springframework.web.multipart.MultipartFile;
+import java.net.URL;
 
 public interface FileStorageService {
 
-    String uploadProfileImage(Long userId, MultipartFile file);
+    URL generatePresignedUrl(String fileKey, String contentType);
+
+    boolean doesObjectExist(String fileKey);
+
+    void deleteObject(String fileKey);
+
+    String getPublicUrl(String fileKey);
 }
