@@ -2,6 +2,7 @@
 /* @import 'pretendard/dist/web/static/pretendard.css'; */
 @import './variables.css';
 @import 'tailwindcss';
+@import './typography-utilities.css';
 
 :root {
   --text-display-1: var(--typography---display1---font-size);

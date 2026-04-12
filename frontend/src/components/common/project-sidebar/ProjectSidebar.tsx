@@ -75,7 +75,7 @@ export const ProjectSidebar = ({
 
   return (
     <motion.aside
-      className="h-screen shrink-0 overflow-hidden border-r border-[rgba(112,115,124,0.16)] bg-[rgba(247,247,248,1)] px-4 py-2"
+      className="h-screen shrink-0 overflow-hidden border-r border-[#70737c29] bg-[#f7f7f8] px-4 py-2"
       initial={false}
       animate={{ width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH }}
       transition={{ duration: 0.24, ease: 'easeInOut' }}
@@ -83,7 +83,7 @@ export const ProjectSidebar = ({
       <div className="flex h-full flex-col justify-between">
         <div className="flex flex-col gap-4">
           <div
-            className={`border-b border-[rgba(112,115,124,0.16)] ${
+            className={`border-b border-[#70737c29] ${
               shouldUseCollapsedLayout
                 ? 'flex flex-col items-center justify-center gap-3 pt-5 pb-2'
                 : 'flex items-center justify-between py-5 pl-2'
@@ -102,7 +102,7 @@ export const ProjectSidebar = ({
                   opacity: isCollapsed ? 0 : 1,
                 }}
                 transition={{ duration: 0.16, ease: 'easeInOut' }}
-                className="overflow-hidden whitespace-nowrap text-center text-[1.5rem] font-medium leading-[2.201rem] tracking-[0.014rem] text-[#686868]"
+                className="overflow-hidden whitespace-nowrap text-center text-title-3 font-medium text-[#686868]"
               >
                 {projectName}
               </motion.div>
@@ -112,7 +112,7 @@ export const ProjectSidebar = ({
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
-                className="grid h-[18px] w-[18px] place-items-center text-[rgba(23,23,25,0.52)] hover:text-[rgba(23,23,25,0.72)]"
+                className="grid h-[18px] w-[18px] place-items-center text-[#17171985] hover:text-[#171719b8]"
                 aria-label="사이드바 접기"
               >
                 <IconLeftSide
@@ -125,7 +125,7 @@ export const ProjectSidebar = ({
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
-                className="flex h-14 w-full items-center justify-center overflow-hidden rounded-[6px] px-4 py-4 text-[rgba(23,23,25,0.52)] hover:bg-[rgba(112,115,124,0.05)]"
+                className="flex h-14 w-full items-center justify-center overflow-hidden rounded-[6px] px-4 py-4 text-[#17171985] hover:bg-[#70737c0d]"
                 aria-label="사이드바 펼치기"
               >
                 <IconChevronDoubleLeft

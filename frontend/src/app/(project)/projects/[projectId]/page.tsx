@@ -8,7 +8,7 @@ export default function ProjectDetailPage() {
       <section className="bg---surface---canvas flex flex-1 items-center justify-center gap-3 overflow-hidden px-20 py-[100px]">
         <Link
           href="/projects"
-          className="rounded-md border border-[rgba(112,115,124,0.16)] bg-white px-4 py-2 text-[1.5rem] font-medium leading-[1.5rem] tracking-[0.014rem] text-[rgba(23,23,25,1)] hover:bg-[rgba(112,115,124,0.05)]"
+          className="rounded-md border border-[#70737c29] bg-white px-4 py-2 text-title-3 font-medium text-[#171719] hover:bg-[#70737c0d]"
         >
           뒤로가기
         </Link>
