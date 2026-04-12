@@ -6,8 +6,7 @@ import {
   IconLeftSide,
 } from '@wanteddev/wds-icon';
 import { motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { PROJECT_SIDEBAR_LAYOUT } from '@/constants/exampleConstant';
 
@@ -23,44 +22,21 @@ interface ProjectSidebarProps {
 }
 
 export const ProjectSidebar = ({ projectName, userName, userEmail }: ProjectSidebarProps) => {
-  const pathname = usePathname();
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(false);
-
-  const sidebarMode = useMemo(() => {
-    if (pathname === '/projects') return 'projectSelect';
-    if (pathname?.startsWith('/projects/')) return 'projectDetail';
-    return 'projectDetail';
-  }, [pathname]);
-
-  const shouldShowProjectMenus = sidebarMode === 'projectDetail';
-  const isCollapsible = sidebarMode !== 'projectSelect';
-  const isCollapsed = isCollapsible ? isCollapsedInternal : true;
+  const isCollapsed = isCollapsedInternal;
   const [isCollapseSettled, setIsCollapseSettled] = useState(true);
   const shouldUseCollapsedLayout = isCollapsed && isCollapseSettled;
 
   useEffect(() => {
-    if (!isCollapsed) {
-      const id = window.setTimeout(() => {
-        setIsCollapseSettled(true);
-      }, 0);
-      return () => window.clearTimeout(id);
+    if (isCollapsed) {
+      setIsCollapseSettled(false);
+      return;
     }
 
-    const idFalse = window.setTimeout(() => {
-      setIsCollapseSettled(false);
-    }, 0);
-    const idTrue = window.setTimeout(() => {
-      setIsCollapseSettled(true);
-    }, PROJECT_SIDEBAR_LAYOUT.transitionDuration * 1000);
-
-    return () => {
-      window.clearTimeout(idFalse);
-      window.clearTimeout(idTrue);
-    };
+    setIsCollapseSettled(true);
   }, [isCollapsed]);
 
   const handleToggleCollapsed = () => {
-    if (!isCollapsible) return;
     setIsCollapsedInternal((prev) => !prev);
   };
 
@@ -70,6 +46,11 @@ export const ProjectSidebar = ({ projectName, userName, userEmail }: ProjectSide
       initial={false}
       animate={{ width: isCollapsed ? 56 : 220 }}
       transition={{ duration: PROJECT_SIDEBAR_LAYOUT.transitionDuration, ease: 'easeInOut' }}
+      onAnimationComplete={() => {
+        if (isCollapsed) {
+          setIsCollapseSettled(true);
+        }
+      }}
     >
       <div className="flex h-full flex-col justify-between">
         <div className="flex flex-col gap-4">
@@ -101,7 +82,7 @@ export const ProjectSidebar = ({ projectName, userName, userEmail }: ProjectSide
               )}
             </div>
 
-            {isCollapsible && !isCollapsed && (
+            {!isCollapsed && (
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
@@ -114,7 +95,7 @@ export const ProjectSidebar = ({ projectName, userName, userEmail }: ProjectSide
                 />
               </button>
             )}
-            {isCollapsible && shouldUseCollapsedLayout && (
+            {shouldUseCollapsedLayout && (
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
@@ -129,13 +110,11 @@ export const ProjectSidebar = ({ projectName, userName, userEmail }: ProjectSide
             )}
           </div>
 
-          {shouldShowProjectMenus && (
-            <nav className={`flex flex-col gap-2 ${isCollapsed ? 'items-start' : ''}`}>
-              <SearchMenuButton isCollapsed={isCollapsed} />
-              <AlarmMenuButton isCollapsed={isCollapsed} />
-              <ProjectSettingMenuButton isCollapsed={isCollapsed} />
-            </nav>
-          )}
+          <nav className={`flex flex-col gap-2 ${isCollapsed ? 'items-start' : ''}`}>
+            <SearchMenuButton isCollapsed={isCollapsed} />
+            <AlarmMenuButton isCollapsed={isCollapsed} />
+            <ProjectSettingMenuButton isCollapsed={isCollapsed} />
+          </nav>
         </div>
 
         <div className="w-full bg-[#F6F6F6]">

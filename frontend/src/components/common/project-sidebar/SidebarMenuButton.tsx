@@ -19,9 +19,7 @@ export const SidebarMenuButton = ({
   return (
     <button
       type="button"
-      className={`flex h-14 w-full items-center overflow-hidden rounded-[6px] px-4 py-4 hover:bg-[#70737c0d] ${
-        isCollapsed ? 'justify-start' : 'justify-between'
-      }`}
+      className="flex h-14 w-full items-center justify-start overflow-hidden rounded-[6px] px-4 py-4 hover:bg-[#70737c0d]"
     >
       <span className="flex items-center gap-2 text-[#17171985]">
         <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
@@ -35,7 +33,7 @@ export const SidebarMenuButton = ({
         </motion.span>
       </span>
       {!isCollapsed && badgeText && (
-        <span className="rounded-[6px] bg-[#70737c14] px-[6px] py-[3px] text-headline-1 font-medium text-[#37383c9c]">
+        <span className="ml-auto rounded-[6px] bg-[#70737c14] px-[6px] py-[3px] text-headline-1 font-medium text-[#37383c9c]">
           {badgeText}
         </span>
       )}
