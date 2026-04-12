@@ -12,7 +12,6 @@ export default function Home() {
         text: '',
         mentions: [],
     });
-    const [submittedMessages, setSubmittedMessages] = useState<MultiSelectInputValue[]>([]);
 
     const peopleOptions = [
         {
@@ -178,9 +177,6 @@ export default function Home() {
                             nodeOptions={nodeOptions}
                             value={chatInput}
                             onChange={setChatInput}
-                            onSubmit={(value) => {
-                                setSubmittedMessages((prev) => [...prev, value]);
-                            }}
                         />
                     </div>
                 </section>
