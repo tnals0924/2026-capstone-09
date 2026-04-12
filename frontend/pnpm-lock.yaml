@@ -23,6 +23,9 @@ importers:
       '@wanteddev/wds':
         specifier: 3.4.6
         version: 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/utils@1.4.2)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+      '@wanteddev/wds-icon':
+        specifier: 3.4.6
+        version: 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/utils@1.4.2)(@types/react@19.2.14)(react@19.2.3)
       '@wanteddev/wds-nextjs':
         specifier: 3.4.6
         version: 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/server@11.11.0)(@emotion/utils@1.4.2)(@types/react@19.2.14)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
@@ -1405,10 +1408,18 @@ packages:
   '@wanteddev/wds-nextjs@3.4.6':
     resolution: {integrity: sha512-qcV2XKytAnLijLg1ZTfHUOgoolKdmIZJ9qSdVyIvxhdXBDaTOkYYU+Q2LOtJp13AlzCiTx5HZSVZFm/VvQXfgQ==, tarball: https://npm.pkg.github.com/download/@wanteddev/wds-nextjs/3.4.6/7d6b422142e3e89683062a7c0fae336510f24d92}
     peerDependencies:
+      '@emotion/cache': '*'
       '@emotion/server': ^11.11.0
       '@types/react': ^18.0.0 || ^19.0.0
       next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
       react: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@emotion/cache':
+        optional: true
+      '@emotion/server':
+        optional: true
+      '@types/react':
+        optional: true
 
   '@wanteddev/wds-theme@3.4.6':
     resolution: {integrity: sha512-3P9itxg03EDIzLAj9xfOPk7gtJWwDvI+VjIqxs3m1aKRzQUw6k+d3DzwSRJJEqUBc4iJojveRSMPVauHFiswzg==, tarball: https://npm.pkg.github.com/download/@wanteddev/wds-theme/3.4.6/0176efd2b96e5420ce00ea9ce55cfad2a7f87ea4}
@@ -1420,6 +1431,11 @@ packages:
       '@types/react-dom': ^18.0.0 || ^19.0.0
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      '@types/react-dom':
+        optional: true
 
   acorn-jsx@5.3.2:
     resolution: {integrity: sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==}
@@ -3612,6 +3628,7 @@ snapshots:
       html-tokenize: 2.0.1
       multipipe: 1.0.2
       through: 2.3.8
+    optional: true
 
   '@emotion/sheet@1.4.0': {}
 
@@ -4666,13 +4683,14 @@ snapshots:
 
   '@wanteddev/wds-nextjs@3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/server@11.11.0)(@emotion/utils@1.4.2)(@types/react@19.2.14)(next@16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)':
     dependencies:
-      '@emotion/server': 11.11.0
-      '@types/react': 19.2.14
       '@wanteddev/wds-engine': 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/utils@1.4.2)(@types/react@19.2.14)(react@19.2.3)
       next: 16.1.6(@babel/core@7.29.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       react: 19.2.3
+    optionalDependencies:
+      '@emotion/cache': 11.14.0
+      '@emotion/server': 11.11.0
+      '@types/react': 19.2.14
     transitivePeerDependencies:
-      - '@emotion/cache'
       - '@emotion/react'
       - '@emotion/serialize'
       - '@emotion/utils'
@@ -4697,8 +4715,6 @@ snapshots:
       '@radix-ui/react-use-controllable-state': 1.2.2(@types/react@19.2.14)(react@19.2.3)
       '@radix-ui/react-use-previous': 1.1.1(@types/react@19.2.14)(react@19.2.3)
       '@radix-ui/react-use-size': 1.1.1(@types/react@19.2.14)(react@19.2.3)
-      '@types/react': 19.2.14
-      '@types/react-dom': 19.2.3(@types/react@19.2.14)
       '@wanteddev/wds-engine': 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/utils@1.4.2)(@types/react@19.2.14)(react@19.2.3)
       '@wanteddev/wds-icon': 3.4.6(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.14)(react@19.2.3))(@emotion/serialize@1.3.3)(@emotion/utils@1.4.2)(@types/react@19.2.14)(react@19.2.3)
       aria-hidden: 1.2.6
@@ -4709,6 +4725,9 @@ snapshots:
       react-dom: 19.2.3(react@19.2.3)
       react-remove-scroll: 2.7.2(@types/react@19.2.14)(react@19.2.3)
       zustand: 5.0.12(@types/react@19.2.14)(react@19.2.3)(use-sync-external-store@1.6.0(react@19.2.3))
+    optionalDependencies:
+      '@types/react': 19.2.14
+      '@types/react-dom': 19.2.3(@types/react@19.2.14)
     transitivePeerDependencies:
       - '@emotion/cache'
       - '@emotion/react'
@@ -4871,7 +4890,8 @@ snapshots:
 
   buffer-crc32@0.2.13: {}
 
-  buffer-from@0.1.2: {}
+  buffer-from@0.1.2:
+    optional: true
 
   cacheable-lookup@5.0.4: {}
 
@@ -4950,7 +4970,8 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
-  core-util-is@1.0.3: {}
+  core-util-is@1.0.3:
+    optional: true
 
   cosmiconfig@7.1.0:
     dependencies:
@@ -5047,6 +5068,7 @@ snapshots:
   duplexer2@0.1.4:
     dependencies:
       readable-stream: 2.3.8
+    optional: true
 
   electron-to-chromium@1.5.313: {}
 
@@ -5640,6 +5662,7 @@ snapshots:
       minimist: 1.2.8
       readable-stream: 1.0.34
       through2: 0.4.2
+    optional: true
 
   http-cache-semantics@4.2.0: {}
 
@@ -5659,7 +5682,8 @@ snapshots:
 
   imurmurhash@0.1.4: {}
 
-  inherits@2.0.4: {}
+  inherits@2.0.4:
+    optional: true
 
   internal-slot@1.1.0:
     dependencies:
@@ -5783,9 +5807,11 @@ snapshots:
       call-bound: 1.0.4
       get-intrinsic: 1.3.0
 
-  isarray@0.0.1: {}
+  isarray@0.0.1:
+    optional: true
 
-  isarray@1.0.0: {}
+  isarray@1.0.0:
+    optional: true
 
   isarray@2.0.5: {}
 
@@ -6005,6 +6031,7 @@ snapshots:
     dependencies:
       duplexer2: 0.1.4
       object-assign: 4.1.1
+    optional: true
 
   nanoid@3.3.11: {}
 
@@ -6056,7 +6083,8 @@ snapshots:
 
   object-inspect@1.13.4: {}
 
-  object-keys@0.4.0: {}
+  object-keys@0.4.0:
+    optional: true
 
   object-keys@1.1.1: {}
 
@@ -6184,7 +6212,8 @@ snapshots:
 
   prettier@3.8.1: {}
 
-  process-nextick-args@2.0.1: {}
+  process-nextick-args@2.0.1:
+    optional: true
 
   progress@2.0.3: {}
 
@@ -6354,6 +6383,7 @@ snapshots:
       inherits: 2.0.4
       isarray: 0.0.1
       string_decoder: 0.10.31
+    optional: true
 
   readable-stream@2.3.8:
     dependencies:
@@ -6364,6 +6394,7 @@ snapshots:
       safe-buffer: 5.1.2
       string_decoder: 1.1.1
       util-deprecate: 1.0.2
+    optional: true
 
   reflect.getprototypeof@1.0.10:
     dependencies:
@@ -6442,7 +6473,8 @@ snapshots:
       has-symbols: 1.1.0
       isarray: 2.0.5
 
-  safe-buffer@5.1.2: {}
+  safe-buffer@5.1.2:
+    optional: true
 
   safe-push-apply@1.0.0:
     dependencies:
@@ -6629,11 +6661,13 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-  string_decoder@0.10.31: {}
+  string_decoder@0.10.31:
+    optional: true
 
   string_decoder@1.1.1:
     dependencies:
       safe-buffer: 5.1.2
+    optional: true
 
   strip-ansi@6.0.1:
     dependencies:
@@ -6684,8 +6718,10 @@ snapshots:
     dependencies:
       readable-stream: 1.0.34
       xtend: 2.1.2
+    optional: true
 
-  through@2.3.8: {}
+  through@2.3.8:
+    optional: true
 
   tinyglobby@0.2.15:
     dependencies:
@@ -6832,7 +6868,8 @@ snapshots:
     dependencies:
       react: 19.2.3
 
-  util-deprecate@1.0.2: {}
+  util-deprecate@1.0.2:
+    optional: true
 
   w3c-keyname@2.2.8: {}
 
@@ -6904,6 +6941,7 @@ snapshots:
   xtend@2.1.2:
     dependencies:
       object-keys: 0.4.0
+    optional: true
 
   y-prosemirror@1.3.7(prosemirror-model@1.25.4)(prosemirror-state@1.4.4)(prosemirror-view@1.41.6)(y-protocols@1.0.7(yjs@13.6.30))(yjs@13.6.30):
     dependencies:
