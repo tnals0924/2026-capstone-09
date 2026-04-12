@@ -141,8 +141,7 @@ public class NodeFacade {
         if (meetingService.hasActiveMeeting(nodeId)) {
             throw new ApiException(NodeErrorCode.NODE_HAS_ACTIVE_MEETING);
         }
-
-        //TODO: 자식 노드 탐색 서비스 레이어로 옮기기
+        
         nodeService.deleteWithAllDescendants(node);
     }
 
