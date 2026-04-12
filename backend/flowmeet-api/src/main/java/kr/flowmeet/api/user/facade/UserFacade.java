@@ -4,14 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.user.dto.response.GetUserResponse;
 import kr.flowmeet.api.user.dto.response.UpdateProfileImageResponse;
 import kr.flowmeet.api.user.dto.request.UpdateUserRequest;
 import kr.flowmeet.api.user.dto.response.UpdateUserResponse;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.user.entity.User;
-import kr.flowmeet.domain.user.exception.UserErrorCode;
 import kr.flowmeet.domain.user.service.UserService;
 import kr.flowmeet.external.file.FileStorageService;
 
@@ -57,9 +55,7 @@ public class UserFacade {
 
     @Transactional
     public void deleteMe(final Long userId) {
-        if (projectMemberService.existsOwnerProject(userId)) {
-            throw new ApiException(UserErrorCode.USER_IS_PROJECT_OWNER);
-        }
+        projectMemberService.validateUserIsNotProjectOwner(userId);
 
         User user = userService.findById(userId);
         userService.delete(user);
