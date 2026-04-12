@@ -33,7 +33,7 @@ export const DropdownInput = ({
   onChange,
   placeholder,
   width = '100%',
-  height = '48px',
+  height = '3rem',
   className,
 }: DropdownInputProps) => {
   const selectedValues = value;
@@ -111,7 +111,7 @@ export const DropdownInput = ({
           <MenuTrigger>
             <FlexBox
               ref={containerRef}
-              gap="8px"
+              gap="0.5rem"
               alignItems="center"
               role="combobox"
               tabIndex={0}
@@ -121,30 +121,30 @@ export const DropdownInput = ({
                 position: 'relative',
                 width: width,
                 height: height,
-                padding: '12px',
+                padding: '0.75rem',
                 backgroundColor: theme.semantic.background.transparent.normal,
-                backdropFilter: 'blur(32px)',
-                borderRadius: '12px',
+                backdropFilter: 'blur(2rem)',
+                borderRadius: '0.75rem',
                 boxShadow: isOpen
-                  ? `inset 0 0 0 2px #33EBC366, ${theme.semantic.elevation.shadow.normal.xsmall}`
-                  : `inset 0 0 0 1px ${theme.semantic.line.normal.neutral}, ${theme.semantic.elevation.shadow.normal.xsmall}`,
+                  ? `inset 0 0 0 0.125rem #33EBC366, ${theme.semantic.elevation.shadow.normal.xsmall}`
+                  : `inset 0 0 0 0.0625rem ${theme.semantic.line.normal.neutral}, ${theme.semantic.elevation.shadow.normal.xsmall}`,
                 cursor: 'pointer',
                 outline: 'none',
                 '&:focus, &:focus-visible': {
                   outline: 'none',
-                  boxShadow: `inset 0 0 0 2px #33EBC366, ${theme.semantic.elevation.shadow.normal.xsmall}`,
+                  boxShadow: `inset 0 0 0 0.125rem #33EBC366, ${theme.semantic.elevation.shadow.normal.xsmall}`,
                 },
               })}
             >
               <FlexBox
                 flex="1"
-                gap="4px"
+                gap="0.25rem"
                 alignItems="center"
                 data-role="select-multiple-render-wrapper"
                 sx={{
                   overflow: 'hidden',
                   minWidth: 0,
-                  minHeight: '24px',
+                  minHeight: '1.5rem',
                 }}
               >
                 {selectedOptions.length === 0 ? (
@@ -152,9 +152,9 @@ export const DropdownInput = ({
                     data-role="select-multiple-placeholder"
                     sx={(theme: Theme) => ({
                       color: theme.semantic.label.assistive,
-                      fontSize: '16px',
-                      lineHeight: '24px',
-                      minHeight: '24px',
+                      fontSize: '1rem',
+                      lineHeight: '1.5rem',
+                      minHeight: '1.5rem',
                       userSelect: 'none',
                     })}
                   >
@@ -165,7 +165,7 @@ export const DropdownInput = ({
                     {/* 측정용 숨겨진 배지들 */}
                     <FlexBox
                       ref={badgesRef}
-                      gap="4px"
+                      gap="0.25rem"
                       sx={{
                         position: 'absolute',
                         visibility: 'hidden',
@@ -246,8 +246,8 @@ export const DropdownInput = ({
                 alignItems="center"
                 sx={(theme: Theme) => ({
                   flexShrink: 0,
-                  fontSize: '16px',
-                  margin: '4px',
+                  fontSize: '1rem',
+                  margin: '0.25rem',
                   color: theme.semantic.label.alternative,
                 })}
               >
@@ -262,7 +262,7 @@ export const DropdownInput = ({
           <MenuContent
             offset={8}
             position="bottom-center"
-            sx={{ width: triggerWidth, minWidth: '140px' }}
+            sx={{ width: triggerWidth, minWidth: '8.75rem' }}
           >
             <MenuList>
               {options.map((option) => {
