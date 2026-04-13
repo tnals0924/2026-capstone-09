@@ -3,13 +3,13 @@ package kr.flowmeet.api.user.facade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import kr.flowmeet.api.common.exception.ApiException;
+import kr.flowmeet.api.file.ImageUploader;
 import kr.flowmeet.api.user.dto.response.GetUserResponse;
 import kr.flowmeet.api.user.dto.request.UpdateUserRequest;
 import kr.flowmeet.api.user.dto.response.UpdateUserResponse;
 import kr.flowmeet.domain.file.entity.FileDomainType;
-import kr.flowmeet.domain.file.entity.FileInformation;
-import kr.flowmeet.domain.file.service.FileInformationService;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
@@ -22,7 +22,7 @@ public class UserFacade {
 
     private final UserService userService;
     private final ProjectMemberService projectMemberService;
-    private final FileInformationService fileInformationService;
+    private final ImageUploader imageUploader;
 
     public GetUserResponse getMe(final Long userId) {
         User user = userService.findById(userId);
@@ -46,11 +46,10 @@ public class UserFacade {
     }
 
     @Transactional
-    public void updateProfileImageUrl(final Long userId, final String fileKey) {
+    public void updateProfileImage(final Long userId, final MultipartFile file) {
         User user = userService.findById(userId);
-        FileInformation fileInformation = fileInformationService.findByFileKey(fileKey);
-        fileInformation.updateDomain(FileDomainType.USER_PROFILE, userId);
-        user.updateProfileImageUrl(fileInformation.getUploadUrl());
+        String imageUrl = imageUploader.upload(file, "profiles", FileDomainType.USER_PROFILE, userId);
+        user.updateProfileImageUrl(imageUrl);
     }
 
     @Transactional

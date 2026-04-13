@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import kr.flowmeet.api.common.dto.PageResponse;
 import kr.flowmeet.api.common.exception.ApiException;
+import kr.flowmeet.api.file.ImageUploader;
 import kr.flowmeet.api.project.dto.request.CreateProjectRequest;
 import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.response.GetProjectResponse;
@@ -15,6 +17,7 @@ import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
 import org.springframework.context.ApplicationEventPublisher;
 import kr.flowmeet.domain.notification.entity.NotificationSetting;
 import kr.flowmeet.domain.notification.service.NotificationSettingService;
+import kr.flowmeet.domain.file.entity.FileDomainType;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
@@ -40,6 +43,7 @@ public class ProjectFacade {
     private final ProjectUrlService projectUrlService;
     private final NotificationSettingService notificationSettingService;
     private final ApplicationEventPublisher eventPublisher;
+    private final ImageUploader imageUploader;
 
     @Transactional
     public CreateProjectResponse createProject(final Long userId, final CreateProjectRequest request) {
@@ -108,6 +112,16 @@ public class ProjectFacade {
 
         List<NotificationSetting> settings = notificationSettingService.findAllByProjectId(project.getId());
         settings.forEach(notificationSettingService::delete);
+    }
+
+    @Transactional
+    public void updateProfileImage(final Long userId, final Long projectId, final MultipartFile file) {
+        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        validateMemberCanEdit(requesterMember);
+
+        Project project = projectService.findById(projectId);
+        String imageUrl = imageUploader.upload(file, "projects", FileDomainType.PROJECT_IMAGE, projectId);
+        project.updateProfileImageUrl(imageUrl);
     }
 
     private void validateMemberCanEdit(final ProjectMember member) {

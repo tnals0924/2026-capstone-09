@@ -3,14 +3,16 @@ package kr.flowmeet.api.user.controller;
 import jakarta.validation.Valid;
 import kr.flowmeet.api.user.facade.UserFacade;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import kr.flowmeet.api.common.dto.CommonResponse;
-import kr.flowmeet.api.user.dto.request.UpdateProfileImageRequest;
 import kr.flowmeet.api.user.dto.response.GetUserResponse;
 import kr.flowmeet.api.user.dto.request.UpdateUserRequest;
 import kr.flowmeet.api.user.dto.response.UpdateUserResponse;
@@ -36,10 +38,10 @@ public class UserController implements UserApi {
     }
 
     @Override
-    @PatchMapping("/me/profile-image")
-    public CommonResponse<?> updateProfileImageUrl(@UserId Long userId,
-                                                @Valid @RequestBody UpdateProfileImageRequest request) {
-        userFacade.updateProfileImageUrl(userId, request.fileKey());
+    @PatchMapping(value = "/me/profile-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public CommonResponse<?> updateProfileImage(@UserId Long userId,
+                                                @RequestPart MultipartFile profileImage) {
+        userFacade.updateProfileImage(userId, profileImage);
         return CommonResponse.ok();
     }
 

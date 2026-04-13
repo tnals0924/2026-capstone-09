@@ -1,9 +1,11 @@
 package kr.flowmeet.domain.file.service;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.domain.common.exception.BusinessException;
+import kr.flowmeet.domain.file.entity.FileDomainType;
 import kr.flowmeet.domain.file.entity.FileInformation;
 import kr.flowmeet.domain.file.exception.FileErrorCode;
 import kr.flowmeet.domain.file.repository.FileInformationRepository;
@@ -23,6 +25,10 @@ public class FileInformationService {
     @Transactional
     public FileInformation create(final FileInformation fileInformation) {
         return fileInformationRepository.save(fileInformation);
+    }
+
+    public Optional<FileInformation> findByDomainTypeAndEntityId(final FileDomainType domainType, final Long entityId) {
+        return fileInformationRepository.findByDomainTypeAndEntityId(domainType, entityId);
     }
 
     @Transactional

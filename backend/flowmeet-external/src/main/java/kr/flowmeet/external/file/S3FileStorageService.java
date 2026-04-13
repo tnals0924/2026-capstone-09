@@ -1,10 +1,12 @@
 package kr.flowmeet.external.file;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import kr.flowmeet.external.file.config.S3Properties;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
@@ -39,6 +41,19 @@ public class S3FileStorageService implements FileStorageService {
 
         PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(presignRequest);
         return presignedRequest.url();
+    }
+
+    @Override
+    public String upload(final String fileKey, final InputStream inputStream,
+                         final String contentType, final long contentLength) {
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(s3Properties.getBucket())
+                .key(fileKey)
+                .contentType(contentType)
+                .build();
+
+        s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, contentLength));
+        return getPublicUrl(fileKey);
     }
 
     @Override
