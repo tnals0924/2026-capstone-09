@@ -32,7 +32,7 @@ public class TagService {
     }
 
     public void validateTagIsInProject(final Long tagId, final Long projectId) {
-        if (tagRepository.existsByIdAndProjectId(tagId, projectId)) {
+        if (!tagRepository.existsByIdAndProjectId(tagId, projectId)) {
             throw new BusinessException(TagErrorCode.TAG_NOT_FOUND);
         }
     }
