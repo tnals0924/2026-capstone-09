@@ -10,9 +10,11 @@
 /* 수직 */
 .top {
   top: 16px;
+  flex-direction: column; /* top은 토스트가 아래로 쌓이도록 */
 }
 .bottom {
   bottom: 16px;
+  flex-direction: column-reverse; /* bottom은 토스트가 위로 쌓이도록 */
 }
 
 /* 수평 */
@@ -27,11 +29,3 @@
   right: 16px;
 }
 
-/* top은 토스트가 아래로 쌓이도록 */
-.top {
-  flex-direction: column;
-}
-/* bottom은 토스트가 위로 쌓이도록 */
-.bottom {
-  flex-direction: column-reverse;
-}

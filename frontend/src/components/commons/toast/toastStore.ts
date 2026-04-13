@@ -1,7 +1,5 @@
 import type { ReactNode } from 'react';
-import type { ToastPlacement } from './toast.types';
-
-type Variant = 'normal' | 'positive' | 'cautionary' | 'negative';
+import type { ToastPlacement, Variant } from './toast.types';
 
 export interface ToastItem {
   id: string;

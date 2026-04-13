@@ -5,3 +5,5 @@ export type ToastPlacement =
   | 'bottom-left'
   | 'bottom-center'
   | 'bottom-right';
+
+export type Variant = 'normal' | 'positive' | 'cautionary' | 'negative';

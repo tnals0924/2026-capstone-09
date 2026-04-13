@@ -5,7 +5,8 @@ import type { ToastPlacement } from './toast.types';
 const containerMap = new Map<ToastPlacement, HTMLDivElement>();
 
 export function getOrCreateContainer(placement: ToastPlacement): HTMLDivElement {
-  if (containerMap.has(placement)) return containerMap.get(placement)!;
+  const cached = containerMap.get(placement);
+  if (cached) return cached;
 
   const [vertical, horizontal] = placement.split('-') as [
     'top' | 'bottom',
