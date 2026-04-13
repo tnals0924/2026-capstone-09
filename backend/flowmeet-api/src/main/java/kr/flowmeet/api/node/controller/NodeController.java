@@ -81,14 +81,10 @@ public class NodeController implements NodeApi {
     public CommonResponse<GetNodeListResponse> getNodeList(
             @UserId Long userId,
             @PathVariable Long projectId,
-            @RequestParam(required = false) String sort,
-            @RequestParam(required = false) List<NodeStatus> status,
-            @RequestParam(required = false) List<Long> tagId,
-            @RequestParam(required = false) List<Long> assigneeId,
-            @RequestParam(required = false) Boolean hasMeeting
+            @RequestParam(required = false) String sort
     ) {
         return CommonResponse.ok(
-                nodeFacade.getNodeList(userId, projectId, sort, status, tagId, assigneeId, hasMeeting));
+                nodeFacade.getNodeList(userId, projectId, sort));
     }
 
     @Override
