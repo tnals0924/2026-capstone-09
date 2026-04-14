@@ -2,17 +2,30 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
+/**
+ * 모달의 시각적 형태를 결정하는 타입입니다.
+ * - `default`: 표준 중앙 모달
+ * - `compact`: 좁은 여백을 가진 모달 (주로 검색창 등에 사용)
+ * - `sidebar`: 좌측에서 나타나는 설정/메뉴용 모달
+ */
 export type ModalVariant =
   | 'default' // 기본 모달
   | 'compact' // 좌우 36px / 상하 24px (초기 기준 검색 모달)
   | 'sidebar'; // 좌측 사이드바(설정) 모달
 
+/**
+ * 모달을 열 때 사용할 수 있는 옵션들입니다.
+ */
 export interface ModalOptions {
+  /** 모달의 디자인 스타일 (기본값: 'default') */
   variant?: ModalVariant;
-  closeOnBackdrop?: boolean; // 백드롭 클릭 시 닫기 여부 (기본: false)
-  closeOnEsc?: boolean; // ESC 키 닫기 여부 (기본: false)
-  title?: ReactNode;
-  sidebar?: ReactNode; // 사이드바 영역 (variant="sidebar" 일 때 사용)
+  /** 백드롭(배경) 클릭 시 모달을 닫을지 여부 (기본값: false) */
+  closeOnBackdrop?: boolean;
+  /** ESC 키를 눌렀을 때 모달을 닫을지 여부 (기본값: false) */
+  closeOnEsc?: boolean;
+  /** `variant="sidebar"`일 때 표시할 사이드바 전용 영역 */
+  sidebar?: ReactNode;
+  /** 모달 본문에 렌더링할 내용 */
   content: ReactNode;
 }
 
@@ -62,6 +75,17 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * 모달 제어를 위한 커스텀 훅입니다.
+ * @returns {ModalContextValue} openModal, closeModal 함수 및 state 객체
+ *
+ * useModal의 parmas
+ * @params variant?: ModalVariant; - 모달의 디자인 스타일
+ * @params closeOnBackdrop?: boolean; - 배경 클릭 시 모달을 닫을지 여부
+ * @parmas closeOnEsc?: boolean; - ESC 키를 눌렀을 때 모달을 닫을지 여부
+ * @parmas sidebar?: ReactNode; - 사이드바 전용 영역
+ * @params conent: ReactNode; - 모달 본문에 렌더링할 내용
+ */
 export function useModal() {
   return useContext(ModalContext);
 }

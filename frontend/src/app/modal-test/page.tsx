@@ -99,7 +99,6 @@ export default function DemoPage() {
           onClick={() =>
             openModal({
               variant: 'default',
-              title: '기본 모달',
               content: (
                 <p className="text-sm leading-relaxed text-gray-600">
                   상하좌우 패딩이 모두 <strong>48px</strong>인 기본 모달입니다. 본문에는 어떤
@@ -118,7 +117,6 @@ export default function DemoPage() {
           onClick={() =>
             openModal({
               variant: 'compact',
-              title: '컴팩트 모달',
               content: (
                 <p className="text-sm leading-relaxed text-gray-600">
                   좌우 <strong>36px</strong>, 상하 <strong>24px</strong> 패딩의 컴팩트 모달입니다.
@@ -137,7 +135,6 @@ export default function DemoPage() {
           onClick={() =>
             openModal({
               variant: 'sidebar',
-              title: '프로젝트 설정',
               sidebar: <SettingsSidebar />,
               content: <ProjectSettingsContent onClose={closeModal} />,
             })
