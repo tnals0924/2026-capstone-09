@@ -1,6 +1,9 @@
 package kr.flowmeet.domain.project.service;
 
+import kr.flowmeet.domain.project.event.ProjectMemberInvitedEvent;
+import kr.flowmeet.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,7 @@ import kr.flowmeet.domain.project.repository.projection.ProjectWithMemberCountPr
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Project findById(final Long projectId) {
         return projectRepository.findById(projectId)
@@ -32,12 +36,30 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project create(final Project project) {
-        return projectRepository.save(project);
+    public Project create(final String name) {
+        return projectRepository.save(
+                Project.builder()
+                        .name(name)
+                        .build()
+        );
     }
 
     @Transactional
     public void delete(final Project project) {
         projectRepository.delete(project);
+    }
+
+    @Transactional
+    public void invite(String email, Long projectId, User inviter) {
+        Project project = findById(projectId);
+
+        eventPublisher.publishEvent(
+                ProjectMemberInvitedEvent.of(
+                        project.getId(),
+                        project.getName(),
+                        email,
+                        inviter.getNickname()
+                )
+        );
     }
 }
