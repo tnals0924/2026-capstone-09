@@ -4,22 +4,11 @@ import { Toast, ToastContainer, ToastContent, ToastIcon } from '@wanteddev/wds';
 import { useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import type { ToastPlacement } from './toast.types';
-import { getOrCreateContainer } from './toastContainerMap';
+import { getOrCreateContainer, cleanupUnusedContainers, containerMap } from './toastContainerMap';
 import { toastStore } from './toastStore';
 import type { ToastItem } from './toastStore';
 
 // placement별로 컨테이너를 동적 생성 -> toastStore를 구독하면서 placement별로 그룹핑 후 각 컨테이너 DOM에 createPortal로 렌더링
-
-const containerMap = new Map<ToastPlacement, HTMLDivElement>();
-
-function cleanupUnusedContainers(usedPlacements: Set<ToastPlacement>) {
-  containerMap.forEach((el, placement) => {
-    if (!usedPlacements.has(placement)) {
-      document.body.removeChild(el);
-      containerMap.delete(placement);
-    }
-  });
-}
 
 export function ToastRenderer() {
   const toasts = useSyncExternalStore<ToastItem[]>(

@@ -2,7 +2,7 @@
 import styles from './toast.module.css';
 import type { ToastPlacement } from './toast.types';
 
-const containerMap = new Map<ToastPlacement, HTMLDivElement>();
+export const containerMap = new Map<ToastPlacement, HTMLDivElement>();
 
 export function getOrCreateContainer(placement: ToastPlacement): HTMLDivElement {
   const cached = containerMap.get(placement);
@@ -18,4 +18,13 @@ export function getOrCreateContainer(placement: ToastPlacement): HTMLDivElement 
   document.body.appendChild(el);
   containerMap.set(placement, el);
   return el;
+}
+
+export function cleanupUnusedContainers(usedPlacements: Set<ToastPlacement>) {
+  containerMap.forEach((el, placement) => {
+    if (!usedPlacements.has(placement)) {
+      document.body.removeChild(el);
+      containerMap.delete(placement);
+    }
+  });
 }
