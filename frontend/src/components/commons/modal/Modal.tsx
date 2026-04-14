@@ -44,7 +44,7 @@ function SidebarModal({ sidebar, content }: { sidebar?: ReactNode; content: Reac
     <div className="relative flex min-h-125 w-full overflow-hidden rounded-4xl bg-white">
       {/* ── 사이드바 ── */}
       <aside className="w-50 shrink-0 bg-gray-50 px-5 py-6">
-        {sidebar ?? <p className="mt-2 text-xs text-gray-400">사이드바 영역</p>}
+        {sidebar ?? <p className="text-label-1 mt-2 text-gray-400">사이드바 영역</p>}
       </aside>
 
       {/* ── 본문 ── */}
@@ -85,7 +85,7 @@ export default function Modal() {
   if (!isOpen) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4">
+    <div className="fixed inset-0 z-9999 flex items-center justify-center px-4">
       {/* 백드롭 */}
       <div
         ref={backdropRef}
