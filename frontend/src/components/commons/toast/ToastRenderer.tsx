@@ -57,13 +57,16 @@ export function ToastRenderer() {
           items.map((t) => (
             <Toast
               key={t.id}
-              open
+              open={!t.closing}
               variant={t.variant}
               duration={t.duration}
               onOpenChange={(open) => {
-                if (!open) toastStore.remove(t.id);
+                if (!open) toastStore.startClose(t.id); // 바로 remove 대신 closing 상태로
               }}
-              onAnimationEnd={t.onAnimationEnd}
+              onAnimationEnd={(type) => {
+                if (type === 'hide') toastStore.remove(t.id); // 애니메이션 끝난 후 제거
+                t.onAnimationEnd?.(type);
+              }}
               disablePortal
             >
               <ToastContainer>

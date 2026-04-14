@@ -9,6 +9,7 @@ export interface ToastItem {
   duration?: number | 'short' | 'long';
   onAnimationEnd?: (type: 'show' | 'hide') => void;
   placement: ToastPlacement;
+  closing?: boolean;
 }
 
 type Listener = () => void;
@@ -25,6 +26,10 @@ function notify() {
 export const toastStore = {
   add(item: ToastItem) {
     items = [...items, item];
+    notify();
+  },
+  startClose(id: string) {
+    items = items.map((i) => (i.id === id ? { ...i, closing: true } : i));
     notify();
   },
   remove(id: string) {
