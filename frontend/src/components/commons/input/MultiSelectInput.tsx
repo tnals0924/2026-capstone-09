@@ -252,8 +252,8 @@ export const MultiSelectInput = ({
         handleCategorySelect(category);
       }
     } 
-    
-    if (menuStage === 'user-list' || menuStage === 'node-list') {
+
+    else if (menuStage === 'user-list' || menuStage === 'node-list') {
       const options = menuStage === 'user-list' ? filteredUserOptions : filteredNodeOptions;
       const atIndex = inputText.lastIndexOf('@');
 
