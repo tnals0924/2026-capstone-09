@@ -33,13 +33,7 @@ public class EdgeFacade {
         nodeValidator.validateIsIn(startNodeId, projectId);
         nodeValidator.validateIsIn(endNodeId, projectId);
 
-        edgeService.create(
-                projectId,
-                startNodeId,
-                endNodeId,
-                userId,
-                request.comment()
-        );
+        edgeService.create(projectId, userId, request.toCommand());
     }
 
     @Transactional

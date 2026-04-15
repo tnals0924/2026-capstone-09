@@ -13,7 +13,6 @@ import kr.flowmeet.api.node.dto.request.AddNodeTagRequest;
 import kr.flowmeet.api.node.dto.request.CreateTagRequest;
 import kr.flowmeet.api.node.dto.request.UpdateTagRequest;
 import kr.flowmeet.api.node.dto.response.GetAllTagsResponse;
-import kr.flowmeet.domain.node.entity.NodeTag;
 import kr.flowmeet.domain.node.entity.Tag;
 import kr.flowmeet.domain.node.exception.NodeErrorCode;
 import kr.flowmeet.domain.node.service.NodeService;
@@ -48,15 +47,7 @@ public class TagFacade {
     ) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
-        tagService.validateNameNotDuplicated(projectId, request.name());
-
-        tagService.create(
-                Tag.builder()
-                        .projectId(projectId)
-                        .name(request.name())
-                        .color(request.color())
-                        .build()
-        );
+        tagService.create(projectId, request.toCommand());
     }
 
     @Transactional
@@ -98,14 +89,8 @@ public class TagFacade {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
         nodeValidator.validateIsIn(nodeId, projectId);
         tagService.validateTagIsInProject(request.tagId(), projectId);
-        nodeTagService.validateNotDuplicated(nodeId, request.tagId());
 
-        nodeTagService.create(
-                NodeTag.builder()
-                        .nodeId(nodeId)
-                        .tagId(request.tagId())
-                        .build()
-        );
+        nodeTagService.create(nodeId, request.tagId());
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package kr.flowmeet.domain.node.service;
 
 import java.util.List;
+import kr.flowmeet.domain.node.service.vo.CreateEdgeCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,10 @@ public class EdgeService {
     }
 
     @Transactional
-    public Edge create(final Long projectId, final Long startNodeId, final Long endNodeId, final Long createdById, final String comment) {
+    public Edge create(final Long projectId, final Long createdById, final CreateEdgeCommand command) {
+        Long startNodeId = command.startNodeId();
+        Long endNodeId = command.endNodeId();
+
         validateNotDuplicated(startNodeId, endNodeId);
 
         return edgeRepository.save(
@@ -35,7 +39,7 @@ public class EdgeService {
                         .startNodeId(startNodeId)
                         .endNodeId(endNodeId)
                         .createdById(createdById)
-                        .comment(comment)
+                        .comment(command.comment())
                         .build()
         );
     }

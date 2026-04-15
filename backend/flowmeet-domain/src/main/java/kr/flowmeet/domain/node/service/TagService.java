@@ -8,6 +8,7 @@ import kr.flowmeet.domain.common.exception.BusinessException;
 import kr.flowmeet.domain.node.entity.Tag;
 import kr.flowmeet.domain.node.exception.TagErrorCode;
 import kr.flowmeet.domain.node.repository.TagRepository;
+import kr.flowmeet.domain.node.service.vo.CreateTagCommand;
 
 @Service
 @RequiredArgsConstructor
@@ -38,8 +39,16 @@ public class TagService {
     }
 
     @Transactional
-    public Tag create(final Tag tag) {
-        return tagRepository.save(tag);
+    public Tag create(final Long projectId, final CreateTagCommand command) {
+        validateNameNotDuplicated(projectId, command.name());
+
+        return tagRepository.save(
+                Tag.builder()
+                        .projectId(projectId)
+                        .name(command.name())
+                        .color(command.color())
+                        .build()
+        );
     }
 
     @Transactional
