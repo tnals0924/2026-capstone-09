@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import kr.flowmeet.domain.common.BaseTimeEntity;
+import kr.flowmeet.domain.node.service.NodeValidator;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
@@ -50,6 +51,7 @@ public class NodeFacade {
     private final NodeAssigneeService nodeAssigneeService;
     private final MeetingService meetingService;
     private final ProjectPermissionValidator projectPermissionValidator;
+    private final NodeValidator nodeValidator;
 
     public GetFlowchartResponse getFlowchart(final Long userId, final Long projectId) {
         projectPermissionValidator.validate(projectId, userId);
@@ -85,7 +87,7 @@ public class NodeFacade {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
         if (request.parentId() != null) {
-            nodeService.findByIdAndProjectId(request.parentId(), projectId);
+            nodeValidator.validateIsIn(request.parentId(), projectId);
         }
 
         int sortOrder = request.parentId() != null
@@ -128,7 +130,7 @@ public class NodeFacade {
 
         Node node = nodeService.findByIdAndProjectId(nodeId, projectId);
 
-        meetingService.validateNoActiveMeeting(nodeId);
+        nodeValidator.validateNoActiveMeeting(node);
 
         List<Long> descendantIds = nodeService.findAllDescendantIds(node);
         List<Long> allNodeIds = new ArrayList<>(descendantIds);

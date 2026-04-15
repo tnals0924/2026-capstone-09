@@ -2,6 +2,7 @@ package kr.flowmeet.api.node.facade;
 
 import java.util.List;
 import kr.flowmeet.domain.node.exception.TagErrorCode;
+import kr.flowmeet.domain.node.service.NodeValidator;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class TagFacade {
     private final NodeTagService nodeTagService;
     private final NodeService nodeService;
     private final ProjectPermissionValidator projectPermissionValidator;
+    private final NodeValidator nodeValidator;
 
     public GetAllTagsResponse getAllTags(final Long userId, final Long projectId) {
         projectPermissionValidator.validate(projectId, userId);
@@ -94,7 +96,7 @@ public class TagFacade {
             final AddNodeTagRequest request
     ) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
-        nodeService.validateNodeIsInProject(projectId, nodeId);
+        nodeValidator.validateIsIn(nodeId, projectId);
         tagService.validateTagIsInProject(request.tagId(), projectId);
         nodeTagService.validateNotDuplicated(nodeId, request.tagId());
 

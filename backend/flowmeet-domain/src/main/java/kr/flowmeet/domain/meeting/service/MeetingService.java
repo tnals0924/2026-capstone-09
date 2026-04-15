@@ -28,20 +28,6 @@ public class MeetingService {
         return meetingRepository.findAllByNodeIdIn(nodeIds);
     }
 
-    public boolean existsByNodeId(final Long nodeId) {
-        return meetingRepository.existsByNodeId(nodeId);
-    }
-
-    public boolean hasActiveMeeting(final Long nodeId) {
-        return meetingRepository.existsByNodeIdAndStatus(nodeId, MeetingStatus.IN_PROGRESS);
-    }
-
-    public void validateNoActiveMeeting(final Long nodeId) {
-        if (meetingRepository.existsByNodeIdAndStatus(nodeId, MeetingStatus.IN_PROGRESS)) {
-            throw new BusinessException(MeetingErrorCode.ACTIVE_MEETING_EXISTS);
-        }
-    }
-
     public Set<Long> findAllMeetingNodeIds(final List<Long> nodeIds) {
         return findAllByNodeIds(nodeIds)
                 .stream()
