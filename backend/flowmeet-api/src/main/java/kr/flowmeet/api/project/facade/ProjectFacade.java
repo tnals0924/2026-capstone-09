@@ -26,15 +26,12 @@ import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.project.service.ProjectService;
 import kr.flowmeet.domain.project.service.ProjectSortType;
 import kr.flowmeet.domain.project.service.ProjectUrlService;
-import kr.flowmeet.domain.user.entity.User;
-import kr.flowmeet.domain.user.service.UserService;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProjectFacade {
 
-    private final UserService userService;
     private final ProjectService projectService;
     private final ProjectMemberService projectMemberService;
     private final ProjectUrlService projectUrlService;
@@ -44,10 +41,9 @@ public class ProjectFacade {
 
     @Transactional
     public CreateProjectResponse createProject(final Long userId, final CreateProjectRequest request) {
-        User user = userService.findById(userId);
         Project project = projectService.create(request.name());
 
-        projectMemberService.create(user.getId(), project.getId(), ProjectMemberRole.OWNER);
+        projectMemberService.create(userId, project.getId(), ProjectMemberRole.OWNER);
 
         return CreateProjectResponse.from(project);
     }
