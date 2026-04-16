@@ -59,7 +59,7 @@ export const ProjectSidebar = ({
 
   return (
     <motion.aside
-      className="h-screen shrink-0 overflow-hidden border-r border-line-normal-neutral bg-background-normal-alternative px-2.5 py-1"
+      className="h-screen shrink-0 overflow-hidden border-r border-line-normal-neutral bg-background-normal-alternative px-2.5 py-1 font-pretendard text-body-2 text-label-alternative"
       initial={false}
       animate={{
         width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
@@ -72,13 +72,13 @@ export const ProjectSidebar = ({
       }}
     >
       <div className="flex h-full flex-col justify-between">
-        <div className="flex flex-col gap-2.5">
+        <div className={cn('flex flex-col', isCollapsed ? 'gap-1' : 'gap-2')}>
           <div
             className={cn(
               'border-b border-line-normal-neutral',
               shouldUseCollapsedLayout
-                ? 'flex flex-col items-center justify-center gap-2 py-3.5'
-                : 'flex items-center justify-between py-3.5 pl-1',
+                ? 'flex flex-col items-center justify-center gap-1 py-2'
+                : 'flex items-center justify-between pt-3 pb-4 pl-1',
             )}
           >
             <div
@@ -111,17 +111,17 @@ export const ProjectSidebar = ({
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
-                className="grid h-6 w-6 place-items-center rounded-md text-material-dimmer hover:bg-fill-alternative hover:text-label-neutral"
+                className="grid h-6 w-6 appearance-none place-items-center rounded-md border-none bg-transparent leading-normal text-material-dimmer hover:bg-fill-alternative hover:text-label-neutral"
                 aria-label="사이드바 접기"
               >
-                <IconLeftSide className="h-4 w-4 rotate-0 transition-transform" aria-hidden="true" />
+                <IconLeftSide className="h-5 w-5 rotate-0 transition-transform" aria-hidden="true" />
               </button>
             )}
             {shouldUseCollapsedLayout && !isProjectSelectionPage && (
               <button
                 type="button"
                 onClick={handleToggleCollapsed}
-                className="flex h-9 w-full items-center justify-center overflow-hidden rounded-md px-2.5 py-2.5 text-material-dimmer hover:bg-fill-alternative"
+                className="flex h-7 w-full appearance-none items-center justify-center overflow-hidden rounded-md border-none bg-transparent px-2 leading-normal text-material-dimmer hover:bg-fill-alternative"
                 aria-label="사이드바 펼치기"
               >
                 <IconChevronDoubleLeft className="h-3 w-3 rotate-180" aria-hidden="true" />

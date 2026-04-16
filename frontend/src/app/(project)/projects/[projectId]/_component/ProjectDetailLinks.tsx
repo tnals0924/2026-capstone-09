@@ -61,9 +61,10 @@ export const ProjectDetailLinks = () => {
 
                     <button
                         type="button"
-                        className="flex items-center justify-center rounded-md p-1 opacity-75 transition-colors hover:bg-fill-normal"
+                        className="flex h-7 w-7 appearance-none items-center justify-center rounded-md border-none bg-transparent text-label-alternative transition-colors hover:bg-fill-normal hover:text-label-neutral"
+                        aria-label="링크 추가"
                     >
-                        <IconPlus className="h-5 w-5 text-label-neutral" aria-hidden="true" />
+                        <IconPlus className="h-4 w-4" aria-hidden="true" />
                     </button>
                 </div>
             </section>
