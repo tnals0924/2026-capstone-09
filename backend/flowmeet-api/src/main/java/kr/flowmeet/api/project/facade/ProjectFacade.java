@@ -75,8 +75,7 @@ public class ProjectFacade {
     public void updateProject(final Long userId, final Long projectId, final UpdateProjectRequest request) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
-        Project project = projectService.findById(projectId);
-        project.updateName(request.name());
+        projectService.updateName(projectId, request.name());
     }
 
     @Transactional
@@ -101,9 +100,8 @@ public class ProjectFacade {
     public void updateProfileImage(final Long userId, final Long projectId, final MultipartFile file) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.OWNER);
 
-        Project project = projectService.findById(projectId);
         String imageUrl = imageUploader.upload(file, "projects", FileDomainType.PROJECT_IMAGE, projectId);
-        project.updateProfileImageUrl(imageUrl);
+        projectService.updateProfileImageUrl(projectId, imageUrl);
     }
 
 }
