@@ -61,14 +61,13 @@ public class ProjectFacade {
     }
 
     public GetProjectResponse getProject(final Long userId, final Long projectId) {
+        ProjectMemberRole myRole = projectPermissionValidator.validateAndGetRole(projectId, userId);
+
         Project project = projectService.findById(projectId);
+        int memberCount = projectMemberService.countByProjectId(projectId);
+        List<ProjectUrl> urls = projectUrlService.findAllByProjectId(projectId);
 
-        ProjectMember requesterMember = projectMemberService.findByProjectIdAndUserId(project.getId(), userId);
-
-        int memberCount = projectMemberService.countByProjectId(project.getId());
-        List<ProjectUrl> urls = projectUrlService.findAllByProjectId(project.getId());
-
-        return GetProjectResponse.of(project, requesterMember.getRole(), memberCount, urls);
+        return GetProjectResponse.of(project, myRole, memberCount, urls);
     }
 
     @Transactional
