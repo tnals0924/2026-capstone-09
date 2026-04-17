@@ -68,7 +68,7 @@ public class ProjectMemberService {
     @Transactional
     public void updateRole(final Long projectId, final Long memberId, final ProjectMemberRole newRole) {
         ProjectMember target = findByIdAndProjectId(memberId, projectId);
-        validateRoleChangeable(target, newRole);
+        validateNotOwnerRoleChange(target, newRole);
         target.updateRole(newRole);
     }
 
@@ -95,7 +95,7 @@ public class ProjectMemberService {
         projectMemberRepository.delete(projectMember);
     }
 
-    private void validateRoleChangeable(final ProjectMember target, final ProjectMemberRole newRole) {
+    private void validateNotOwnerRoleChange(final ProjectMember target, final ProjectMemberRole newRole) {
         if (target.isOwner() || newRole == ProjectMemberRole.OWNER) {
             throw new BusinessException(ProjectErrorCode.MEMBER_CANNOT_CHANGE_OWNER);
         }
