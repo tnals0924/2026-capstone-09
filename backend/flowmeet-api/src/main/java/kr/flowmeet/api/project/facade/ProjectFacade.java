@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import kr.flowmeet.api.common.dto.CursorSliceResponse;
-import kr.flowmeet.api.file.ImageUploader;
+import kr.flowmeet.api.file.facade.ImageUploader;
 import kr.flowmeet.api.project.dto.request.CreateProjectRequest;
 import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.response.GetProjectResponse;
