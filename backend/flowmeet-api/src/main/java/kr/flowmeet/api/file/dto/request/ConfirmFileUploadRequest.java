@@ -18,6 +18,6 @@ public record ConfirmFileUploadRequest(
 ) {
 
     public CreateFileInformationCommand toCommand() {
-        return new CreateFileInformationCommand(fileKey, fileName, extension, fileSize, contentType);
+        return CreateFileInformationCommand.of(fileKey, fileName, extension, fileSize, contentType);
     }
 }

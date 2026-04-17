@@ -38,7 +38,7 @@ public class ImageUploader {
 
             FileInformation fileInformation = fileInformationService.create(
                     imageUrl,
-                    new CreateFileInformationCommand(
+                    CreateFileInformationCommand.of(
                             fileKey,
                             file.getOriginalFilename(),
                             extension,
