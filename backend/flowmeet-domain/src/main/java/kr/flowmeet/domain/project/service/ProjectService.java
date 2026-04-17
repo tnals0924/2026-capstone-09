@@ -31,8 +31,8 @@ public class ProjectService {
     public Page<ProjectWithMemberCountProjection> findAllByUserId(final Long userId, final String search,
                                                                   final ProjectSortType sort,
                                                                   final int page, final int size) {
-        Pageable pageable = PageRequest.of(page, size, sort.toSort());
-        return projectRepository.findAllByUserId(userId, search, pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        return projectRepository.findAllByUserId(userId, search, sort, pageable);
     }
 
     @Transactional
