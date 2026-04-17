@@ -3,12 +3,26 @@
 import { ThemeProvider } from '@wanteddev/wds';
 import { AppRouterCacheProvider } from '@wanteddev/wds-nextjs';
 
-import '@wanteddev/wds/global.css';
+import Modal from '@/components/commons/modal/Modal';
+import { ModalProvider } from '@/components/commons/modal/ModalContext';
+import Dialog from './commons/dialog/Dialog';
+import { DialogProvider } from './commons/dialog/DialogContext';
+import { ToastProvider } from './commons/toast/ToastProvider';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
-      <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
+      <AppRouterCacheProvider>
+        <ToastProvider>
+          <ModalProvider>
+            <DialogProvider>
+              {children}
+              <Modal />
+              <Dialog />
+            </DialogProvider>
+          </ModalProvider>
+        </ToastProvider>
+      </AppRouterCacheProvider>
     </ThemeProvider>
   );
 }

@@ -357,6 +357,11 @@
   letter-spacing: var(--typography---caption2---letter-spacing);
 }
 
+/* WDS 내 primary FlowMeet 색상으로 변경 */
+:root {
+  --semantic-primary-normal: #03C98F;
+}
+
 body {
   font-family: var(--font-pretendard);
   background: var(--color-static-white);
