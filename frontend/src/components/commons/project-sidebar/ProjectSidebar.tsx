@@ -12,7 +12,10 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import { EXAMPLE_PROJECT_SIDEBAR_PROFILE } from '@/constants/exampleConstant';
+import {
+  EXAMPLE_PROJECT_SIDEBAR_PROFILE,
+  EXAMPLE_SIDEBAR_ALARM_ITEMS,
+} from '@/constants/exampleConstant';
 import { cn } from '@/utils/cn';
 
 import { SidebarAlarmModal } from './SidebarAlarmModal';
@@ -47,10 +50,12 @@ export const ProjectSidebar = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(false);
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState(false);
+  const { unreadCount } = EXAMPLE_SIDEBAR_ALARM_ITEMS.data;
   const isProjectSelectionPage = pathname === '/projects';
   const isCollapsed = isProjectSelectionPage || isCollapsedInternal;
   const [isCollapseSettled, setIsCollapseSettled] = useState(true);
   const shouldUseCollapsedLayout = isCollapsed && isCollapseSettled;
+  const badgeText = unreadCount > 99 ? '+99' : unreadCount > 0 ? `${unreadCount}` : undefined;
 
   useEffect(() => {
     if (!isAlarmModalOpen) {
@@ -89,7 +94,7 @@ export const ProjectSidebar = ({
   return (
     <div ref={containerRef} className="relative flex shrink-0">
       <motion.aside
-        className="relative z-10 h-screen shrink-0 overflow-hidden border-r border-line-normal-neutral bg-background-normal-alternative px-2.5 pt-2 pb-0 font-pretendard text-body-2 text-label-alternative"
+        className="border-line-normal-neutral bg-background-normal-alternative font-pretendard text-body-2 text-label-alternative relative z-10 h-screen shrink-0 overflow-hidden border-r px-2.5 pt-2 pb-0"
         initial={false}
         animate={{
           width: isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_EXPANDED_WIDTH,
@@ -105,7 +110,7 @@ export const ProjectSidebar = ({
           <div className={cn('flex flex-col', isCollapsed ? 'gap-1' : 'gap-2')}>
             <div
               className={cn(
-                'border-b border-line-normal-neutral',
+                'border-line-normal-neutral border-b',
                 shouldUseCollapsedLayout
                   ? 'flex flex-col items-center justify-center gap-3 py-2'
                   : 'flex items-center justify-between pt-2 pb-4 pl-1.5',
@@ -118,8 +123,8 @@ export const ProjectSidebar = ({
                 )}
               >
                 <div className="relative flex items-center justify-center">
-                  <div className="relative flex aspect-square h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md border border-line-solid-normal bg-cool-neutral-96">
-                    <IconCompany className="h-4 w-4 text-static-white" aria-hidden="true" />
+                  <div className="border-line-solid-normal bg-cool-neutral-96 relative flex aspect-square h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded-md border">
+                    <IconCompany className="text-static-white h-4 w-4" aria-hidden="true" />
                   </div>
                 </div>
                 {projectName && (
@@ -130,7 +135,7 @@ export const ProjectSidebar = ({
                       opacity: isCollapsed ? 0 : 1,
                     }}
                     transition={{ duration: SIDEBAR_LABEL_TRANSITION_DURATION, ease: 'easeInOut' }}
-                    className="overflow-hidden whitespace-nowrap text-center text-body-2 font-medium text-label-alternative"
+                    className="text-body-2 text-label-alternative overflow-hidden text-center font-medium whitespace-nowrap"
                   >
                     {projectName}
                   </motion.div>
@@ -141,17 +146,20 @@ export const ProjectSidebar = ({
                 <button
                   type="button"
                   onClick={handleToggleCollapsed}
-                  className="grid h-6 w-6 appearance-none place-items-center rounded-md border-none bg-transparent leading-normal text-material-dimmer hover:bg-fill-alternative hover:text-label-neutral"
+                  className="text-material-dimmer hover:bg-fill-alternative hover:text-label-neutral grid h-6 w-6 appearance-none place-items-center rounded-md border-none bg-transparent leading-normal"
                   aria-label="사이드바 접기"
                 >
-                  <IconLeftSide className="h-5 w-5 rotate-0 transition-transform" aria-hidden="true" />
+                  <IconLeftSide
+                    className="h-5 w-5 rotate-0 transition-transform"
+                    aria-hidden="true"
+                  />
                 </button>
               )}
               {shouldUseCollapsedLayout && !isProjectSelectionPage && (
                 <button
                   type="button"
                   onClick={handleToggleCollapsed}
-                  className="flex h-7 w-full appearance-none items-center justify-center overflow-hidden rounded-md border-none bg-transparent px-2 leading-normal text-material-dimmer hover:bg-fill-alternative"
+                  className="text-material-dimmer hover:bg-fill-alternative flex h-7 w-full appearance-none items-center justify-center overflow-hidden rounded-md border-none bg-transparent px-2 leading-normal"
                   aria-label="사이드바 펼치기"
                 >
                   <IconChevronDoubleLeft className="h-3 w-3 rotate-180" aria-hidden="true" />
@@ -174,7 +182,7 @@ export const ProjectSidebar = ({
                   isCollapsed={isCollapsed}
                   label="수신함"
                   labelWidth={64}
-                  badgeText="+99"
+                  badgeText={badgeText}
                   labelTransitionDuration={SIDEBAR_LABEL_TRANSITION_DURATION}
                   onClick={handleAlarmModalToggle}
                 />
@@ -190,7 +198,7 @@ export const ProjectSidebar = ({
             )}
           </div>
 
-          <div className="w-full bg-neutral-99">
+          <div className="bg-neutral-99 w-full">
             <UserProfileButton
               isCollapsed={isCollapsed}
               userName={userName}
@@ -201,7 +209,9 @@ export const ProjectSidebar = ({
         </div>
       </motion.aside>
       <AnimatePresence>
-        {isAlarmModalOpen && !isCollapsed && <SidebarAlarmModal onClose={() => setIsAlarmModalOpen(false)} />}
+        {isAlarmModalOpen && !isCollapsed && (
+          <SidebarAlarmModal onClose={() => setIsAlarmModalOpen(false)} />
+        )}
       </AnimatePresence>
     </div>
   );
