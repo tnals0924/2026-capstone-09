@@ -9,8 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.StringUtils;
-import kr.flowmeet.domain.common.dto.CursorSlice;
-import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.QProjectMember;
 import kr.flowmeet.domain.project.repository.projection.ProjectWithMemberCountProjection;
 import kr.flowmeet.domain.project.service.ProjectSortType;
@@ -24,7 +22,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CursorSlice<ProjectWithMemberCountProjection> findAllByUserId(
+    public List<ProjectWithMemberCountProjection> findAllByUserId(
             final Long userId,
             final String search,
             final ProjectSortType sort,
@@ -32,7 +30,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             final String cursorValue,
             final int size
     ) {
-        List<ProjectWithMemberCountProjection> content = queryFactory
+        return queryFactory
                 .select(Projections.constructor(
                         ProjectWithMemberCountProjection.class,
                         project,
@@ -50,21 +48,6 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 .orderBy(sort.toOrderSpecifier(), project.id.desc())
                 .limit(size + 1L)
                 .fetch();
-
-        boolean hasNext = content.size() > size;
-        if (hasNext) {
-            content.removeLast();
-        }
-
-        Long nextCursorId = null;
-        String nextCursorValue = null;
-        if (hasNext && !content.isEmpty()) {
-            Project last = content.getLast().project();
-            nextCursorId = last.getId();
-            nextCursorValue = extractSortValue(last, sort);
-        }
-
-        return new CursorSlice<>(content, hasNext, nextCursorId, nextCursorValue);
     }
 
     private BooleanExpression nameContains(final String search) {
@@ -90,13 +73,6 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             }
             case NAME -> project.name.gt(cursorValue)
                     .or(project.name.eq(cursorValue).and(project.id.gt(cursorId)));
-        };
-    }
-
-    private String extractSortValue(final Project last, final ProjectSortType sort) {
-        return switch (sort) {
-            case LATEST -> last.getUpdatedAt().toString();
-            case NAME -> last.getName();
         };
     }
 }

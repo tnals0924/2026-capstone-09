@@ -1,5 +1,6 @@
 package kr.flowmeet.api.notification.facade;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,7 +10,6 @@ import kr.flowmeet.api.notification.dto.request.UpdateNotificationSettingRequest
 import kr.flowmeet.api.notification.dto.response.NotificationSummaryResponse;
 import kr.flowmeet.api.notification.dto.response.GetNotificationSettingResponse;
 import kr.flowmeet.api.notification.dto.response.GetUnreadCountResponse;
-import kr.flowmeet.domain.common.dto.CursorSlice;
 import kr.flowmeet.domain.notification.entity.Notification;
 import kr.flowmeet.domain.notification.entity.NotificationSetting;
 import kr.flowmeet.domain.notification.exception.NotificationErrorCode;
@@ -30,8 +30,14 @@ public class NotificationFacade {
             final Long cursorId,
             final int size
     ) {
-        CursorSlice<Notification> notifications = notificationService.findAllByUserId(userId, isRead, cursorId, size);
-        return CursorSliceResponse.from(notifications.map(NotificationSummaryResponse::from), size);
+        List<Notification> notifications = notificationService.findAllByUserId(userId, isRead, cursorId, size);
+
+        return CursorSliceResponse.of(
+                notifications,
+                size,
+                NotificationSummaryResponse::from,
+                Notification::getId
+        );
     }
 
     @Transactional

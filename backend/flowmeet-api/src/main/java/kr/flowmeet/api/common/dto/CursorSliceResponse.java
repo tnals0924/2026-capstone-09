@@ -1,7 +1,7 @@
 package kr.flowmeet.api.common.dto;
 
 import java.util.List;
-import kr.flowmeet.domain.common.dto.CursorSlice;
+import java.util.function.Function;
 
 public record CursorSliceResponse<T>(
         List<T> content,
@@ -11,13 +11,34 @@ public record CursorSliceResponse<T>(
         String nextCursorValue
 ) {
 
-    public static <T> CursorSliceResponse<T> from(final CursorSlice<T> slice, final int size) {
-        return new CursorSliceResponse<>(
-                slice.content(),
-                size,
-                slice.hasNext(),
-                slice.nextCursorId(),
-                slice.nextCursorValue()
-        );
+    public static <T, R> CursorSliceResponse<R> of(
+            final List<T> data,
+            final int size,
+            final Function<T, R> mapper,
+            final Function<T, Long> idExtractor
+    ) {
+        return of(data, size, mapper, idExtractor, item -> null);
+    }
+
+    public static <T, R> CursorSliceResponse<R> of(
+            final List<T> fetched,
+            final int size,
+            final Function<T, R> mapper,
+            final Function<T, Long> idExtractor,
+            final Function<T, String> valueExtractor
+    ) {
+        boolean hasNext = fetched.size() > size;
+        List<T> content = hasNext ? fetched.subList(0, size) : fetched;
+
+        Long nextCursorId = null;
+        String nextCursorValue = null;
+        if (hasNext) {
+            T last = content.getLast();
+            nextCursorId = idExtractor.apply(last);
+            nextCursorValue = valueExtractor.apply(last);
+        }
+
+        List<R> mapped = content.stream().map(mapper).toList();
+        return new CursorSliceResponse<>(mapped, size, hasNext, nextCursorId, nextCursorValue);
     }
 }

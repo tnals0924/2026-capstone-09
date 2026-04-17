@@ -6,7 +6,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import kr.flowmeet.domain.common.dto.CursorSlice;
 import kr.flowmeet.domain.notification.entity.Notification;
 
 @RequiredArgsConstructor
@@ -15,13 +14,13 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CursorSlice<Notification> findAllByUserId(
+    public List<Notification> findAllByUserId(
             final Long userId,
             final Boolean isRead,
             final Long cursorId,
             final int size
     ) {
-        List<Notification> content = queryFactory
+        return queryFactory
                 .selectFrom(notification)
                 .where(
                         notification.userId.eq(userId),
@@ -31,18 +30,6 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
                 .orderBy(notification.id.desc())
                 .limit(size + 1L)
                 .fetch();
-
-        boolean hasNext = content.size() > size;
-        if (hasNext) {
-            content.removeLast();
-        }
-
-        Long nextCursorId = null;
-        if (hasNext && !content.isEmpty()) {
-            nextCursorId = content.getLast().getId();
-        }
-
-        return new CursorSlice<>(content, hasNext, nextCursorId, null);
     }
 
     private BooleanExpression isReadEq(final Boolean isRead) {

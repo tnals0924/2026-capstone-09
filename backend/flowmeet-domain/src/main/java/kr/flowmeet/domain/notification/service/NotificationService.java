@@ -1,11 +1,11 @@
 package kr.flowmeet.domain.notification.service;
 
+import java.util.List;
 import kr.flowmeet.domain.notification.entity.NotificationType;
 import kr.flowmeet.domain.notification.service.vo.NotificationCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import kr.flowmeet.domain.common.dto.CursorSlice;
 import kr.flowmeet.domain.common.exception.BusinessException;
 import kr.flowmeet.domain.notification.entity.Notification;
 import kr.flowmeet.domain.notification.exception.NotificationErrorCode;
@@ -26,7 +26,7 @@ public class NotificationService {
                 .orElseThrow(() -> new BusinessException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
     }
 
-    public CursorSlice<Notification> findAllByUserId(
+    public List<Notification> findAllByUserId(
             final Long userId,
             final Boolean isRead,
             final Long cursorId,

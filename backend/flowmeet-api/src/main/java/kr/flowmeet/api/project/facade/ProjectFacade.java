@@ -13,7 +13,6 @@ import kr.flowmeet.api.project.dto.response.CreateProjectResponse;
 import kr.flowmeet.api.project.dto.response.GetProjectResponse;
 import kr.flowmeet.api.project.dto.response.ProjectSummaryResponse;
 import kr.flowmeet.api.project.dto.request.UpdateProjectRequest;
-import kr.flowmeet.domain.common.dto.CursorSlice;
 import kr.flowmeet.domain.file.entity.FileDomainType;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.ProjectMember;
@@ -58,10 +57,16 @@ public class ProjectFacade {
             final String cursorValue,
             final int size
     ) {
-        CursorSlice<ProjectWithMemberCountProjection> results =
+        List<ProjectWithMemberCountProjection> projects =
                 projectService.findAllByUserId(userId, search, sort, cursorId, cursorValue, size);
 
-        return CursorSliceResponse.from(results.map(ProjectSummaryResponse::from), size);
+        return CursorSliceResponse.of(
+                projects,
+                size,
+                ProjectSummaryResponse::from,
+                item -> item.project().getId(),
+                item -> sort.extractValue(item.project())
+        );
     }
 
     public GetProjectResponse getProject(final Long userId, final Long projectId) {
