@@ -1,8 +1,9 @@
 import { Menu, MenuContent, MenuList, MenuTrigger } from '@wanteddev/wds';
-import { IconPlus } from '@wanteddev/wds-icon';
+import type { Theme } from '@wanteddev/wds-engine';
+import { IconPencil, IconPlus, IconTrash } from '@wanteddev/wds-icon';
 import { useState } from 'react';
 
-import { CustomMenu } from '@/components/commons/custom-menu/CustomMemu';
+import { CustomMenuItem } from '@/components/commons/custom-menu/CustomMemuItem';
 import { ProjectDetailLinkItem } from '@/components/projects/project-detail/ProjectDetailLinkItem';
 import { EXAMPLE_PROJECT_DETAIL_LINKS } from '@/constants/exampleConstant';
 
@@ -13,6 +14,7 @@ interface LinkContextMenuState {
 
 export const ProjectDetailLinks = () => {
   const [contextMenu, setContextMenu] = useState<LinkContextMenuState | null>(null);
+
   const handleLinkContextMenu = () => (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     setContextMenu({
@@ -57,14 +59,28 @@ export const ProjectDetailLinks = () => {
             }}
           />
         </MenuTrigger>
-        <MenuContent offset={4} position="bottom-center" sx={{ width: '9.625rem' }}>
+        <MenuContent offset={0} position="bottom-start" sx={{ width: '4rem' }}>
           <MenuList>
-            <CustomMenu value="edit-link" onClick={() => setContextMenu(null)}>
+            <CustomMenuItem
+              value="edit-link"
+              icon={<IconPencil />}
+              onClick={() => setContextMenu(null)}
+            >
               수정
-            </CustomMenu>
-            <CustomMenu value="delete-link" onClick={() => setContextMenu(null)}>
+            </CustomMenuItem>
+            <CustomMenuItem
+              value="delete-link"
+              icon={<IconTrash />}
+              textProps={{ variant: 'label2', color: 'semantic.status.negative' }}
+              onClick={() => setContextMenu(null)}
+              sx={(theme: Theme) => ({
+                '& svg': {
+                  color: theme.semantic.status.negative,
+                },
+              })}
+            >
               삭제
-            </CustomMenu>
+            </CustomMenuItem>
           </MenuList>
         </MenuContent>
       </Menu>
