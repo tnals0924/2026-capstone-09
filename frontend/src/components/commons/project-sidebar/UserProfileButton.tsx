@@ -32,7 +32,7 @@ export const UserProfileButton = ({
       {shouldShowUserInfo && (
         <div className="flex flex-col gap-0">
           {userName && (
-            <div className="text-left text-caption-2 font-normal text-label-alternative">
+            <div className="text-left text-label-2 font-normal text-label-alternative">
               {userName}
             </div>
           )}

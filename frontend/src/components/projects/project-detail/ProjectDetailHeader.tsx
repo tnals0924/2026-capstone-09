@@ -1,0 +1,68 @@
+import { SegmentedControl, SegmentedControlItem } from '@wanteddev/wds';
+import { Box } from '@wanteddev/wds-engine';
+
+import type { ProjectViewTypes } from '@/app/(project)/projects/[projectId]/layout';
+import { Users, type UserInfo } from '@/components/commons/UserAvatarGroup';
+
+interface ProjectDetailHeaderProps {
+  activeView: ProjectViewTypes;
+  onlineUsers: readonly UserInfo[];
+  onViewChange: (view: ProjectViewTypes) => void;
+}
+
+const PROJECT_VIEW_OPTIONS: Array<{
+  label: string;
+  value: ProjectViewTypes;
+}> = [
+  { label: '노드 플로우', value: 'node-flow' },
+  { label: '리스트', value: 'list' },
+  { label: '칸반', value: 'kanban' },
+];
+
+export const ProjectDetailHeader = ({
+  activeView,
+  onlineUsers,
+  onViewChange,
+}: ProjectDetailHeaderProps) => {
+  return (
+    <header className="relative z-10 flex h-14 shrink-0 items-center justify-between overflow-visible border-b border-line-soft bg-static-white px-4 pb-4 pt-4.5">
+      <div className="shrink-0">
+        <Box
+          className="inline-flex w-[300px] shrink-0 rounded-md bg-fill-normal p-0.5"
+          sx={{
+            '& button': {
+              flex: 1,
+              minWidth: 0,
+              justifyContent: 'center',
+              color: 'var(--color-label-alternative)',
+              fontSize: 'var(--typography---label2---font-size)',
+              lineHeight: 'var(--typography---label2---line-height)',
+              letterSpacing: 'var(--typography---label2---letter-spacing)',
+              fontFamily: 'var(--font-pretendard)',
+            },
+            '& button[data-state="on"]': {
+              backgroundColor: 'var(--color-background-elevated-normal)',
+              color: 'var(--color-label-normal)',
+            },
+          }}
+        >
+          <SegmentedControl
+            size="small"
+            value={activeView}
+            onValueChange={(value) => onViewChange(value as ProjectViewTypes)}
+          >
+            {PROJECT_VIEW_OPTIONS.map(({ label, value }) => (
+              <SegmentedControlItem key={value} value={value} className="h-8 px-3">
+                {label}
+              </SegmentedControlItem>
+            ))}
+          </SegmentedControl>
+        </Box>
+      </div>
+
+      <div className="shrink-0">
+        <Users users={onlineUsers} />
+      </div>
+    </header>
+  );
+};

@@ -53,12 +53,18 @@ interface AllUsersTooltipProps {
 }
 
 const AllUsersTooltip = ({ users }: AllUsersTooltipProps) => {
+    const hiddenUserCount = users.length - MAX_VISIBLE_ONLINE_USERS;
+
+    if (hiddenUserCount <= 0) {
+        return null;
+    }
+
     return (
         <Tooltip>
             <TooltipTrigger>
                 <div>
                     <Typography variant="label1" weight="bold" color="semantic.label.alternative">
-                        외 {users.length - MAX_VISIBLE_ONLINE_USERS}명
+                        외 {hiddenUserCount}명
                     </Typography>
                 </div>
             </TooltipTrigger>
