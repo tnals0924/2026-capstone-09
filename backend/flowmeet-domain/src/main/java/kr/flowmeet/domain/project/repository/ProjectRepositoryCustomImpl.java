@@ -5,12 +5,12 @@ import static kr.flowmeet.domain.project.entity.QProject.project;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.util.StringUtils;
+import kr.flowmeet.domain.common.dto.CursorSlice;
+import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.project.entity.QProjectMember;
 import kr.flowmeet.domain.project.repository.projection.ProjectWithMemberCountProjection;
 import kr.flowmeet.domain.project.service.ProjectSortType;
@@ -24,11 +24,13 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<ProjectWithMemberCountProjection> findAllByUserId(
+    public CursorSlice<ProjectWithMemberCountProjection> findAllByUserId(
             final Long userId,
             final String search,
             final ProjectSortType sort,
-            final Pageable pageable
+            final Long cursorId,
+            final String cursorValue,
+            final int size
     ) {
         List<ProjectWithMemberCountProjection> content = queryFactory
                 .select(Projections.constructor(
@@ -41,25 +43,28 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                 .join(memberCounter).on(memberCounter.projectId.eq(project.id))
                 .where(
                         memberFilter.userId.eq(userId),
-                        nameContains(search)
+                        nameContains(search),
+                        afterCursor(cursorId, cursorValue, sort)
                 )
                 .groupBy(project)
-                .orderBy(sort.toOrderSpecifier())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .orderBy(sort.toOrderSpecifier(), project.id.desc())
+                .limit(size + 1L)
                 .fetch();
 
-        Long total = queryFactory
-                .select(project.countDistinct())
-                .from(project)
-                .join(memberFilter).on(memberFilter.projectId.eq(project.id))
-                .where(
-                        memberFilter.userId.eq(userId),
-                        nameContains(search)
-                )
-                .fetchOne();
+        boolean hasNext = content.size() > size;
+        if (hasNext) {
+            content.removeLast();
+        }
 
-        return new PageImpl<>(content, pageable, total == null ? 0L : total);
+        Long nextCursorId = null;
+        String nextCursorValue = null;
+        if (hasNext && !content.isEmpty()) {
+            Project last = content.getLast().project();
+            nextCursorId = last.getId();
+            nextCursorValue = extractSortValue(last, sort);
+        }
+
+        return new CursorSlice<>(content, hasNext, nextCursorId, nextCursorValue);
     }
 
     private BooleanExpression nameContains(final String search) {
@@ -67,5 +72,31 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
             return null;
         }
         return project.name.contains(search);
+    }
+
+    private BooleanExpression afterCursor(
+            final Long cursorId,
+            final String cursorValue,
+            final ProjectSortType sort
+    ) {
+        if (cursorId == null || cursorValue == null) {
+            return null;
+        }
+        return switch (sort) {
+            case LATEST -> {
+                LocalDateTime cursorTime = LocalDateTime.parse(cursorValue);
+                yield project.updatedAt.lt(cursorTime)
+                        .or(project.updatedAt.eq(cursorTime).and(project.id.lt(cursorId)));
+            }
+            case NAME -> project.name.gt(cursorValue)
+                    .or(project.name.eq(cursorValue).and(project.id.gt(cursorId)));
+        };
+    }
+
+    private String extractSortValue(final Project last, final ProjectSortType sort) {
+        return switch (sort) {
+            case LATEST -> last.getUpdatedAt().toString();
+            case NAME -> last.getName();
+        };
     }
 }

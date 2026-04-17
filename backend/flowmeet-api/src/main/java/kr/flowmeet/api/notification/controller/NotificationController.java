@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import kr.flowmeet.api.common.dto.CommonResponse;
-import kr.flowmeet.api.common.dto.PageResponse;
+import kr.flowmeet.api.common.dto.CursorSliceResponse;
 import kr.flowmeet.api.notification.dto.response.NotificationSummaryResponse;
 import kr.flowmeet.api.notification.dto.response.GetUnreadCountResponse;
 import kr.flowmeet.api.notification.facade.NotificationFacade;
@@ -23,12 +23,12 @@ public class NotificationController implements NotificationApi {
 
     @Override
     @GetMapping
-    public CommonResponse<PageResponse<NotificationSummaryResponse>> getAllNotifications(
+    public CommonResponse<CursorSliceResponse<NotificationSummaryResponse>> getAllNotifications(
             @UserId Long userId,
             @RequestParam(required = false) Boolean isRead,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(required = false) Long cursorId,
             @RequestParam(defaultValue = "20") int size) {
-        return CommonResponse.ok(notificationFacade.getAllNotifications(userId, isRead, page, size));
+        return CommonResponse.ok(notificationFacade.getAllNotifications(userId, isRead, cursorId, size));
     }
 
     @Override

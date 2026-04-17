@@ -6,9 +6,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import kr.flowmeet.domain.common.dto.CursorSlice;
 import kr.flowmeet.domain.notification.entity.Notification;
 
 @RequiredArgsConstructor
@@ -17,32 +15,34 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Notification> findAllByUserId(
+    public CursorSlice<Notification> findAllByUserId(
             final Long userId,
             final Boolean isRead,
-            final Pageable pageable
+            final Long cursorId,
+            final int size
     ) {
         List<Notification> content = queryFactory
                 .selectFrom(notification)
                 .where(
                         notification.userId.eq(userId),
-                        isReadEq(isRead)
+                        isReadEq(isRead),
+                        afterCursor(cursorId)
                 )
                 .orderBy(notification.id.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .limit(size + 1L)
                 .fetch();
 
-        Long total = queryFactory
-                .select(notification.count())
-                .from(notification)
-                .where(
-                        notification.userId.eq(userId),
-                        isReadEq(isRead)
-                )
-                .fetchOne();
+        boolean hasNext = content.size() > size;
+        if (hasNext) {
+            content.removeLast();
+        }
 
-        return new PageImpl<>(content, pageable, total == null ? 0L : total);
+        Long nextCursorId = null;
+        if (hasNext && !content.isEmpty()) {
+            nextCursorId = content.getLast().getId();
+        }
+
+        return new CursorSlice<>(content, hasNext, nextCursorId, null);
     }
 
     private BooleanExpression isReadEq(final Boolean isRead) {
@@ -50,5 +50,12 @@ public class NotificationRepositoryCustomImpl implements NotificationRepositoryC
             return null;
         }
         return notification.isRead.eq(isRead);
+    }
+
+    private BooleanExpression afterCursor(final Long cursorId) {
+        if (cursorId == null) {
+            return null;
+        }
+        return notification.id.lt(cursorId);
     }
 }
