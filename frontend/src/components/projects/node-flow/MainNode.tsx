@@ -14,10 +14,12 @@ import {
 } from '@wanteddev/wds';
 import {
   IconBubblePlus,
+  IconPencil,
   IconMoreVertical,
   IconPin,
   IconPlus,
   IconTrash,
+  IconCircleClose
 } from '@wanteddev/wds-icon';
 import { useState } from 'react';
 import { CustomMenuItem } from '@/components/commons/custom-menu/CustomMemuItem';
@@ -42,6 +44,14 @@ export function MainNode({ node }: MainNodeProps) {
 
   const handleCreateMeeting = () => {
     // TODO: 회의 생성 모달 열기
+  };
+
+  const handleEditMeeting = () => {
+    // TODO: 회의 수정 모달 열기
+  };
+
+  const handleDeleteMeeting = () => {
+    // TODO: 회의 삭제 확인 모달 열기
   };
 
   const handleCreateReference = () => {
@@ -95,31 +105,74 @@ export function MainNode({ node }: MainNodeProps) {
                   >
                     서브 노드 생성
                   </CustomMenuItem>
-                  <CustomMenuItem
-                    value="create-meeting"
-                    icon={<IconBubblePlus />}
-                    onClick={handleCreateMeeting}
-                  >
-                    회의 생성
-                  </CustomMenuItem>
-                  <CustomMenuItem
-                    value="create-reference"
-                    icon={<IconPin />}
-                    onClick={handleCreateReference}
-                  >
-                    참조 노드
-                  </CustomMenuItem>
-                  <CustomMenuItem
-                    value="delete"
-                    icon={<IconTrash className="text-status-negative" />}
-                    onClick={handleDelete}
-                    textProps={{
-                      variant: 'label2',
-                      sx: (theme) => ({ color: theme.semantic.status.negative }),
-                    }}
-                  >
-                    삭제
-                  </CustomMenuItem>
+                  {node.hasMeeting ? (
+                    <>
+                      <CustomMenuItem
+                        value="edit-meeting"
+                        icon={<IconPencil />}
+                        onClick={handleEditMeeting}
+                      >
+                        회의 수정
+                      </CustomMenuItem>
+                      <CustomMenuItem
+                        value="create-reference"
+                        icon={<IconPin />}
+                        onClick={handleCreateReference}
+                      >
+                        참조 노드
+                      </CustomMenuItem>
+                      <CustomMenuItem
+                        value="delete-meeting"
+                        icon={<IconCircleClose className="text-status-negative" />}
+                        onClick={handleDeleteMeeting}
+                        textProps={{
+                          variant: 'label2',
+                          sx: (theme) => ({ color: theme.semantic.status.negative }),
+                        }}
+                      >
+                        회의 삭제
+                      </CustomMenuItem>
+                      <CustomMenuItem
+                        value="delete"
+                        icon={<IconTrash className="text-status-negative" />}
+                        onClick={handleDelete}
+                        textProps={{
+                          variant: 'label2',
+                          sx: (theme) => ({ color: theme.semantic.status.negative }),
+                        }}
+                      >
+                        삭제
+                      </CustomMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <CustomMenuItem
+                        value="create-meeting"
+                        icon={<IconBubblePlus />}
+                        onClick={handleCreateMeeting}
+                      >
+                        회의 생성
+                      </CustomMenuItem>
+                      <CustomMenuItem
+                        value="create-reference"
+                        icon={<IconPin />}
+                        onClick={handleCreateReference}
+                      >
+                        참조 노드
+                      </CustomMenuItem>
+                      <CustomMenuItem
+                        value="delete"
+                        icon={<IconTrash className="text-status-negative" />}
+                        onClick={handleDelete}
+                        textProps={{
+                          variant: 'label2',
+                          sx: (theme) => ({ color: theme.semantic.status.negative }),
+                        }}
+                      >
+                        삭제
+                      </CustomMenuItem>
+                    </>
+                  )}
                 </MenuList>
               </MenuContent>
             </Menu>
@@ -141,7 +194,7 @@ export function MainNode({ node }: MainNodeProps) {
             {visibleTags.map((tag) => (
                 <ContentBadge
                     key={tag.tagId}
-                    size="small"
+                    size="xsmall"
                     variant="solid"
                     color="neutral"
                     sx={{
@@ -153,7 +206,7 @@ export function MainNode({ node }: MainNodeProps) {
                 </ContentBadge>
             ))}
             {remainingTagsCount > 0 && (
-                <ContentBadge size="small" variant="solid" color="neutral">
+                <ContentBadge size="xsmall" variant="solid" color="neutral">
                   +{remainingTagsCount}
                 </ContentBadge>
             )}
@@ -166,7 +219,7 @@ export function MainNode({ node }: MainNodeProps) {
                     {node.assignees.slice(0, 3).map((assignee, index) => (
                         <Tooltip key={assignee.userId}>
                           <TooltipTrigger>
-                            <div className={index === 0 ? '' : '-ml-1'}>
+                            <div className={index === 0 ? '' : '-ml-1'} style={{ zoom: 0.75 }}>
                               <Avatar
                                   variant="person"
                                   size="xsmall"
