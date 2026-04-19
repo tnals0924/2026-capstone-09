@@ -26,6 +26,10 @@ public class ProjectMemberService {
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
     }
 
+    public ProjectMemberRole findMemberRole(final Long projectId, final Long userId) {
+        return findByProjectIdAndUserId(projectId, userId).getRole();
+    }
+
     public ProjectMember findByIdAndProjectId(final Long memberId, final Long projectId) {
         return projectMemberRepository.findByIdAndProjectId(memberId, projectId)
                 .orElseThrow(() -> new BusinessException(ProjectErrorCode.MEMBER_NOT_FOUND));
