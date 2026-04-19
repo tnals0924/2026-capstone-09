@@ -5,6 +5,7 @@ import kr.flowmeet.domain.project.event.ProjectMemberInvitedEvent;
 import kr.flowmeet.external.email.EmailSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -18,6 +19,7 @@ public class ProjectMemberInvitedEventListener {
 
     private final EmailSender emailSender;
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handle(final ProjectMemberInvitedEvent event) {
         try {
