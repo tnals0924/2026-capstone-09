@@ -38,8 +38,12 @@ services:
       - ./docker/certbot/conf:/etc/letsencrypt:ro
       - ./docker/certbot/www:/var/www/certbot:ro
     # 인증서 갱신 반영을 위해 6시간마다 nginx reload
+    # 공식 이미지의 docker-entrypoint.sh 는 $1 이 "nginx" 일 때만 /docker-entrypoint.d/*
+    # (envsubst 포함) 를 실행하므로, /bin/sh 로 래핑하기 전에 템플릿 렌더링을 직접 호출한다.
     command: >
-      /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g 'daemon off;'"
+      /bin/sh -c "/docker-entrypoint.d/20-envsubst-on-templates.sh &&
+      { while :; do sleep 6h & wait $${!}; nginx -s reload; done & } &&
+      exec nginx -g 'daemon off;'"
     depends_on:
       app:
         condition: service_healthy
