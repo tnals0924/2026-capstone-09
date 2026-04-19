@@ -72,7 +72,7 @@ public class ProjectRepositoryCustomImpl implements ProjectRepositoryCustom {
                         .or(project.updatedAt.eq(cursorTime).and(project.id.lt(cursorId)));
             }
             case NAME -> project.name.gt(cursorValue)
-                    .or(project.name.eq(cursorValue).and(project.id.gt(cursorId)));
+                    .or(project.name.eq(cursorValue).and(project.id.lt(cursorId)));
         };
     }
 }
