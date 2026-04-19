@@ -33,6 +33,10 @@ RUN ./gradlew --no-daemon :flowmeet-api:bootJar -x test
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd --system spring && useradd --system --gid spring spring
 USER spring
 

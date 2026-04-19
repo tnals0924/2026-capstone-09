@@ -15,7 +15,7 @@ services:
     # management(8081) 포트는 expose 하지 않아 같은 compose network 내부에서도
     # 호출은 가능하지만 호스트/외부로는 노출되지 않음 (헬스체크는 컨테이너 내부에서 수행)
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/actuator/health || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/actuator/health || exit 1"]
       interval: 15s
       timeout: 5s
       retries: 10
