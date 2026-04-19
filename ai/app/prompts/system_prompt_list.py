@@ -204,6 +204,7 @@ CREATE_ANAL_MERMAID_PROMPT="""
 
 [주의 사항]
 - "reason"은 무시한다.
+- 반드시 [] 안에 따옴표("")롤 사용할 것
 
 [출력]
 - 설명 없이 Mermaid 코드만 출력
