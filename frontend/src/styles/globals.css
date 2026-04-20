@@ -385,3 +385,29 @@ body {
     padding: 2rem;
   }
 }
+
+
+@theme {
+  /* 애니메이션 변수 정의 */
+  --animate-slide-in: slide-in 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+  --animate-slide-out: slide-out 0.22s cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* 키프레임 정의 */
+  @keyframes slide-in {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slide-out {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+}
