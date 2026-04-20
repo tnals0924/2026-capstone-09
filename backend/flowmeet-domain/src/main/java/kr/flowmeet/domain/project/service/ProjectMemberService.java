@@ -112,7 +112,7 @@ public class ProjectMemberService {
     }
 
     @Transactional
-    public void acceptInvitation(User user, Long projectId, String inviteeEmail) {
+    public void acceptInvitation(final User user, final Long projectId, final String inviteeEmail) {
         if (!user.getEmail().equals(inviteeEmail)) {
             throw new BusinessException(ProjectErrorCode.INVITATION_EMAIL_MISMATCH);
         }
