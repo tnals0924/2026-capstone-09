@@ -1,7 +1,7 @@
 'use client';
 
-import { useProjectDetailLayout } from '@/contexts/ProjectDetailLayoutContext';
 import { NodeFlowView } from '@/components/projects/node-flow/NodeFlowView';
+import { useProjectDetailLayout } from '@/contexts/ProjectDetailLayoutContext';
 
 export default function ProjectDetailPage() {
   const { activeView } = useProjectDetailLayout();
