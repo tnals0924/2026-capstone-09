@@ -63,6 +63,13 @@ public class ProjectService {
     }
 
     @Transactional
+    public int issueRootNodeSeq(final Long projectId) {
+        Project project = projectRepository.findByIdWithLock(projectId)
+                .orElseThrow(() -> new BusinessException(ProjectErrorCode.PROJECT_NOT_FOUND));
+        return project.issueRootNodeSeq();
+    }
+
+    @Transactional
     public void invite(String email, Long projectId, User inviter) {
         Project project = findById(projectId);
 
