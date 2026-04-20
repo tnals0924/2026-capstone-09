@@ -4,11 +4,9 @@ import { useState, useRef, useEffect } from 'react';
 import { EXAMPLE_PROJECT_SIDEBAR_PROFILE } from '@/constants/exampleConstant';
 import type { Edge } from '@/types/FlowChartTypes';
 
-interface DashedCommentProps {
-  edge?: Edge;
-  isCreateMode?: boolean;
-  onCommentCreate?: (comment: string) => void;
-}
+type DashedCommentProps =
+  | { isCreateMode: true; edge?: never; onCommentCreate?: (comment: string) => void }
+  | { isCreateMode?: false; edge: Edge; onCommentCreate?: never };
 
 interface CommentDisplayProps {
   avatarSrc?: string;
@@ -24,8 +22,8 @@ function CommentDisplay({ avatarSrc, nickname, timeText, comment }: CommentDispl
       <Avatar variant="person" size="xsmall" src={avatarSrc} />
       <div className="flex flex-col items-start justify-center gap-[3px]">
         <div className="flex items-center justify-between self-stretch gap-4">
-          <div className="text-caption-2 font-medium text-label-neutral">{nickname}</div>
-          <div className="text-caption-2 font-regular text-neutral-50">{timeText}</div>
+          <div className="max-w-[100px] truncate text-caption-2 font-medium text-label-neutral">{nickname}</div>
+          <div className="shrink-0 text-caption-2 font-regular text-neutral-50">{timeText}</div>
         </div>
         <div className="whitespace-nowrap text-caption-1 font-medium text-label-neutral">
           {comment}
@@ -35,7 +33,8 @@ function CommentDisplay({ avatarSrc, nickname, timeText, comment }: CommentDispl
   );
 }
 
-export function DashedComment({ edge, isCreateMode = false, onCommentCreate }: DashedCommentProps) {
+export function DashedComment(props: DashedCommentProps) {
+  const { isCreateMode, onCommentCreate } = props;
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [savedComment, setSavedComment] = useState<string | null>(null);
@@ -76,7 +75,7 @@ export function DashedComment({ edge, isCreateMode = false, onCommentCreate }: D
     setInputValue('');
   };
 
-  if (isCreateMode && savedComment) {
+  if (isCreateMode === true && savedComment) {
     return (
       <CommentDisplay
         avatarSrc={EXAMPLE_PROJECT_SIDEBAR_PROFILE.profileImageUrl}
@@ -88,7 +87,7 @@ export function DashedComment({ edge, isCreateMode = false, onCommentCreate }: D
   }
 
   // Create 상태
-  if (isCreateMode) {
+  if (isCreateMode === true) {
     if (isEditing) {
       return (
         <div className="flex items-center justify-center rounded bg-white px-3 py-1 outline outline-1 outline-offset-[-1px] outline-primary-40">
@@ -121,7 +120,7 @@ export function DashedComment({ edge, isCreateMode = false, onCommentCreate }: D
   }
 
   // Default 상태 (코멘트가 있는 경우)
-  if (!edge) return null;
+  const { edge } = props;
 
   return (
     <CommentDisplay
