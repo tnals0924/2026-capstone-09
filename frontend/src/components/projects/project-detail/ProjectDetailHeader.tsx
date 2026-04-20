@@ -1,7 +1,7 @@
 import { SegmentedControl, SegmentedControlItem } from '@wanteddev/wds';
 import { Box, type Theme } from '@wanteddev/wds-engine';
 
-import type { ProjectViewTypes } from '@/app/(project)/projects/[projectId]/layout';
+import type { ProjectViewTypes } from '@/contexts/ProjectDetailLayoutContext';
 import { type UserInfo, Users } from '@/components/commons/user/UserAvatarGroup';
 
 interface ProjectDetailHeaderProps {
