@@ -2,10 +2,15 @@ name: Deploy to AWS Lambda
 
 on:
   push:
-    branches:
-      - ai/develop
+    branches: [ai/develop]
     paths:
       - 'ai/**'
+      - '.github/workflows/ai_deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -13,7 +18,7 @@ jobs:
 
     steps:
       - name: 코드 체크아웃
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: AWS CLI 설정
         uses: aws-actions/configure-aws-credentials@v2
