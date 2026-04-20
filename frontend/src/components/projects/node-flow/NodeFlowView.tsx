@@ -30,10 +30,6 @@ export function NodeFlowView() {
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).closest('[data-interactive="true"]')) {
-      return;
-    }
-
     setIsDragging(true);
     setDragStart({
       x: e.clientX + (containerRef.current?.scrollLeft || 0),
@@ -82,9 +78,11 @@ export function NodeFlowView() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-auto bg-surface-canvas p-6"
+      className="w-full h-full overflow-auto bg-surface-canvas p-6 [&::-webkit-scrollbar]:hidden"
       style={{
-        cursor: isDragging ? 'grabbing' : 'grab',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        cursor: isDragging ? 'grabbing' : 'default',
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -97,14 +95,13 @@ export function NodeFlowView() {
           <h2 className="text-body-1 font-semibold text-neutral-90">메인 노드</h2>
           <div className="flex gap-4">
             {mainNodes.map((node) => (
-              <div key={node.nodeId} data-interactive="true">
-                <BaseNode
-                  node={node}
-                  variant="main"
-                  isFocused={focusedNodeId === node.nodeId}
-                  onNodeClick={handleNodeClick}
-                />
-              </div>
+              <BaseNode
+                key={node.nodeId}
+                node={node}
+                variant="main"
+                isFocused={focusedNodeId === node.nodeId}
+                onNodeClick={handleNodeClick}
+              />
             ))}
           </div>
         </div>
@@ -112,16 +109,15 @@ export function NodeFlowView() {
         {/* 서브 노드 */}
         <div className="flex flex-col gap-4">
           <h2 className="text-body-1 font-semibold text-neutral-90">서브 노드</h2>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col flex-wrap gap-4">
             {subNodes.map((node) => (
-              <div key={node.nodeId} data-interactive="true">
-                <BaseNode
-                  node={node}
-                  variant="sub"
-                  isFocused={focusedNodeId === node.nodeId}
-                  onNodeClick={handleNodeClick}
-                />
-              </div>
+              <BaseNode
+                key={node.nodeId}
+                node={node}
+                variant="sub"
+                isFocused={focusedNodeId === node.nodeId}
+                onNodeClick={handleNodeClick}
+              />
             ))}
           </div>
         </div>

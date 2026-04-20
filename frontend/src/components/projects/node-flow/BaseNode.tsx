@@ -24,8 +24,13 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
   const isMain = variant === 'main';
   const nodeNumber = node.parentId ? `#${node.parentId}-${node.nodeId}` : `#${node.nodeId}`;
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onNodeClick(node.nodeId);
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   const handleCreateSubNode = () => {
@@ -70,6 +75,7 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
         boxShadow: '-2px -2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent), 2px 2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent)'
       } : undefined}
       onClick={handleClick}
+      onMouseDown={handleMouseDown}
     >
       <div className="flex self-stretch flex-col gap-1">
         <div className="flex w-full items-center justify-between">
