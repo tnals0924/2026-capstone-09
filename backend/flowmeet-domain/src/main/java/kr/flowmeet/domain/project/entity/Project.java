@@ -33,10 +33,14 @@ public class Project extends BaseTimeEntity {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
+    @Column(name = "root_node_seq", nullable = false)
+    private int rootNodeSeq;
+
     @Builder
     public Project(String name, String profileImageUrl) {
         this.name = name;
         this.profileImageUrl = profileImageUrl;
+        this.rootNodeSeq = 0;
     }
 
     public void updateName(final String name) {
@@ -45,5 +49,10 @@ public class Project extends BaseTimeEntity {
 
     public void updateProfileImageUrl(final String profileImageUrl) {
         this.profileImageUrl = profileImageUrl;
+    }
+
+    public int issueRootNodeSeq() {
+        this.rootNodeSeq += 1;
+        return this.rootNodeSeq;
     }
 }
