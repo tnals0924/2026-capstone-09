@@ -12,6 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,9 @@ import kr.flowmeet.domain.user.entity.User;
 @Entity
 @Table(
         name = "project_members",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_project_members_project_id_user_id", columnNames = { "project_id", "user_id" })
+        },
         indexes = {
                 @Index(name = "idx_project_members_project_id", columnList = "project_id"),
                 @Index(name = "idx_project_members_user_id", columnList = "user_id")
@@ -67,10 +71,6 @@ public class ProjectMember extends BaseTimeEntity {
 
     public void updateRole(final ProjectMemberRole role) {
         this.role = role;
-    }
-
-    public boolean canEdit() {
-        return this.role != ProjectMemberRole.VIEWER;
     }
 
     public boolean isOwner() {
