@@ -66,17 +66,22 @@ public class Meeting extends BaseTimeEntity {
     @Column(name = "is_push_enabled", nullable = false)
     private boolean isPushEnabled;
 
+    @Column(name = "push_notify_at")
+    private LocalDateTime pushNotifyAt;
+
     @Column(columnDefinition = "TEXT")
     private String summary;
 
     @Builder
     public Meeting(Long nodeId, Long createdById, MeetingStatus status,
-                   LocalDateTime startedAt, boolean isPushEnabled, String summary) {
+                   LocalDateTime startedAt, boolean isPushEnabled, LocalDateTime pushNotifyAt,
+                   String summary) {
         this.nodeId = nodeId;
         this.createdById = createdById;
         this.status = status;
         this.startedAt = startedAt;
         this.isPushEnabled = isPushEnabled;
+        this.pushNotifyAt = pushNotifyAt;
         this.summary = summary;
     }
 }
