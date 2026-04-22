@@ -22,7 +22,7 @@ export default function NodePageLayout({ params }: NodeDetailLayoutProps) {
   const value = pathname.endsWith('meeting') ? 'meeting' : 'note';
 
   return (
-    <div className="flex h-full w-full justify-center bg-white">
+    <div className="flex h-full w-full justify-center bg-white pt-14">
       {/* TODO : 내부 요소들 사이즈 맞추고 사이즈 적절하게 조절 필요 */}
       <div className="w-1/2">
         <NodeDetailLayout
@@ -30,7 +30,7 @@ export default function NodePageLayout({ params }: NodeDetailLayoutProps) {
           noteContent={<NodeNoteTab />}
           meetingContent={<NodeMeetingTab />}
           value={value}
-          onValueChange={(tab) => router.push(`/nodes/${id}/${tab}`)}
+          onValueChange={(tab) => router.replace(`/nodes/${id}/${tab}`)}
         />
       </div>
     </div>

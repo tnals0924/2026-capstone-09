@@ -64,6 +64,7 @@ export const EXAMPLE_PROJECT_DETAIL_LINKS = [
   { id: 'link-4', label: 'Vercel', href: 'https://vercel.com/dashboard' },
 ] as const;
 
+// TODO : 프로필 이미지 url 추가 + User 컴포넌트에 이미지 들어도록 수정 필요
 export const EXAMPLE_USERS = [
   { name: '황수민', email: 'tnals655@kookmin.ac.kr' },
   { name: '박건민', email: 'parkkunmin@kookmin.ac.kr' },
@@ -74,33 +75,49 @@ export const EXAMPLE_USERS = [
 ] as const;
 
 export const EXAMPLE_NODE_DETAIL = {
-  nodeId: 1,
-  projectId: 1,
+  nodeId: 101,
+  projectId: 17,
   parentId: null,
-  title: '기획 문서 작성',
-  description: '기획 초안 작성',
-  noteContent: '# 기획 문서\\n\\n## 1. 서론\\n프로젝트 목적은...',
-  status: 'IN_PROGRESS',
-  sortOrder: 0,
+  title: '로그인 화면 기획',
+  description: 'OAuth2 로그인 플로우 정리',
+  noteContent:
+    '## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????## 로그인 시나리오\n- Google OAuth ... 근데노드설명개길어지면어떡할거임?????????',
+  status: 'WAITING',
+  sortOrder: 1024,
+  number: '1',
   tags: [
-    { tagId: 1, name: '긴급', color: '#FF0000' },
-    { tagId: 3, name: '백엔드', color: '#0066FF' },
+    {
+      tagId: 5,
+      name: '긴급',
+      color: '#FF5A5F',
+    },
+    {
+      tagId: 6,
+      name: '긴급',
+      color: '#FF5A5F',
+    },
   ],
   assignees: [
     {
-      userId: 10,
-      nickname: '홍길동',
-      email: 'hong@gmail.com',
-      profileImageUrl: '<https://cdn.flowmit.com/profiles/10.png>',
+      userId: 91,
+      nickname: '플로우민',
+      email: 'flowmin@flowmeet.kr',
+      profileImageUrl: null,
+    },
+    {
+      userId: 92,
+      nickname: '플로우민',
+      email: 'flowmin@flowmeet.kr',
+      profileImageUrl: 'https://cdn.flowmeet.kr/profile/91.png',
     },
   ],
   meeting: {
-    meetingId: 1,
+    meetingId: 57,
     status: 'SCHEDULED',
-    startedAt: '2026-03-27T15:30:00',
-    pushEnabled: true,
-    pushNotifyAt: '2026-03-27T15:00:00',
+    startedAt: '2026-04-20T14:00:00',
+    isPushEnabled: true,
+    pushNotifyAt: '2026-04-20T13:50:00',
   },
-  createdAt: '2026-03-25T09:00:00',
-  updatedAt: '2026-03-26T10:00:00',
+  createdAt: '2026-03-01T09:00:00',
+  updatedAt: '2026-04-19T10:15:30',
 };

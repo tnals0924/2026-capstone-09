@@ -1,4 +1,28 @@
-import { Tab, TabList, TabListItem, TabPanel } from '@wanteddev/wds';
+import {
+  Avatar,
+  ContentBadge,
+  Tab,
+  TabList,
+  TabListItem,
+  TabPanel,
+  ThemeColorsToken,
+  Typography,
+} from '@wanteddev/wds';
+import { EXAMPLE_NODE_DETAIL, EXAMPLE_USERS } from '@/constants/exampleConstant';
+import { Users } from '../commons/user/UserAvatarGroup';
+import {
+  IconDocumentText,
+  IconFire,
+  IconMoreVertical,
+  IconPersons,
+  IconTag,
+} from '@wanteddev/wds-icon';
+import {
+  getNodeStatusColor,
+  getNodeStatusIcon,
+  getNodeStatusLabel,
+} from '@/constants/getNodeStatus';
+import { NodeStatusType } from '@/constants/nodeStatus';
 
 interface NodeDetailLayoutProps {
   nodeId: string | null;
@@ -15,50 +39,94 @@ export function NodeDetailLayout({
   value, // 외부에서 탭 상태 주입
   onValueChange, // 외부에서 탭 변경 핸들링
 }: NodeDetailLayoutProps) {
+  const nodeDetail = EXAMPLE_NODE_DETAIL;
+
   return (
     <div className="flex h-full flex-col">
+      {/* 태그, 프로필, 타코볼 */}
       <div className="flex items-center justify-between">
-        <span className="text-xs font-medium tracking-wide text-gray-400">#1-1</span>
-        <div className="flex items-center gap-2">
-          <ToggleButton />
-          <MoreButton />
+        {nodeDetail.parentId ? ( // 메인 노드 / 서브 노드 분기
+          <ContentBadge color="neutral" size="xsmall" variant="outlined">
+            #{nodeDetail.number}
+          </ContentBadge>
+        ) : (
+          <ContentBadge
+            className="!bg-primary-40/10 !text-primary-40"
+            size="xsmall"
+            variant="solid"
+          >
+            #{nodeDetail.number}
+          </ContentBadge>
+        )}
+
+        <div className="flex items-center gap-1 py-0.5">
+          {/* TODO : 현재 디자인이랑 불일치해서 디자인에 맞출 건지 확인 필요 */}
+          <Users users={EXAMPLE_USERS} />
+          <IconMoreVertical />
         </div>
       </div>
 
-      <h1 className="text-[22px] leading-tight font-bold text-gray-900">노드 제목</h1>
+      <div className="flex flex-col gap-6 pb-5">
+        {/* 제목 */}
+        {/* TODO : 현재 타이포라서 read만 가능한 상태 - 나중에 input 변경 */}
+        <Typography variant="title3" weight="medium">
+          {nodeDetail.title}
+        </Typography>
 
-      <div className="space-y-2.5">
-        <MetaRow icon="🏷️" label="태그">
-          <div className="flex flex-wrap gap-1.5">
-            {['텍스트', '텍스트', '텍스트', '텍스트', '텍스트'].map((t, i) => (
-              <span
-                key={i}
-                className="rounded-full border border-teal-100 bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-700"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
-        </MetaRow>
+        <div className="flex flex-col gap-5">
+          {/* 태그 */}
+          <MetaRow icon={<IconTag />} label="태그">
+            <div className="flex flex-wrap gap-1.5">
+              {nodeDetail.tags.map((tag) => (
+                <span key={tag.tagId}>
+                  {/* TODO : 서버에서 뱃지 색 color ENUM값으로 넘겨줘야 해서 형식 보고 + 매핑하고 추후 수정 */}
+                  <ContentBadge size="xsmall">{tag.name}</ContentBadge>
+                </span>
+              ))}
+            </div>
+          </MetaRow>
 
-        <MetaRow icon="👥" label="노드 담당자">
-          <div className="flex items-center gap-2">
-            <Avatar name="박건민" />
-            <Avatar name="박건민" />
-          </div>
-        </MetaRow>
+          {/* 노드 담당자 */}
+          <MetaRow icon={<IconPersons />} label="노드 담당자">
+            <div className="flex gap-3">
+              {nodeDetail.assignees.map((assingee) => (
+                <div key={assingee.userId} className="flex items-center gap-1">
+                  <div className="scale-75">
+                    <Avatar
+                      variant="person"
+                      size="xsmall"
+                      src={assingee.profileImageUrl || undefined}
+                    />
+                  </div>
+                  <Typography variant="label1">{assingee.nickname}</Typography>
+                </div>
+              ))}
+            </div>
+          </MetaRow>
 
-        <MetaRow icon="📄" label="노드 설명">
-          <span className="text-sm text-gray-600">
-            노드 설명입니다. 노드 설명입니다. 노드 설명입니다.
-          </span>
-        </MetaRow>
+          {/* 노드 설명 */}
+          <MetaRow icon={<IconDocumentText />} label="노드 설명">
+            <div className="flex">
+              <Typography variant="label1">{nodeDetail.noteContent}</Typography>
+            </div>
+          </MetaRow>
 
-        <MetaRow icon="⏳" label="진행 상태">
-          <span className="inline-flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 text-xs font-semibold text-teal-700">
-            <span className="text-teal-500">✓</span> 완료
-          </span>
-        </MetaRow>
+          {/* 진행 상태 */}
+          <MetaRow icon={<IconFire />} label="진행 상태">
+            <ContentBadge
+              size="xsmall"
+              color="accent"
+              accentColor={
+                getNodeStatusColor(nodeDetail.status as NodeStatusType) as ThemeColorsToken
+              }
+              leadingContent={getNodeStatusIcon(nodeDetail.status as NodeStatusType)}
+            >
+              {getNodeStatusLabel(nodeDetail.status as NodeStatusType)}
+            </ContentBadge>
+          </MetaRow>
+        </div>
+
+        {/* TODO : 회의가 있을 경우 회의 내용 필요 */}
       </div>
 
       <Tab value={value} onValueChange={onValueChange} defaultValue="notes">
@@ -73,56 +141,22 @@ export function NodeDetailLayout({
   );
 }
 
-// ────────────────────────────────────────────────
-// 로컬 더미 공통 컴포넌트 - 이 아래는 리뷰 안 남겨도 됩니다!
-// ────────────────────────────────────────────────
 function MetaRow({
   icon,
   label,
   children,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="flex w-28 shrink-0 items-center gap-1.5 pt-0.5 text-xs text-gray-400">
+      <span className="text-label-alternative flex min-w-25 items-center gap-1">
         <span>{icon}</span>
-        {label}
+        <Typography variant="label1">{label}</Typography>
       </span>
-      <div className="min-w-0 flex-1">{children}</div>
+      <div>{children}</div>
     </div>
-  );
-}
-
-function Avatar({ name }: { name: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-[10px] font-bold text-white">
-        {name[0]}
-      </div>
-      <span className="text-sm text-gray-700">{name}</span>
-    </div>
-  );
-}
-
-function ToggleButton() {
-  return (
-    <button className="relative h-5 w-10 rounded-full bg-gray-200 transition-colors hover:bg-gray-300">
-      <span className="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform" />
-    </button>
-  );
-}
-
-function MoreButton() {
-  return (
-    <button className="flex h-7 w-7 items-center justify-center rounded-md text-gray-400 transition-colors hover:bg-gray-100">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-        <circle cx="8" cy="3" r="1.2" />
-        <circle cx="8" cy="8" r="1.2" />
-        <circle cx="8" cy="13" r="1.2" />
-      </svg>
-    </button>
   );
 }
