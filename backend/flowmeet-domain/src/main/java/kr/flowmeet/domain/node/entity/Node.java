@@ -55,6 +55,12 @@ public class Node extends BaseTimeEntity {
     private Node parent;
 
     @Column(nullable = false)
+    private String number;
+
+    @Column(name = "child_seq", nullable = false)
+    private int childSeq;
+
+    @Column(nullable = false)
     private String title;
 
     private String description;
@@ -74,16 +80,23 @@ public class Node extends BaseTimeEntity {
     private int sortOrder;
 
     @Builder
-    public Node(Long projectId, Long parentId, String title, String description, NodeType type,
-                String noteContent, NodeStatus status, int sortOrder) {
+    public Node(Long projectId, Long parentId, String number, String title, String description,
+                NodeType type, String noteContent, NodeStatus status, int sortOrder) {
         this.projectId = projectId;
         this.parentId = parentId;
+        this.number = number;
+        this.childSeq = 0;
         this.title = title;
         this.description = description;
         this.type = type;
         this.noteContent = noteContent;
         this.status = status;
         this.sortOrder = sortOrder;
+    }
+
+    public int issueChildSeq() {
+        this.childSeq += 1;
+        return this.childSeq;
     }
 
     public void update(final String title, final String description, final String noteContent,

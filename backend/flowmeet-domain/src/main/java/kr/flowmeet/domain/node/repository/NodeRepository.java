@@ -1,8 +1,10 @@
 package kr.flowmeet.domain.node.repository;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,6 +15,10 @@ public interface NodeRepository extends JpaRepository<Node, Long>, NodeRepositor
     List<Node> findAllByProjectId(Long projectId);
 
     Optional<Node> findByIdAndProjectId(Long id, Long projectId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT n FROM Node n WHERE n.id = :id AND n.projectId = :projectId")
+    Optional<Node> findByIdAndProjectIdWithLock(@Param("id") Long id, @Param("projectId") Long projectId);
 
     List<Node> findAllByParentId(Long parentId);
 
