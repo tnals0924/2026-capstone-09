@@ -10,6 +10,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import kr.flowmeet.domain.common.BaseTimeEntity;
 import kr.flowmeet.domain.project.entity.Project;
 import lombok.AccessLevel;
@@ -22,6 +23,9 @@ import org.hibernate.annotations.SQLRestriction;
 @Entity
 @Table(
         name = "tags",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_tags_project_id_name", columnNames = { "project_id", "name" })
+        },
         indexes = {
                 @Index(name = "idx_tags_project_id", columnList = "project_id")
         }

@@ -10,6 +10,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import kr.flowmeet.domain.common.BaseTimeEntity;
 import kr.flowmeet.domain.project.entity.Project;
 import kr.flowmeet.domain.user.entity.User;
@@ -21,6 +22,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "notification_settings",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_notification_settings_user_id_project_id", columnNames = { "user_id", "project_id" })
+        },
         indexes = {
                 @Index(name = "idx_notification_settings_user_id", columnList = "user_id"),
                 @Index(name = "idx_notification_settings_project_id", columnList = "project_id")

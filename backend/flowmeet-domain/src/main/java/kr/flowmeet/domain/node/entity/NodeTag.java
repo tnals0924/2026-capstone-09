@@ -10,6 +10,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
         name = "node_tags",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_node_tags_node_id_tag_id", columnNames = { "node_id", "tag_id" })
+        },
         indexes = {
                 @Index(name = "idx_node_tags_tag_id", columnList = "tag_id"),
                 @Index(name = "idx_node_tags_node_id", columnList = "node_id")
