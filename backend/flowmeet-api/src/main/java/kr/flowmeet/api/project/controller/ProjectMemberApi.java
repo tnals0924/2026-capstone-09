@@ -18,7 +18,7 @@ public interface ProjectMemberApi {
     @Operation(summary = "멤버 목록 조회")
     CommonResponse<GetAllProjectMembersResponse> getAllMembers(@UserId Long userId, @PathVariable Long projectId);
 
-    @Operation(summary = "멤버 권한 수정", description = "OWNER만 변경할 수 있습니다.")
+    @Operation(summary = "멤버 권한 수정", description = "- OWNER 부여: OWNER 권한 필요\n- OWNER 강등: 본인만 가능\n- VIEWER ↔ MEMBER 변경: MEMBER 이상 가능")
     @ApiErrorCode(code = ProjectErrorCode.class, names = {"MEMBER_NOT_FOUND", "PROJECT_ACCESS_DENIED", "MEMBER_CANNOT_CHANGE_OWNER"})
     CommonResponse<?> updateMemberRole(@UserId Long userId, @PathVariable Long projectId,
                                        @PathVariable Long memberId,
