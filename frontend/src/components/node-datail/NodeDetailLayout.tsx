@@ -17,17 +17,15 @@ import {
   IconPersons,
   IconTag,
 } from '@wanteddev/wds-icon';
-import {
-  getNodeStatusColor,
-  getNodeStatusIcon,
-  getNodeStatusLabel,
-} from '@/constants/getNodeStatus';
+import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
 import { NodeStatusType } from '@/constants/nodeStatus';
 import { EditorContent } from '@tiptap/react';
 import { useTitleEditor } from './hooks/useTitleEditor';
 import { useEffect, useState } from 'react';
 import { privateApi } from '@/api';
 import { GetNodeResponse } from '@/api/Api';
+import { getColorToken } from '@/utils/getBadgeColorInfo';
+import { ColorType } from '@/constants/badgeColor';
 
 interface Tag {
   tagId: number;
@@ -114,9 +112,14 @@ export function NodeDetailLayout({
           <MetaRow icon={<IconTag />} label="태그">
             <div className="flex flex-wrap gap-1.5">
               {nodeDetail?.tags?.map((tag) => (
-                <span key={tag.tagId}>
-                  <ContentBadge size="xsmall">{tag.name}</ContentBadge>
-                </span>
+                <ContentBadge
+                  key={tag.tagId}
+                  color="accent"
+                  size="xsmall"
+                  accentColor={getColorToken(tag.color as ColorType) as ThemeColorsToken}
+                >
+                  {tag.name}
+                </ContentBadge>
               ))}
             </div>
           </MetaRow>
