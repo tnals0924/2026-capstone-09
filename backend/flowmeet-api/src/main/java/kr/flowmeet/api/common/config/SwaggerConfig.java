@@ -6,7 +6,9 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import kr.flowmeet.api.common.swagger.ApiErrorCodeOperationCustomizer;
+import kr.flowmeet.api.common.swagger.ApiSuccessCodeOpenApiCustomizer;
 import kr.flowmeet.api.common.swagger.ApiSuccessCodeOperationCustomizer;
+import org.springdoc.core.customizers.GlobalOpenApiCustomizer;
 import kr.flowmeet.auth.annotation.UserId;
 import org.springdoc.core.customizers.OperationCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -44,6 +46,11 @@ public class SwaggerConfig {
     @Bean
     public OperationCustomizer apiSuccessCodeOperationCustomizer() {
         return new ApiSuccessCodeOperationCustomizer();
+    }
+
+    @Bean
+    public GlobalOpenApiCustomizer apiSuccessCodeOpenApiCustomizer() {
+        return new ApiSuccessCodeOpenApiCustomizer();
     }
 
     @Bean
