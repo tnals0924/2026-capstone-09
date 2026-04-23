@@ -15,7 +15,8 @@ export default function NodeNoteTab({ nodeId, projectId }: NodeNoteTabProps) {
   useEffect(() => {
     const fetchNodeDetail = async () => {
       try {
-        // TODO : 노드 플로우 페이지 API 연결 이후 제대로 된 nodeId 받아올 수 있도록
+        if (!projectId || !nodeId) return;
+
         const data = await privateApi.node.getNode(projectId, nodeId);
         setContent(data.data.data?.noteContent);
       } catch (error) {
