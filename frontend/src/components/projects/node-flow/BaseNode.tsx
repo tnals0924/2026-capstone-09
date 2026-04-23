@@ -10,6 +10,10 @@ interface BaseNodeProps {
   variant: 'main' | 'sub';
   isFocused: boolean;
   onNodeClick: (nodeId: number) => void;
+  onCreateSubNode?: (parentNodeId: number) => void;
+  onCreateReference?: (startNodeId: number) => void;
+  onDeleteNode?: (nodeId: number) => void;
+  allNodes: Node[];
 }
 
 function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodeProps) {

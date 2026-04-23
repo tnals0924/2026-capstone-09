@@ -8,6 +8,8 @@ import { privateApi } from '@/api';
 import { MainNodeConnector } from './MainNodeConnector';
 import { NodeBranch } from './NodeBranch';
 import NodeButton from './NodeButton';
+import { NodeSidebar } from '@/components/node-datail/NodeSidebar';
+import useSingleAndDoubleClick from '@/hooks/useSingleAndDoubleClick';
 
 interface NodeFlowViewProps {
   projectId: number;
@@ -24,6 +26,21 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
+
+  const [clickTargetId, setClickTargetId] = useState<number | null>(null);
+
+  const handleClick = useSingleAndDoubleClick({
+    actionSimpleClick: () => {
+      if (clickTargetId !== null) {
+        setFocusedNodeId((prev) => (prev === clickTargetId ? null : clickTargetId));
+      }
+    },
+    actionDoubleClick: () => {
+      if (clickTargetId !== null) {
+        setSelectedNodeId(clickTargetId);
+      }
+    },
+  });
 
   useEffect(() => {
     const loadFlowChart = async () => {
@@ -60,11 +77,14 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
     }
   }, [loading]);
 
-  const handleNodeClick = useCallback((nodeId: number, e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    setFocusedNodeId((prev) => (prev === nodeId ? null : nodeId));
-    setSelectedNodeId(nodeId);
-  }, []);
+  const handleNodeClick = useCallback(
+    (nodeId: number, e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      setClickTargetId(nodeId);
+      handleClick();
+    },
+    [handleClick],
+  );
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
@@ -343,6 +363,7 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
           </div>
         </div>
       </div>
+      <NodeSidebar nodeId={selectedNodeId} onClose={() => setSelectedNodeId(null)} />
     </div>
   );
 }

@@ -54,7 +54,7 @@ export function NodeSidebar({ nodeId, onClose }: NodeSidebarProps) {
       {/* TODO : 지금 열릴 때만 애니메이션 적용됨 - 추후 닫힐 때 애니메이션 구현 */}
       {/* TODO : z-index 한 번에 관리할 수 있도록 정리 */}
       <aside
-        className="animate-slide-in fixed top-0 right-0 z-40 flex h-full w-2/5 flex-col border-l border-white bg-white"
+        className="animate-slide-in fixed top-0 right-0 z-90 flex h-full w-2/5 flex-col border-l border-white bg-white"
         onClick={(e) => e.stopPropagation()}
       >
         {/* TODO : 전체 페이지의 경우 페이지 닫는 아이콘으로 변경 필요 */}
