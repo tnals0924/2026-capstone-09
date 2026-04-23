@@ -60,24 +60,26 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
   const menuVariant = isMain
     ? 'main'
     : node.hasMeeting
-    ? 'sub-with-meeting'
-    : 'sub-without-meeting';
+      ? 'sub-with-meeting'
+      : 'sub-without-meeting';
 
   return (
     <div
-      className={`bg-white flex flex-col overflow-hidden rounded-xl p-4 outline outline-1 outline-offset-[-1px] cursor-pointer transition-all
-        ${isMain ? 'w-64 gap-5' : 'w-60 gap-3'}
-        ${isFocused
-          ? 'outline-primary-40'
-          : 'outline-neutral-200 hover:outline-primary-40'
-        }`}
-      style={isFocused ? {
-        boxShadow: '-2px -2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent), 2px 2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent)'
-      } : undefined}
+      className={`flex cursor-pointer flex-col overflow-hidden rounded-xl bg-white p-4 outline outline-1 outline-offset-[-1px] transition-all ${isMain ? 'w-64 gap-5' : 'w-60 gap-3'} ${
+        isFocused ? 'outline-primary-40' : 'hover:outline-primary-40 outline-neutral-200'
+      }`}
+      style={
+        isFocused
+          ? {
+              boxShadow:
+                '-2px -2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent), 2px 2px 4px 0px color-mix(in srgb, var(--color-primary-40) 20%, transparent)',
+            }
+          : undefined
+      }
       onClick={handleClick}
       onMouseDown={handleMouseDown}
     >
-      <div className="flex self-stretch flex-col gap-1">
+      <div className="flex flex-col gap-1 self-stretch">
         <div className="flex w-full items-center justify-between">
           <div className="flex min-w-0 items-center gap-2">
             <ContentBadge
@@ -89,7 +91,7 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
               {nodeNumber}
             </ContentBadge>
 
-            <div className="min-w-0 truncate text-caption-2 font-normal text-label-alternative">
+            <div className="text-caption-2 text-label-alternative min-w-0 truncate font-normal">
               {formatDate(node.updatedAt)}
             </div>
           </div>
@@ -105,18 +107,16 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
           />
         </div>
 
-        <div className="text-body-1 font-medium line-clamp-1">
-          {node.title}
-        </div>
+        <div className="text-body-1 line-clamp-1 font-medium">{node.title}</div>
 
         {isMain && node.description && (
-          <div className="text-label-2 font-normal text-label-alternative line-clamp-2">
+          <div className="text-label-2 text-label-alternative line-clamp-2 font-normal">
             {node.description}
           </div>
         )}
       </div>
 
-      <div className="flex self-stretch items-center justify-between gap-2 overflow-hidden">
+      <div className="flex items-center justify-between gap-2 self-stretch overflow-hidden">
         <div className="flex min-w-0 items-center gap-1 overflow-hidden">
           {visibleTags.map((tag) => (
             <ContentBadge
@@ -147,28 +147,18 @@ function BaseNodeComponent({ node, variant, isFocused, onNodeClick }: BaseNodePr
                   <Tooltip key={assignee.userId}>
                     <TooltipTrigger>
                       <div className={index === 0 ? '' : '-ml-1'} style={{ zoom: 0.75 }}>
-                        <Avatar
-                          variant="person"
-                          size="xsmall"
-                          src={assignee.profileImageUrl}
-                        />
+                        <Avatar variant="person" size="xsmall" src={assignee.profileImageUrl} />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent
                       size="small"
                       position={
-                        index === node.assignees.length - 1
-                          ? 'bottom-end'
-                          : 'bottom-center'
+                        index === node.assignees.length - 1 ? 'bottom-end' : 'bottom-center'
                       }
                     >
                       <div className="flex min-w-[100px] items-center gap-2 px-1 py-1.5">
-                        <Avatar
-                          variant="person"
-                          size="xsmall"
-                          src={assignee.profileImageUrl}
-                        />
-                        <span className="text-caption-1 text-neutral-100 font-medium">
+                        <Avatar variant="person" size="xsmall" src={assignee.profileImageUrl} />
+                        <span className="text-caption-1 font-medium text-neutral-100">
                           {assignee.nickname}
                         </span>
                       </div>

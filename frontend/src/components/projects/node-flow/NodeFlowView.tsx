@@ -6,6 +6,7 @@ import { EXAMPLE_FLOWCHART_DATA } from '@/constants/exampleConstant';
 import { FlowChart } from '@/types/FlowChartTypes';
 import { BaseNode } from './BaseNode';
 import { DashedComment } from './DashedComment';
+import { NodeSidebar } from '@/components/node-datail/NodeSidebar';
 
 export function NodeFlowView() {
   const [flowChart, setFlowChart] = useState<FlowChart | null>(null);
@@ -14,6 +15,7 @@ export function NodeFlowView() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
 
   useEffect(() => {
     const loadFlowChart = async () => {
@@ -32,6 +34,7 @@ export function NodeFlowView() {
 
   const handleNodeClick = useCallback((nodeId: number) => {
     setFocusedNodeId((prev) => (prev === nodeId ? null : nodeId));
+    setSelectedNodeId(nodeId);
   }, []);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -79,7 +82,7 @@ export function NodeFlowView() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-auto bg-surface-canvas p-6 [&::-webkit-scrollbar]:hidden"
+      className="bg-surface-canvas h-full w-full overflow-auto p-6 [&::-webkit-scrollbar]:hidden"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -90,10 +93,12 @@ export function NodeFlowView() {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex flex-col gap-8 min-w-max">
+      {/* 현재 여기 타입 에러 있는데 서버에서 number: string으로 준다고 합니다 */}
+      <NodeSidebar nodeId={selectedNodeId} onClose={() => setSelectedNodeId(null)} />
+      <div className="flex min-w-max flex-col gap-8">
         {/* 메인 노드 */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">메인 노드</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">메인 노드</h2>
           <div className="flex gap-4">
             {mainNodes.map((node) => (
               <BaseNode
@@ -109,7 +114,7 @@ export function NodeFlowView() {
 
         {/* 서브 노드 */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">서브 노드</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">서브 노드</h2>
           <div className="flex flex-col flex-wrap gap-4">
             {subNodes.map((node) => (
               <BaseNode
@@ -125,7 +130,7 @@ export function NodeFlowView() {
 
         {/* 점선 코멘트 - Default */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">점선 코멘트 (Default)</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">점선 코멘트 (Default)</h2>
           <div className="flex gap-4">
             {commentEdges.map((edge) => (
               <DashedComment key={edge.edgeId} edge={edge} isCreateMode={false} />
@@ -135,7 +140,7 @@ export function NodeFlowView() {
 
         {/* 점선 코멘트 - Create */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">점선 코멘트 (Create)</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">점선 코멘트 (Create)</h2>
           <div className="flex gap-4">
             <DashedComment isCreateMode={true} />
           </div>
