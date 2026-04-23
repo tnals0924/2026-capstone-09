@@ -67,7 +67,7 @@ export function NodeDetailLayout({
   value,
   onValueChange,
 }: NodeDetailLayoutProps) {
-  const [nodeDetail, setNodeDetail] = useState<GetNodeResponse | null>(null);
+  const [nodeDetail, setNodeDetail] = useState<GetNodeResponse | undefined>(undefined);
   const titleEditor = useTitleEditor(nodeDetail?.title);
 
   useEffect(() => {

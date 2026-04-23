@@ -6,7 +6,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { Markdown } from 'tiptap-markdown';
 
 interface EditorProps {
-  content: string;
+  content: string | undefined;
 }
 
 export default function Editor({ content }: EditorProps) {

@@ -10,7 +10,7 @@ interface NodeNoteTabProps {
 }
 
 export default function NodeNoteTab({ nodeId, projectId }: NodeNoteTabProps) {
-  const [content, setContent] = useState('테스트');
+  const [content, setContent] = useState<string | undefined>('테스트');
 
   useEffect(() => {
     const fetchNodeDetail = async () => {
