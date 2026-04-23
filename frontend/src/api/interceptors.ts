@@ -1,4 +1,3 @@
-// src/api/interceptors.ts
 import { authStorage } from './authStorage';
 
 export function customFetch(baseFetch: typeof fetch = fetch) {

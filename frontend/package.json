@@ -9,7 +9,8 @@
     "start": "next start",
     "dev:desktop": "wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .",
     "dev:electron": "concurrently -k \"pnpm dev\" \"pnpm dev:desktop\"",
-    "lint": "eslint"
+    "lint": "eslint",
+    "api:gen": "dotenv -- sh -c 'npx swagger-typescript-api generate -p $SWAGGER_URL -o ./src/api --httpClientType fetch --module-name-first-tag'"
   },
   "dependencies": {
     "@tiptap/extension-collaboration": "^3.20.1",
