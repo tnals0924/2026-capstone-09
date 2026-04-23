@@ -1,8 +1,5 @@
 package kr.flowmeet.domain.project.exception;
 
-import kr.flowmeet.domain.common.exception.BusinessException;
-import kr.flowmeet.domain.project.entity.ProjectMember;
-import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,7 +10,7 @@ import kr.flowmeet.common.exception.ErrorCode;
 public enum ProjectErrorCode implements ErrorCode {
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 프로젝트입니다."),
     PROJECT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "프로젝트의 권한이 없습니다."),
-    PROJECT_OWNER_CANNOT_LEAVE(HttpStatus.BAD_REQUEST, "OWNER는 프로젝트를 나갈 수 없습니다."),
+    PROJECT_OWNER_CANNOT_LEAVE(HttpStatus.BAD_REQUEST, "프로젝트의 유일한 OWNER는 나갈 수 없습니다. 다른 멤버에게 OWNER 권한을 부여한 후 나가주세요."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 멤버입니다."),
     MEMBER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 프로젝트에 소속된 멤버입니다."),
     MEMBER_CANNOT_CHANGE_OWNER(HttpStatus.BAD_REQUEST, "OWNER 권한은 변경할 수 없습니다."),
