@@ -4,7 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 
 import { NodeDetailLayout } from '@/components/node-datail/NodeDetailLayout';
 
-interface NodePageLayoutDetailProps {
+interface NodePageLayoutClientProps {
   id: string;
   noteContent: React.ReactNode;
   meetingContent: React.ReactNode;
@@ -14,7 +14,7 @@ export function NodePageLayoutClient({
   id,
   noteContent,
   meetingContent,
-}: NodePageLayoutDetailProps) {
+}: NodePageLayoutClientProps) {
   const pathname = usePathname();
   const router = useRouter();
 
