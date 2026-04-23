@@ -38,7 +38,7 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
 
         // test
         const test = await privateApi.project.getAllProjects();
-        console.log(test);
+        console.log(test.data);
 
         setFlowChart(JSON.parse(JSON.stringify(EXAMPLE_FLOWCHART_DATA.data)));
       } catch (error) {

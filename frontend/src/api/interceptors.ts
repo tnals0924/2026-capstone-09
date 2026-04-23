@@ -8,7 +8,10 @@ export function customFetch(baseFetch: typeof fetch = fetch) {
 
     return new Response(JSON.stringify(unwrapped), {
       status: response.status,
-      headers: response.headers,
+      statusText: response.statusText,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
   };
 }
