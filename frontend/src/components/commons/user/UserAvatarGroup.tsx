@@ -34,11 +34,11 @@ const UserAvatarWithTooltip = ({ user, position }: UserAvatarWithTooltipProps) =
       </TooltipTrigger>
 
       <TooltipContent size="small" position={position}>
-        <div className="flex min-w-[140px] items-center gap-2 px-1 py-1.5">
+        <div className="flex min-w-35 items-center gap-2 px-1 py-1.5">
           <Avatar variant="person" size="xsmall" />
           <div className="flex flex-col">
-            <span className="text-caption-1 text-neutral-100 font-medium">{user.name}</span>
-            <span className="text-caption-2 text-neutral-100 font-normal">{user.email}</span>
+            <span className="text-caption-1 font-medium text-neutral-100">{user.name}</span>
+            <span className="text-caption-2 font-normal text-neutral-100">{user.email}</span>
           </div>
         </div>
       </TooltipContent>
@@ -68,13 +68,13 @@ const AllUsersTooltip = ({ users }: AllUsersTooltipProps) => {
       </TooltipTrigger>
 
       <TooltipContent size="small" position="bottom-end">
-        <div className="flex min-w-[160px] flex-col gap-2 px-1 py-1.5">
+        <div className="flex min-w-40 flex-col gap-2 px-1 py-1.5">
           {users.map((user) => (
             <div key={user.email} className="flex items-center gap-2">
               <Avatar variant="person" size="xsmall" />
               <div className="flex flex-col">
-                <span className="text-caption-1 text-neutral-100 font-medium">{user.name}</span>
-                <span className="text-caption-2 text-neutral-100 font-normal">{user.email}</span>
+                <span className="text-caption-1 font-medium text-neutral-100">{user.name}</span>
+                <span className="text-caption-2 font-normal text-neutral-100">{user.email}</span>
               </div>
             </div>
           ))}

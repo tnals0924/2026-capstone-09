@@ -1,0 +1,86 @@
+'use client';
+
+import { IconButton } from '@wanteddev/wds';
+import { IconFull } from '@wanteddev/wds-icon';
+import Link from 'next/link';
+import { useEffect, useState, useCallback, useSyncExternalStore } from 'react';
+import {
+  getServerSnapshot,
+  getSessionSnapshot,
+  SESSION_KEY,
+  subscribeToSession,
+} from '@/utils/sidebarSnapshot';
+import { NodeDetailLayout } from './NodeDetailLayout';
+import NodeMeetingTab from './NodeMeetingTab';
+import NodeNoteTab from './NodeNoteTab';
+
+interface NodeSidebarProps {
+  nodeId: string | null;
+  onClose: () => void;
+}
+
+export function NodeSidebar({ nodeId, onClose }: NodeSidebarProps) {
+  const savedNodeId = useSyncExternalStore(
+    subscribeToSession,
+    getSessionSnapshot,
+    getServerSnapshot,
+  );
+
+  const [value, setValue] = useState('note');
+
+  useEffect(() => {
+    if (nodeId) {
+      sessionStorage.setItem(SESSION_KEY, nodeId);
+    }
+  }, [nodeId]);
+
+  const activeNodeId = nodeId ?? savedNodeId;
+  const isOpen = !!activeNodeId;
+
+  const handleClose = useCallback(() => {
+    sessionStorage.removeItem(SESSION_KEY);
+    onClose();
+  }, [onClose]);
+
+  if (!isOpen || !activeNodeId) return null;
+
+  return (
+    <>
+      {/* 오버레이 */}
+      {/* TODO : 현재 새로고침 하거나 다른 페이지 다녀오면 오버레이 안 먹히는 상태 - 수정 필요 */}
+      <div className="fixed inset-0 z-30" onClick={handleClose} aria-hidden="true" />
+
+      {/* 사이드바 */}
+      {/* TODO : 지금 열릴 때만 애니메이션 적용됨 - 추후 닫힐 때 애니메이션 구현 */}
+      {/* TODO : z-index 한 번에 관리할 수 있도록 정리 */}
+      <aside
+        className="animate-slide-in fixed top-0 right-0 z-40 flex h-full w-2/5 flex-col border-l border-white bg-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* TODO : 전체 페이지의 경우 페이지 닫는 아이콘으로 변경 필요 */}
+        {/* TODO : 사이드바 닫는 아이콘 필요 */}
+        <div className="absolute -scale-x-100 p-3">
+          <IconButton
+            color="semantic.label.alternative"
+            href={`/nodes/${activeNodeId}/${value}`}
+            size={16}
+            aria-label="전체화면 보기"
+            as={Link}
+          >
+            <IconFull />
+          </IconButton>
+        </div>
+
+        <div className="flex-1 overflow-hidden px-14 pt-14">
+          <NodeDetailLayout
+            nodeId={nodeId}
+            noteContent={<NodeNoteTab />}
+            meetingContent={<NodeMeetingTab />}
+            value={value}
+            onValueChange={setValue}
+          />
+        </div>
+      </aside>
+    </>
+  );
+}
