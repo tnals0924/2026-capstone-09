@@ -95,15 +95,19 @@ public class ProjectMemberService {
     public void leave(final Long projectId, final Long userId) {
         ProjectMember member = findByProjectIdAndUserId(projectId, userId);
         if (member.isOwner()) {
-            int totalMembers = projectMemberRepository.countByProjectId(projectId);
-            if (totalMembers > 1) {
-                int ownerCount = projectMemberRepository.countByProjectIdAndRole(projectId, ProjectMemberRole.OWNER);
-                if (ownerCount == 1) {
-                    throw new BusinessException(ProjectErrorCode.PROJECT_OWNER_CANNOT_LEAVE);
-                }
-            }
+            validateSoleOwnerCannotLeave(projectId);
         }
         projectMemberRepository.delete(member);
+    }
+
+    private void validateSoleOwnerCannotLeave(final Long projectId) {
+        int totalMembers = projectMemberRepository.countByProjectId(projectId);
+        if (totalMembers > 1) {
+            int ownerCount = projectMemberRepository.countByProjectIdAndRole(projectId, ProjectMemberRole.OWNER);
+            if (ownerCount == 1) {
+                throw new BusinessException(ProjectErrorCode.PROJECT_OWNER_CANNOT_LEAVE);
+            }
+        }
     }
 
     @Transactional
