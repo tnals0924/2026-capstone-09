@@ -64,6 +64,7 @@ export function NodeSidebar({ nodeId, projectId, onClose }: NodeSidebarProps) {
           <IconButton
             color="semantic.label.alternative"
             href={`/projects/${projectId}/nodes/${activeNodeId}/${value}`}
+            onClick={handleClose}
             size={16}
             aria-label="전체화면 보기"
             as={Link}
