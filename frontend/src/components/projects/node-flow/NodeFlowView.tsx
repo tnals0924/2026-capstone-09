@@ -6,6 +6,7 @@ import { EXAMPLE_FLOWCHART_DATA } from '@/constants/exampleConstant';
 import { FlowChart } from '@/types/FlowChartTypes';
 import { BaseNode } from './BaseNode';
 import { DashedComment } from './DashedComment';
+import { privateApi } from '@/api';
 
 export function NodeFlowView() {
   const [flowChart, setFlowChart] = useState<FlowChart | null>(null);
@@ -20,6 +21,11 @@ export function NodeFlowView() {
       try {
         // TODO: API 호출로 변경
         await new Promise((resolve) => setTimeout(resolve, 100));
+
+        // test
+        const test = await privateApi.project.getAllProjects();
+        console.log(test);
+
         setFlowChart(EXAMPLE_FLOWCHART_DATA);
       } catch (error) {
         console.error('Failed to load flowchart:', error);
@@ -79,7 +85,7 @@ export function NodeFlowView() {
   return (
     <div
       ref={containerRef}
-      className="w-full h-full overflow-auto bg-surface-canvas p-6 [&::-webkit-scrollbar]:hidden"
+      className="bg-surface-canvas h-full w-full overflow-auto p-6 [&::-webkit-scrollbar]:hidden"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -90,10 +96,10 @@ export function NodeFlowView() {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex flex-col gap-8 min-w-max">
+      <div className="flex min-w-max flex-col gap-8">
         {/* 메인 노드 */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">메인 노드</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">메인 노드</h2>
           <div className="flex gap-4">
             {mainNodes.map((node) => (
               <BaseNode
@@ -109,7 +115,7 @@ export function NodeFlowView() {
 
         {/* 서브 노드 */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">서브 노드</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">서브 노드</h2>
           <div className="flex flex-col flex-wrap gap-4">
             {subNodes.map((node) => (
               <BaseNode
@@ -125,7 +131,7 @@ export function NodeFlowView() {
 
         {/* 점선 코멘트 - Default */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">점선 코멘트 (Default)</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">점선 코멘트 (Default)</h2>
           <div className="flex gap-4">
             {commentEdges.map((edge) => (
               <DashedComment key={edge.edgeId} edge={edge} isCreateMode={false} />
@@ -135,7 +141,7 @@ export function NodeFlowView() {
 
         {/* 점선 코멘트 - Create */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-body-1 font-semibold text-neutral-90">점선 코멘트 (Create)</h2>
+          <h2 className="text-body-1 text-neutral-90 font-semibold">점선 코멘트 (Create)</h2>
           <div className="flex gap-4">
             <DashedComment isCreateMode={true} />
           </div>
