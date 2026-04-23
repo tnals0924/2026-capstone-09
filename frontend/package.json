@@ -48,6 +48,7 @@
     "eslint-plugin-unused-imports": "^4.4.1",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
+    "swagger-typescript-api": "^13.6.10",
     "tailwindcss": "^4",
     "typescript": "^5",
     "wait-on": "^9.0.4"
