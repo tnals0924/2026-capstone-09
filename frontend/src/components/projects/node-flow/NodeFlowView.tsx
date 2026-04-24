@@ -18,8 +18,6 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
   const [flowChart, setFlowChart] = useState<GetFlowchartResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [focusedNodeId, setFocusedNodeId] = useState<number | null>(null);
-  // const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -53,6 +51,8 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
   }, [loading]);
 
   const [clickTargetId, setClickTargetId] = useState<number | null>(null);
+  const [focusedNodeId, setFocusedNodeId] = useState<number | null>(null);
+  const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
 
   const handleClick = useSingleAndDoubleClick({
     actionSimpleClick: () => {
@@ -62,7 +62,7 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
     },
     actionDoubleClick: () => {
       if (clickTargetId !== null) {
-        setFocusedNodeId(clickTargetId);
+        setSelectedNodeId(clickTargetId);
       }
     },
   });
@@ -70,6 +70,7 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
   const handleNodeClick = useCallback(
     (nodeId: number, e?: React.MouseEvent) => {
       e?.stopPropagation();
+
       setClickTargetId(nodeId);
       handleClick();
     },
@@ -339,8 +340,8 @@ export function NodeFlowView({ projectId }: NodeFlowViewProps) {
       </div>
       <NodeSidebar
         projectId={projectId}
-        nodeId={focusedNodeId}
-        onClose={() => setFocusedNodeId(null)}
+        nodeId={selectedNodeId}
+        onClose={() => setSelectedNodeId(null)}
       />
     </div>
   );

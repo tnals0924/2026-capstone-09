@@ -26,6 +26,7 @@ import { privateApi } from '@/api';
 import { GetNodeResponse } from '@/api/Api';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
 import { ColorType } from '@/constants/badgeColor';
+import { formatDateTime } from '@/utils/formatData';
 
 interface Tag {
   tagId: number;
@@ -36,16 +37,6 @@ interface Assignee {
   userId: number;
   nickname: string;
   profileImageUrl: string | null;
-}
-
-interface NodeDetail {
-  title: string;
-  number: number;
-  parentId: number | null;
-  tags: Tag[];
-  assignees: Assignee[];
-  noteContent: string;
-  status: NodeStatusType;
 }
 
 interface NodeDetailLayoutProps {
@@ -161,6 +152,20 @@ export function NodeDetailLayout({
             </ContentBadge>
           </MetaRow>
         </div>
+        {nodeDetail?.meeting?.meetingId ? (
+          <a
+            href="https://meet.google.com/jne-evsa-qzn"
+            className="text-label-1-normal flex items-center justify-between rounded-lg border border-gray-200 p-3"
+          >
+            <div>{formatDateTime(nodeDetail?.meeting?.startedAt)}에 회의 예정</div>
+            <img
+              className="h-5 w-5"
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/250px-Google_Meet_icon_%282020%29.svg.png"
+            />
+          </a>
+        ) : (
+          <></>
+        )}
       </div>
 
       <Tab value={value} onValueChange={onValueChange} defaultValue="note">
@@ -169,7 +174,14 @@ export function NodeDetailLayout({
           <TabListItem value="meeting">회의</TabListItem>
         </TabList>
         <TabPanel value="note">{noteContent}</TabPanel>
-        <TabPanel value="meeting">{meetingContent}</TabPanel>
+        <TabPanel
+          value="meeting"
+          sx={{
+            flex: 1,
+          }}
+        >
+          {meetingContent}
+        </TabPanel>
       </Tab>
     </div>
   );
