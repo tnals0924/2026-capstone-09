@@ -1,6 +1,5 @@
 package kr.flowmeet.api.notification.controller;
 
-import java.io.IOException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +16,7 @@ import kr.flowmeet.api.common.dto.CursorSliceResponse;
 import kr.flowmeet.api.notification.dto.response.NotificationSummaryResponse;
 import kr.flowmeet.api.notification.dto.response.GetUnreadCountResponse;
 import kr.flowmeet.api.notification.facade.NotificationFacade;
-import kr.flowmeet.api.notification.sse.SseEmitterRepository;
+import kr.flowmeet.api.notification.sse.SseEmitterService;
 import kr.flowmeet.auth.annotation.UserId;
 
 @Slf4j
@@ -26,30 +25,14 @@ import kr.flowmeet.auth.annotation.UserId;
 @RequiredArgsConstructor
 public class NotificationController implements NotificationApi {
 
-    private static final long SSE_TIMEOUT = 30L * 60 * 1000;
-
     private final NotificationFacade notificationFacade;
-    private final SseEmitterRepository sseEmitterRepository;
+    private final SseEmitterService sseEmitterService;
 
     @Override
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@UserId Long userId, HttpServletResponse response) {
         response.setHeader("X-Accel-Buffering", "no");
-
-        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
-        sseEmitterRepository.save(userId, emitter);
-
-        emitter.onTimeout(() -> sseEmitterRepository.remove(userId));
-        emitter.onError(e -> sseEmitterRepository.remove(userId));
-        emitter.onCompletion(() -> sseEmitterRepository.remove(userId));
-
-        try {
-            emitter.send(SseEmitter.event().name("connect").data("connected"));
-        } catch (IOException e) {
-            sseEmitterRepository.remove(userId);
-        }
-
-        return emitter;
+        return sseEmitterService.subscribe(userId);
     }
 
     @Override

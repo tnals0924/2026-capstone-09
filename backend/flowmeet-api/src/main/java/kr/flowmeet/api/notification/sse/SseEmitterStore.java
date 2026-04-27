@@ -1,17 +1,14 @@
 package kr.flowmeet.api.notification.sse;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-@Slf4j
 @Component
-public class SseEmitterRepository {
+public class SseEmitterStore {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -30,18 +27,7 @@ public class SseEmitterRepository {
         emitters.remove(userId);
     }
 
-    @Scheduled(fixedRate = 30_000)
-    public void sendHeartbeat() {
-        if (emitters.isEmpty()) {
-            return;
-        }
-        emitters.forEach((userId, emitter) -> {
-            try {
-                emitter.send(SseEmitter.event().name("heartbeat").data(""));
-            } catch (IOException e) {
-                emitters.remove(userId);
-                log.debug("[SSE] heartbeat 실패, 연결 제거: userId={}", userId);
-            }
-        });
+    public Map<Long, SseEmitter> findAll() {
+        return Collections.unmodifiableMap(emitters);
     }
 }
