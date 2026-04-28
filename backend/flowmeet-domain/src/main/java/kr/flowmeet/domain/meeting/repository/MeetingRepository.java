@@ -20,8 +20,12 @@ public interface MeetingRepository extends JpaRepository<Meeting, Long> {
 
     boolean existsByNodeIdAndStatus(Long nodeId, MeetingStatus status);
 
-    @Query("SELECT m FROM Meeting m JOIN FETCH m.node WHERE m.isPushEnabled = true AND m.pushNotifyAt BETWEEN :from AND :now AND m.status = :status")
+    @Query("SELECT m FROM Meeting m JOIN FETCH m.node WHERE m.isPushEnabled = true AND m.reminderSent = false AND m.pushNotifyAt BETWEEN :from AND :now AND m.status = :status")
     List<Meeting> findPendingReminders(@Param("from") LocalDateTime from, @Param("now") LocalDateTime now, @Param("status") MeetingStatus status);
+
+    @Modifying(clearAutomatically = true)
+    @Query("UPDATE Meeting m SET m.reminderSent = true WHERE m.id IN :meetingIds")
+    int markRemindersSent(@Param("meetingIds") List<Long> meetingIds);
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Meeting m SET m.deletedAt = CURRENT_TIMESTAMP WHERE m.id IN :meetingIds")

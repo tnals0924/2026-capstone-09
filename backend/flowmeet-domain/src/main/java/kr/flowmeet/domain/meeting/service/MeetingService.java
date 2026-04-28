@@ -55,6 +55,11 @@ public class MeetingService {
     }
 
     @Transactional
+    public void markRemindersSent(final List<Long> meetingIds) {
+        meetingRepository.markRemindersSent(meetingIds);
+    }
+
+    @Transactional
     public void deleteAllByIds(final List<Long> meetingIds) {
         if (meetingIds.isEmpty()) {
             return;

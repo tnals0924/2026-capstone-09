@@ -72,6 +72,9 @@ public class Meeting extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String summary;
 
+    @Column(name = "reminder_sent", nullable = false)
+    private boolean reminderSent;
+
     @Builder
     public Meeting(Long nodeId, Long createdById, MeetingStatus status,
                    LocalDateTime startedAt, boolean isPushEnabled, LocalDateTime pushNotifyAt,
@@ -83,5 +86,7 @@ public class Meeting extends BaseTimeEntity {
         this.isPushEnabled = isPushEnabled;
         this.pushNotifyAt = pushNotifyAt;
         this.summary = summary;
+        this.reminderSent = false;
     }
+
 }

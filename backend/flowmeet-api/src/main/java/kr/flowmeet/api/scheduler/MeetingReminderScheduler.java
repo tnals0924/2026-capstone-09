@@ -3,7 +3,6 @@ package kr.flowmeet.api.scheduler;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import kr.flowmeet.domain.meeting.entity.Meeting;
@@ -36,24 +35,13 @@ public class MeetingReminderScheduler {
 
     @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     public void sendMeetingReminders() {
-        List<Meeting> meetings = findMeetingsToNotify();
+        List<Meeting> meetings = meetingService.findPendingReminders(LocalDateTime.now());
         if (meetings.isEmpty()) {
             return;
         }
         sendNotifications(meetings);
-    }
-
-    private List<Meeting> findMeetingsToNotify() {
-        List<Meeting> pendingMeetings = meetingService.findPendingReminders(LocalDateTime.now());
-        if (pendingMeetings.isEmpty()) {
-            return List.of();
-        }
-
-        List<Long> nodeIds = pendingMeetings.stream().map(Meeting::getNodeId).toList();
-        Set<Long> alreadyNotifiedNodeIds = notificationService.findAlreadyNotifiedNodeIds(nodeIds);
-        return pendingMeetings.stream()
-                .filter(m -> !alreadyNotifiedNodeIds.contains(m.getNodeId()))
-                .toList();
+        List<Long> meetingIds = meetings.stream().map(Meeting::getId).toList();
+        meetingService.markRemindersSent(meetingIds);
     }
 
     private void sendNotifications(List<Meeting> meetings) {
