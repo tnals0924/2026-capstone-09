@@ -2,15 +2,7 @@
 
 import { Avatar, Chip } from '@wanteddev/wds';
 import { IconChevronDownThickSmall, IconClose } from '@wanteddev/wds-icon';
-import {
-  KeyboardEvent,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { KeyboardEvent, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 export interface ParticipantOption {

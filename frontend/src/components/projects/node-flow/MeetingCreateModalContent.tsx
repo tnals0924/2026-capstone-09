@@ -12,9 +12,9 @@ import { IconClose } from '@wanteddev/wds-icon';
 import { Controller } from 'react-hook-form';
 
 import { EXAMPLE_MEETING_PARTICIPANTS } from '@/constants/exampleConstant';
+import { useMeetingCreateForm } from '@/hooks/useMeetingCreateForm';
 
 import { ParticipantsSelect } from './ParticipantsSelect';
-import { useMeetingCreateForm } from './useMeetingCreateForm';
 
 export interface MeetingCreatePayload {
   nodeBadge: string;
@@ -37,14 +37,8 @@ export const MeetingCreateModalContent = ({
   onClose,
   onCreate,
 }: MeetingCreateModalContentProps) => {
-  const {
-    form,
-    isDateOpen,
-    setIsDateOpen,
-    isTimeOpen,
-    setIsTimeOpen,
-    buildPayload,
-  } = useMeetingCreateForm();
+  const { form, isDateOpen, setIsDateOpen, isTimeOpen, setIsTimeOpen, buildPayload } =
+    useMeetingCreateForm();
   const {
     control,
     formState: { isSubmitting },

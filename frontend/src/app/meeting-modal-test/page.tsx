@@ -4,12 +4,11 @@ import { Button } from '@wanteddev/wds';
 import { useState } from 'react';
 
 import { useModal } from '@/components/commons/modal/ModalContext';
-import { EXAMPLE_MEETING_CREATE_NODE } from '@/constants/exampleConstant';
-
 import {
   MeetingCreateModalContent,
   type MeetingCreatePayload,
-} from './_components/MeetingCreateModalContent';
+} from '@/components/projects/node-flow/MeetingCreateModalContent';
+import { EXAMPLE_MEETING_CREATE_NODE } from '@/constants/exampleConstant';
 
 export default function MeetingModalTestPage() {
   const { openModal, closeModal } = useModal();

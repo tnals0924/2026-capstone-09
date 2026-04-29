@@ -4,7 +4,7 @@ import type { DateType } from '@wanteddev/wds';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { ParticipantOption } from './ParticipantsSelect';
+import type { ParticipantOption } from '@/components/projects/node-flow/ParticipantsSelect';
 
 export interface MeetingCreateFormValues {
   date: DateType;
