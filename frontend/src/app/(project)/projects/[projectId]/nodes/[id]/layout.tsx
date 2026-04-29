@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 
-import NodeMeetingTab from '@/components/node-datail/NodeMeetingTab';
-import NodeNoteTab from '@/components/node-datail/NodeNoteTab';
+import NodeMeetingTab from '@/components/node-datail/meeting/NodeMeetingTab';
+import NodeNoteTab from '@/components/node-datail/note/NodeNoteTab';
 import { NodePageLayoutClient } from './_components/NodePageLayoutClient';
 
 export default function NodePageLayout() {
@@ -22,7 +22,7 @@ export default function NodePageLayout() {
           nodeId={nodeId}
           projectId={projectId}
           noteContent={<NodeNoteTab nodeId={nodeId} projectId={projectId} />}
-          meetingContent={<NodeMeetingTab />}
+          meetingContent={<NodeMeetingTab nodeId={nodeId} projectId={projectId} />}
         />
       </div>
     </div>
