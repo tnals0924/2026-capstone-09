@@ -26,17 +26,11 @@ import { privateApi } from '@/api';
 import { GetNodeResponse } from '@/api/Api';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
 import { ColorType } from '@/constants/badgeColor';
-import { formatDateTime } from '@/utils/formatData';
+import { formatDatetoString } from '@/utils/formatData';
 
 interface Tag {
   tagId: number;
   name: string;
-}
-
-interface Assignee {
-  userId: number;
-  nickname: string;
-  profileImageUrl: string | null;
 }
 
 interface NodeDetailLayoutProps {
@@ -153,11 +147,12 @@ export function NodeDetailLayout({
           </MetaRow>
         </div>
         {nodeDetail?.meeting?.meetingId ? (
+          // 추후 수정 필요...
           <a
             href="https://meet.google.com/jne-evsa-qzn"
             className="text-label-1-normal flex items-center justify-between rounded-lg border border-gray-200 p-3"
           >
-            <div>{formatDateTime(nodeDetail?.meeting?.startedAt)}에 회의 예정</div>
+            <div>{formatDatetoString(nodeDetail?.meeting?.startedAt)}에 회의 예정</div>
             <img
               className="h-5 w-5"
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/250px-Google_Meet_icon_%282020%29.svg.png"

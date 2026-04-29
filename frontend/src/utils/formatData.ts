@@ -1,4 +1,6 @@
-export function formatDateTime(isoString: string): string {
+export function formatDatetoString(isoString: string | undefined): string | undefined {
+  if (!isoString) return;
+
   const date = new Date(isoString);
 
   const year = date.getFullYear();
