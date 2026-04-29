@@ -1923,7 +1923,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseCursorSliceResponseProjectSummaryResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ALL_PROJECTS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트 목록을 조회했어요."
+           */
+          message?: object;
+          /** 커서 기반 페이지 응답 */
+          data?: CursorSliceResponseProjectSummaryResponse;
+        },
         any
       >({
         path: `/v1/projects`,
@@ -1943,7 +1962,29 @@ export class Api<
      * @secure
      */
     createProject: (data: CreateProjectRequest, params: RequestParams = {}) =>
-      this.request<CommonResponseCreateProjectResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_PROJECT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트를 생성했어요."
+           */
+          message?: object;
+          /** 프로젝트 생성 응답 */
+          data?: CreateProjectResponse;
+        },
+        any
+      >({
         path: `/v1/projects`,
         method: "POST",
         body: data,
@@ -1967,7 +2008,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "INVITE_MEMBER"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "멤버 초대 메일을 전송했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -1998,7 +2058,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseAcceptProjectInvitationResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "ACCEPT_INVITATION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트에 합류했어요."
+           */
+          message?: object;
+          /** 프로젝트 초대 수락 응답 */
+          data?: AcceptProjectInvitationResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2026,7 +2105,26 @@ export class Api<
      */
     getProject: (projectId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseGetProjectResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_PROJECT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트를 조회했어요."
+           */
+          message?: object;
+          /** 프로젝트 상세 조회 응답 */
+          data?: GetProjectResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2051,7 +2149,29 @@ export class Api<
      * @secure
      */
     deleteProject: (projectId: number, params: RequestParams = {}) =>
-      this.request<CommonResponseObject, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_PROJECT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트를 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}`,
         method: "DELETE",
         secure: true,
@@ -2073,7 +2193,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_PROJECT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트를 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2105,7 +2244,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_PROFILE_IMAGE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트 이미지를 변경했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2138,7 +2296,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseProjectUrlResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "ADD_URL"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "URL을 추가했어요."
+           */
+          message?: object;
+          /** 프로젝트 URL 응답 */
+          data?: ProjectUrlResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2166,7 +2343,26 @@ export class Api<
      */
     deleteUrl: (projectId: number, urlId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_URL"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "URL을 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2197,7 +2393,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseProjectUrlResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_URL"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "URL을 수정했어요."
+           */
+          message?: object;
+          /** 프로젝트 URL 응답 */
+          data?: ProjectUrlResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2225,7 +2440,29 @@ export class Api<
      * @secure
      */
     getAllTags: (projectId: number, params: RequestParams = {}) =>
-      this.request<CommonResponseGetAllTagsResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ALL_TAGS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "태그 목록을 조회했어요."
+           */
+          message?: object;
+          /** 프로젝트 태그 전체 조회 응답 */
+          data?: GetAllTagsResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/tags`,
         method: "GET",
         secure: true,
@@ -2247,7 +2484,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_TAG"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "태그를 생성했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2280,7 +2536,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "ADD_NODE_TAG"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드에 태그를 추가했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2308,7 +2583,26 @@ export class Api<
      */
     deleteTag: (projectId: number, tagId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_TAG"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "태그를 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2339,7 +2633,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_TAG"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "태그를 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2371,7 +2684,29 @@ export class Api<
       tagId: number,
       params: RequestParams = {},
     ) =>
-      this.request<CommonResponseObject, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "REMOVE_NODE_TAG"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드에서 태그를 제거했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/nodes/${nodeId}/tags/${tagId}`,
         method: "DELETE",
         secure: true,
@@ -2389,7 +2724,29 @@ export class Api<
      * @secure
      */
     getFlowchart: (projectId: number, params: RequestParams = {}) =>
-      this.request<CommonResponseGetFlowchartResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_FLOWCHART"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "플로우차트를 조회했어요."
+           */
+          message?: object;
+          /** 플로우차트 조회 응답 (노드와 엣지) */
+          data?: GetFlowchartResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/nodes`,
         method: "GET",
         secure: true,
@@ -2411,7 +2768,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드를 추가했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2439,7 +2815,26 @@ export class Api<
      */
     getNode: (projectId: number, nodeId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseGetNodeResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드를 조회했어요."
+           */
+          message?: object;
+          /** 노드 상세 조회 응답 */
+          data?: GetNodeResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2469,7 +2864,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드를 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2500,7 +2914,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드를 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2533,7 +2966,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_STATUS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 상태를 변경했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2566,7 +3018,29 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CommonResponseSearchNodeResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "SEARCH"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "검색을 완료했어요."
+           */
+          message?: object;
+          /** 노드 검색 응답 */
+          data?: SearchNodeResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/search`,
         method: "GET",
         query: query,
@@ -2590,7 +3064,29 @@ export class Api<
       },
       params: RequestParams = {},
     ) =>
-      this.request<CommonResponseGetNodeListResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_NODE_LIST"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 리스트를 조회했어요."
+           */
+          message?: object;
+          /** 노드 목록 조회 응답 */
+          data?: GetNodeListResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/nodes/list`,
         method: "GET",
         query: query,
@@ -2608,7 +3104,29 @@ export class Api<
      * @secure
      */
     getKanban: (projectId: number, params: RequestParams = {}) =>
-      this.request<CommonResponseGetKanbanResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_KANBAN"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "칸반 보드를 조회했어요."
+           */
+          message?: object;
+          /** 칸반 보드 조회 응답 (상태별 그룹핑) */
+          data?: GetKanbanResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/nodes/kanban`,
         method: "GET",
         secure: true,
@@ -2632,7 +3150,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_ASSIGNEE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "담당자를 추가했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2665,7 +3202,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_ASSIGNEE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "담당자를 제거했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2696,7 +3252,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_EDGE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "연결선을 생성했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2728,7 +3303,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_EDGE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "연결선을 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2758,7 +3352,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseFileInformationResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CONFIRM_UPLOAD"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "파일 업로드를 완료했어요."
+           */
+          message?: object;
+          /** 파일 정보 응답 */
+          data?: FileInformationResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2791,7 +3404,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_FILE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "파일을 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2821,7 +3453,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseCreatePresignedUrlResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_PRESIGNED_URL"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "업로드 URL을 발급했어요."
+           */
+          message?: object;
+          /** Presigned URL 발급 응답 */
+          data?: CreatePresignedUrlResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2849,7 +3500,29 @@ export class Api<
      * @secure
      */
     getMe: (params: RequestParams = {}) =>
-      this.request<CommonResponseGetUserResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ME"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "내 정보를 조회했어요."
+           */
+          message?: object;
+          /** 내 정보 조회 응답 */
+          data?: GetUserResponse;
+        },
+        any
+      >({
         path: `/v1/users/me`,
         method: "GET",
         secure: true,
@@ -2867,7 +3540,26 @@ export class Api<
      */
     deleteMe: (params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_ME"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "회원 탈퇴가 완료됐어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2893,7 +3585,26 @@ export class Api<
      */
     updateMe: (data: UpdateUserRequest, params: RequestParams = {}) =>
       this.request<
-        CommonResponseUpdateUserResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_ME"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "내 정보를 수정했어요."
+           */
+          message?: object;
+          /** 내 정보 수정 응답 */
+          data?: UpdateUserResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2921,7 +3632,26 @@ export class Api<
      */
     updateProfileImage: (data: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_PROFILE_IMAGE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로필 이미지를 변경했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2950,7 +3680,26 @@ export class Api<
      */
     getNotificationSetting: (projectId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseGetNotificationSettingResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_NOTIFICATION_SETTING"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "알림 설정을 조회했어요."
+           */
+          message?: object;
+          /** 프로젝트 알림 설정 조회 응답 */
+          data?: GetNotificationSettingResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -2980,7 +3729,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseGetNotificationSettingResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NOTIFICATION_SETTING"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "알림 설정을 변경했어요."
+           */
+          message?: object;
+          /** 프로젝트 알림 설정 조회 응답 */
+          data?: GetNotificationSettingResponse;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -3014,7 +3782,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_MEMBER_ROLE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "멤버 권한을 변경했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -3041,7 +3828,29 @@ export class Api<
      * @secure
      */
     getAllMembers: (projectId: number, params: RequestParams = {}) =>
-      this.request<CommonResponseGetAllProjectMembersResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ALL_MEMBERS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "멤버 목록을 조회했어요."
+           */
+          message?: object;
+          /** 프로젝트 멤버 전체 조회 응답 */
+          data?: GetAllProjectMembersResponse;
+        },
+        any
+      >({
         path: `/v1/projects/${projectId}/members`,
         method: "GET",
         secure: true,
@@ -3063,7 +3872,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_MEMBER"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "멤버를 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -3089,7 +3917,26 @@ export class Api<
      */
     leaveProject: (projectId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "LEAVE_PROJECT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "프로젝트에서 나갔어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -3116,7 +3963,26 @@ export class Api<
      */
     markAsRead: (notificationId: number, params: RequestParams = {}) =>
       this.request<
-        CommonResponseObject,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "MARK_AS_READ"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "알림을 읽음 처리했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
         {
           /** @format int32 */
           status?: number;
@@ -3141,7 +4007,29 @@ export class Api<
      * @secure
      */
     markAllAsRead: (params: RequestParams = {}) =>
-      this.request<CommonResponseObject, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "MARK_ALL_AS_READ"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "전체 알림을 읽음 처리했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        any
+      >({
         path: `/v1/notifications/all`,
         method: "PATCH",
         secure: true,
@@ -3171,7 +4059,26 @@ export class Api<
       params: RequestParams = {},
     ) =>
       this.request<
-        CommonResponseCursorSliceResponseNotificationSummaryResponse,
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ALL_NOTIFICATIONS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "알림 목록을 조회했어요."
+           */
+          message?: object;
+          /** 커서 기반 페이지 응답 */
+          data?: CursorSliceResponseNotificationSummaryResponse;
+        },
         any
       >({
         path: `/v1/notifications`,
@@ -3191,7 +4098,29 @@ export class Api<
      * @secure
      */
     getUnreadCount: (params: RequestParams = {}) =>
-      this.request<CommonResponseGetUnreadCountResponse, any>({
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_UNREAD_COUNT"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "읽지 않은 알림 개수를 조회했어요."
+           */
+          message?: object;
+          /** 읽지 않은 알림 개수 응답 */
+          data?: GetUnreadCountResponse;
+        },
+        any
+      >({
         path: `/v1/notifications/unread-count`,
         method: "GET",
         secure: true,

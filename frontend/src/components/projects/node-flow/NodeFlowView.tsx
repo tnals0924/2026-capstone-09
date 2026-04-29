@@ -16,12 +16,11 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
-//import { privateApi } from '@/api';
+import { privateApi } from '@/api';
 import { GetFlowchartResponse } from '@/api/Api';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { Loading } from '@/components/commons/loading/Loading';
 import { NodeSidebar } from '@/components/node-datail/NodeSidebar';
-import { EXAMPLE_FLOWCHART_DATA } from '@/constants/exampleConstant';
 import { convertToReactFlow } from '@/utils/flowchartToReactFlow';
 import { CustomNode } from './CustomNode';
 import NodeButton from './NodeButton';
@@ -72,12 +71,8 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
       try {
         setLoading(true);
 
-        // 실제 API 호출
-        // const data = await privateApi.node.getFlowchart(projectId);
-        // const chartData = data.data.data ?? null;
-
-        // 목업 데이터
-        const chartData = EXAMPLE_FLOWCHART_DATA;
+        const data = await privateApi.node.getFlowchart(projectId);
+        const chartData = data.data.data ?? null;
         setFlowChart(chartData);
 
         if (chartData) {
@@ -91,7 +86,7 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
         toast({
           content: errorMessage,
           variant: 'negative',
-          placement: 'center',
+          placement: 'top-center',
         });
       } finally {
         setLoading(false);
@@ -167,52 +162,28 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
       if (!parentNode) return;
 
       try {
-        // 실제 API 호출
-        // await privateApi.node.createNode(projectId, {
-        //   title: '새 서브 노드',
-        //   type: 'SUB',
-        //   parentId: parentNodeId,
-        // });
-        // const data = await privateApi.node.getFlowchart(projectId);
-        // const chartData = data.data.data ?? null;
-
-        // 목업
-        const newNodeId = Math.max(...(flowChart.nodes.map((n) => n.nodeId ?? 0))) + 1;
-        const childCount = (parentNode.childNodeIds?.length ?? 0) + 1;
-
-        const newNode = {
-          nodeId: newNodeId,
-          parentId: parentNodeId,
-          number: `${parentNode.number}.${childCount}`,
+        await privateApi.node.createNode(projectId, {
           title: '새 서브 노드',
-          status: 'WAITING' as const,
-          tags: [],
-          assignees: [],
-          updatedAt: new Date().toISOString(),
-        };
-
-        const chartData = {
-          ...flowChart,
-          nodes: [
-            ...(flowChart.nodes ?? []).map((n) =>
-              n.nodeId === parentNodeId
-                ? { ...n, childNodeIds: [...(n.childNodeIds ?? []), newNodeId] }
-                : n
-            ),
-            newNode,
-          ],
-        };
+          type: 'SUB',
+          parentId: parentNodeId,
+        });
+        const data = await privateApi.node.getFlowchart(projectId);
+        const chartData = data.data.data ?? null;
 
         setFlowChart(chartData);
 
         if (chartData) {
-          updateFlowAndMoveToNode(chartData, newNodeId);
+          const newNodes = chartData.nodes?.filter((n) => n.parentId === parentNodeId) ?? [];
+          const newNode = newNodes[newNodes.length - 1];
+          if (newNode?.nodeId) {
+            updateFlowAndMoveToNode(chartData, newNode.nodeId);
+          }
         }
       } catch (error) {
         console.error('Failed to create sub node:', error);
       }
     },
-    [flowChart, updateFlowAndMoveToNode]
+    [flowChart, updateFlowAndMoveToNode, projectId]
   );
 
   // 메인 노드 생성
@@ -220,45 +191,26 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
     if (!flowChart?.nodes) return;
 
     try {
-      // 실제 API 호출
-      // await privateApi.node.createNode(projectId, {
-      //   title: '새 메인 노드',
-      //   type: 'MAIN',
-      // });
-      // const data = await privateApi.node.getFlowchart(projectId);
-      // const chartData = data.data.data ?? null;
-
-      // 목업
-      const newNodeId = Math.max(...(flowChart.nodes.map((n) => n.nodeId ?? 0))) + 1;
-      const mainNodeCount = flowChart.nodes.filter((n) => !n.parentId).length + 1;
-
-      const newNode = {
-        nodeId: newNodeId,
-        parentId: undefined,
-        number: String(mainNodeCount),
+      await privateApi.node.createNode(projectId, {
         title: '새 메인 노드',
-        description: '',
-        status: 'WAITING' as const,
-        tags: [],
-        assignees: [],
-        childNodeIds: [],
-        updatedAt: new Date().toISOString(),
-      };
-
-      const chartData = {
-        ...flowChart,
-        nodes: [...(flowChart.nodes ?? []), newNode],
-      };
+        type: 'MAIN',
+      });
+      const data = await privateApi.node.getFlowchart(projectId);
+      const chartData = data.data.data ?? null;
 
       setFlowChart(chartData);
 
       if (chartData) {
-        updateFlowAndMoveToNode(chartData, newNodeId);
+        const mainNodes = chartData.nodes?.filter((n) => !n.parentId) ?? [];
+        const newNode = mainNodes[mainNodes.length - 1];
+        if (newNode?.nodeId) {
+          updateFlowAndMoveToNode(chartData, newNode.nodeId);
+        }
       }
     } catch (error) {
       console.error('Failed to create main node:', error);
     }
-  }, [flowChart, updateFlowAndMoveToNode]);
+  }, [flowChart, updateFlowAndMoveToNode, projectId]);
 
   const nodesWithHandlers = useMemo(() => {
     return nodes.map((node) => ({
