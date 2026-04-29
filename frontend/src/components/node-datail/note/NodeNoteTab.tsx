@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Editor from '../commons/editor/editor';
+import Editor from '../../commons/editor/editor';
 import { privateApi } from '@/api';
 
 interface NodeNoteTabProps {

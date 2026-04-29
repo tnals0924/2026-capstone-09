@@ -28,7 +28,7 @@ function BaseNodeComponent({
 }: BaseNodeProps) {
   const { visibleTags, remainingTagsCount } = getVisibleTags(node.tags ?? []);
   const isMain = variant === 'main';
-  const nodeNumber = node.number ?? `#${node.nodeId}`;
+  const nodeNumber = `${node.number}`;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -103,7 +103,7 @@ function BaseNodeComponent({
               color={isMain ? undefined : 'neutral'}
               className={isMain ? '!bg-primary-40/10 !text-primary-40' : undefined}
             >
-              {nodeNumber}
+              #{nodeNumber}
             </ContentBadge>
 
             <div className="text-caption-2 text-label-alternative min-w-0 truncate font-normal">
