@@ -308,3 +308,15 @@ export const EXAMPLE_FLOWCHART_DATA = {
     },
   ],
 };
+
+// 회의 삭제 컨펌 다이얼로그 테스트 페이지 전용 더미 데이터.
+// 실제 API(`privateApi.meeting.deleteMeeting`)는 아직 generated 되지 않아
+// 테스트 페이지에서는 호출 없이 상태 표시 용도로만 사용한다.
+export const EXAMPLE_MEETING_DELETE_TEST = {
+  projectId: 1,
+  candidates: [
+    { meetingId: 101, title: '주간 디자인 회의' },
+    { meetingId: 102, title: '발표 자료 검토 회의' },
+    { meetingId: 103, title: '스프린트 회고' },
+  ],
+} as const;
