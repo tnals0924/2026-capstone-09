@@ -12,23 +12,21 @@ import { IconClose } from '@wanteddev/wds-icon';
 import { Controller } from 'react-hook-form';
 
 import { EXAMPLE_MEETING_PARTICIPANTS } from '@/constants/exampleConstant';
-import { useMeetingCreateForm } from '@/hooks/useMeetingCreateForm';
+import { type MeetingCreateRequest, useMeetingCreateForm } from '@/hooks/useMeetingCreateForm';
 
 import { ParticipantsSelect } from './ParticipantsSelect';
 
-export interface MeetingCreatePayload {
-  nodeBadge: string;
-  nodeTitle: string;
-  date: string;
-  time: string;
-  participants: string[];
+export interface MeetingCreateResponse {
+  code: 'SUCCESS';
+  message: string;
+  data: null;
 }
 
 interface MeetingCreateModalContentProps {
   nodeBadge: string;
   nodeTitle: string;
   onClose: () => void;
-  onCreate?: (payload: MeetingCreatePayload) => void;
+  onCreate?: (payload: MeetingCreateRequest) => void;
 }
 
 export const MeetingCreateModalContent = ({
@@ -46,7 +44,7 @@ export const MeetingCreateModalContent = ({
   } = form;
 
   const handleCreate = handleSubmit((values) => {
-    onCreate?.({ nodeBadge, nodeTitle, ...buildPayload(values) });
+    onCreate?.(buildPayload(values));
   });
 
   return (
