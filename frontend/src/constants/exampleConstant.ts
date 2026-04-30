@@ -75,6 +75,63 @@ export const EXAMPLE_USERS = [
   { userId: 6, nickname: '박정은', email: 'jeongeun@kookmin.ac.kr' },
 ] as const;
 
+export const EXAMPLE_MULTI_NODE_SUMMARY_NODES = [
+  { id: 1, label: '비즈니스 모델 전략 회의' },
+  { id: 2, label: 'MVP기능 회의' },
+  { id: 3, label: 'MVP 개발 일정 조정 회의' },
+  { id: 5, label: 'PPT 제작 회의' },
+] as const;
+
+export const EXAMPLE_MULTI_NODE_SUMMARY_RESULT = {
+  meeting_relationships: [
+    {
+      from: '비즈니스 모델 전략 회의',
+      to: 'MVP기능 회의',
+      relation: '구체화',
+      reason:
+        '비즈니스 모델 전략에서 결정된 학교 인터뷰 및 초기 UX 설계를 MVP 기능 회의에서 구체화함',
+    },
+    {
+      from: 'MVP기능 회의',
+      to: 'MVP 개발 일정 조정 회의',
+      relation: '변화 발생',
+      reason: '초기 MVP 기능 정의와 개발 일정이 일정 지연으로 인해 변경됨',
+    },
+    {
+      from: '비즈니스 모델 전략 회의',
+      to: 'PPT 제작 회의',
+      relation: '시너지',
+      reason: '수립된 비즈니스 모델 전략을 PT에 담아 대외 발표 자료로 활용함',
+    },
+    {
+      from: 'MVP기능 회의',
+      to: 'PPT 제작 회의',
+      relation: '시너지',
+      reason: '정의된 MVP 핵심 기능을 PT에 담아 대외 발표 자료로 활용함',
+    },
+    {
+      from: 'MVP 개발 일정 조정 회의',
+      to: 'PPT 제작 회의',
+      relation: '선행조건',
+      reason:
+        'PT의 핵심 기능 파트는 조정된 MVP 기능으로 업데이트되어야 정확한 내용을 전달할 수 있음',
+    },
+  ],
+  action_items_analysis: {
+    total_count: 12,
+    by_person: {
+      정대학: { count: 3, rate: 0.25 },
+      이학교: { count: 3, rate: 0.25 },
+      박민대: { count: 4, rate: 0.33 },
+      김국민: { count: 2, rate: 0.17 },
+    },
+  },
+  development_ideas:
+    '### 아이디어1: 비즈니스-개발 연동 강화\n전략과 MVP 구현 간의 피드백 루프를 강화하여 개발 현실성을 조기 반영.\n\n### 아이디어2: 통합 프로젝트 현황판 도입\n각 회의록의 결정 사항과 액션 아이템, 주요 이슈를 통합하여 공유.\n\n### 아이디어3: 비용 효율적 아키텍처 사전 검토\n초기 설계 단계부터 서버 비용 등 운영 비용을 고려한 아키텍처를 검토.',
+  mermaid_code:
+    'graph TD\n    비즈니스모델전략회의["비즈니스 모델 전략 회의"] --- "구체화" --- MVP기능회의["MVP기능 회의"]\n    MVP기능회의["MVP기능 회의"] --- "변화 발생" --- MVP개발일정조정회의["MVP 개발 일정 조정 회의"]\n    비즈니스모델전략회의["비즈니스 모델 전략 회의"] --- "시너지" --- PPT제작회의["PPT 제작 회의"]\n    MVP기능회의["MVP기능 회의"] --- "시너지" --- PPT제작회의["PPT 제작 회의"]\n    MVP개발일정조정회의["MVP 개발 일정 조정 회의"] --- "선행조건" --- PPT제작회의["PPT 제작 회의"]',
+} as const;
+
 export const EXAMPLE_NODE_DETAIL = {
   nodeId: 101,
   projectId: 17,
@@ -121,7 +178,7 @@ export const EXAMPLE_NODE_DETAIL = {
   },
   createdAt: '2026-03-01T09:00:00',
   updatedAt: '2026-04-19T10:15:30',
-}
+};
 
 export const EXAMPLE_FLOWCHART_DATA = {
   nodes: [
@@ -155,7 +212,9 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'DONE' as const,
       sortOrder: 2048,
       tags: [{ tagId: 1, name: 'Backend', color: 'BLUE' as const }],
-      assignees: [{ userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined }],
+      assignees: [
+        { userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-24T15:30:00',
@@ -170,7 +229,14 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'IN_PROGRESS' as const,
       sortOrder: 3072,
       tags: [{ tagId: 2, name: 'Frontend', color: 'GREEN' as const }],
-      assignees: [{ userId: 2, nickname: '박프론트', email: 'frontend@example.com', profileImageUrl: undefined }],
+      assignees: [
+        {
+          userId: 2,
+          nickname: '박프론트',
+          email: 'frontend@example.com',
+          profileImageUrl: undefined,
+        },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-25T09:15:00',
@@ -189,8 +255,18 @@ export const EXAMPLE_FLOWCHART_DATA = {
         { tagId: 3, name: 'Design', color: 'PURPLE' as const },
       ],
       assignees: [
-        { userId: 2, nickname: '박프론트', email: 'frontend@example.com', profileImageUrl: undefined },
-        { userId: 3, nickname: '이디자인', email: 'design@example.com', profileImageUrl: undefined },
+        {
+          userId: 2,
+          nickname: '박프론트',
+          email: 'frontend@example.com',
+          profileImageUrl: undefined,
+        },
+        {
+          userId: 3,
+          nickname: '이디자인',
+          email: 'design@example.com',
+          profileImageUrl: undefined,
+        },
       ],
       hasMeeting: true,
       childNodeIds: [21, 22, 23],
@@ -206,7 +282,14 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'IN_PROGRESS' as const,
       sortOrder: 5120,
       tags: [{ tagId: 2, name: 'Frontend', color: 'GREEN' as const }],
-      assignees: [{ userId: 2, nickname: '박프론트', email: 'frontend@example.com', profileImageUrl: undefined }],
+      assignees: [
+        {
+          userId: 2,
+          nickname: '박프론트',
+          email: 'frontend@example.com',
+          profileImageUrl: undefined,
+        },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-25T11:00:00',
@@ -221,7 +304,14 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'WAITING' as const,
       sortOrder: 6144,
       tags: [{ tagId: 3, name: 'Design', color: 'PURPLE' as const }],
-      assignees: [{ userId: 3, nickname: '이디자인', email: 'design@example.com', profileImageUrl: undefined }],
+      assignees: [
+        {
+          userId: 3,
+          nickname: '이디자인',
+          email: 'design@example.com',
+          profileImageUrl: undefined,
+        },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-24T16:00:00',
@@ -236,7 +326,14 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'WAITING' as const,
       sortOrder: 7168,
       tags: [{ tagId: 2, name: 'Frontend', color: 'GREEN' as const }],
-      assignees: [{ userId: 2, nickname: '박프론트', email: 'frontend@example.com', profileImageUrl: undefined }],
+      assignees: [
+        {
+          userId: 2,
+          nickname: '박프론트',
+          email: 'frontend@example.com',
+          profileImageUrl: undefined,
+        },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-23T14:30:00',
@@ -271,7 +368,9 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'WAITING' as const,
       sortOrder: 9216,
       tags: [{ tagId: 4, name: 'Database', color: 'RED' as const }],
-      assignees: [{ userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined }],
+      assignees: [
+        { userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-22T15:00:00',
@@ -286,7 +385,9 @@ export const EXAMPLE_FLOWCHART_DATA = {
       status: 'WAITING' as const,
       sortOrder: 10240,
       tags: [{ tagId: 1, name: 'Backend', color: 'BLUE' as const }],
-      assignees: [{ userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined }],
+      assignees: [
+        { userId: 1, nickname: '김개발', email: 'dev@example.com', profileImageUrl: undefined },
+      ],
       hasMeeting: false,
       childNodeIds: [],
       updatedAt: '2026-04-21T11:30:00',
