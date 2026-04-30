@@ -9,13 +9,11 @@ import {
   IconSetting,
 } from '@wanteddev/wds-icon';
 import { AnimatePresence, motion } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-import {
-  EXAMPLE_PROJECT_SIDEBAR_PROFILE,
-  EXAMPLE_SIDEBAR_ALARM_ITEMS,
-} from '@/constants/exampleConstant';
+import { privateApi } from '@/api';
+import { EXAMPLE_SIDEBAR_ALARM_ITEMS } from '@/constants/exampleConstant';
 import { cn } from '@/utils/cn';
 
 import { SidebarAlarmModal } from './SidebarAlarmModal';
@@ -38,20 +36,77 @@ interface ProjectSidebarProps {
 }
 
 export const ProjectSidebar = ({
-  projectName = EXAMPLE_PROJECT_SIDEBAR_PROFILE.projectName,
-  userName = EXAMPLE_PROJECT_SIDEBAR_PROFILE.userName,
-  userEmail = EXAMPLE_PROJECT_SIDEBAR_PROFILE.userEmail,
+  projectName: projectNameProp,
+  userName: userNameProp,
+  userEmail: userEmailProp,
   onSearchClick,
   onInboxClick,
   onSettingClick,
   onProfileClick,
 }: ProjectSidebarProps) => {
   const pathname = usePathname();
+  const params = useParams<{ projectId?: string }>();
+  const projectIdRaw = params?.projectId;
+  const projectId = projectIdRaw ? Number(projectIdRaw) : undefined;
+  const isProjectIdValid = projectId !== undefined && !Number.isNaN(projectId);
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollapsedInternal, setIsCollapsedInternal] = useState(false);
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState(false);
+  // 사이드바가 직접 fetch 한 결과 — props 로 명시 전달된 값이 있으면 그 값을, 없으면 fetch 결과를 사용한다.
+  const [fetchedProjectName, setFetchedProjectName] = useState<string | undefined>(undefined);
+  const [me, setMe] = useState<{ nickname?: string; email?: string } | null>(null);
   const { unreadCount } = EXAMPLE_SIDEBAR_ALARM_ITEMS.data;
   const isProjectSelectionPage = pathname === '/projects';
+
+  // 프로젝트 이름 fetch — 라우트에 projectId 가 있을 때만.
+  // setState 는 inline async 함수 안에서 호출해 `react-hooks/set-state-in-effect` 룰 회피.
+  useEffect(() => {
+    let cancelled = false;
+    const fetchProjectName = async () => {
+      if (!isProjectIdValid || projectId === undefined) {
+        if (!cancelled) setFetchedProjectName(undefined);
+        return;
+      }
+      try {
+        const response = await privateApi.project.getProject(projectId);
+        if (cancelled) return;
+        setFetchedProjectName(response.data.data?.name);
+      } catch (caught) {
+        if (cancelled) return;
+        console.error('프로젝트 이름 조회에 실패했어요.', caught);
+      }
+    };
+    void fetchProjectName();
+    return () => {
+      cancelled = true;
+    };
+  }, [isProjectIdValid, projectId]);
+
+  // 내 계정 fetch — 사이드바 마운트 시 한 번.
+  useEffect(() => {
+    let cancelled = false;
+    const fetchMe = async () => {
+      try {
+        const response = await privateApi.user.getMe();
+        if (cancelled) return;
+        const data = response.data.data;
+        setMe({ nickname: data?.nickname, email: data?.email });
+      } catch (caught) {
+        if (cancelled) return;
+        console.error('내 정보 조회에 실패했어요.', caught);
+      }
+    };
+    void fetchMe();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // prop > fetch > 빈 문자열 우선순위로 합성.
+  const projectName = projectNameProp ?? fetchedProjectName ?? '';
+  const userName = userNameProp ?? me?.nickname ?? '';
+  const userEmail = userEmailProp ?? me?.email ?? '';
   const isCollapsed = isProjectSelectionPage || isCollapsedInternal;
   const [isCollapseSettled, setIsCollapseSettled] = useState(true);
   const shouldUseCollapsedLayout = isCollapsed && isCollapseSettled;
