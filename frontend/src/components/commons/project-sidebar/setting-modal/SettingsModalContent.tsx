@@ -83,7 +83,9 @@ export const SettingsModalContent = ({ projectId, onClose }: SettingsModalConten
           {activeTab === 'members' && (
             <MembersSettingsPanel projectId={projectId} myRole={myRole} />
           )}
-          {activeTab === 'notifications' && <NotificationsSettingsPanel />}
+          {activeTab === 'notifications' && (
+            <NotificationsSettingsPanel projectId={projectId} />
+          )}
         </div>
       </section>
     </div>

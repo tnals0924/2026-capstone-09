@@ -1,55 +1,72 @@
 'use client';
 
 import { Checkbox, Switch } from '@wanteddev/wds';
-import { useState } from 'react';
 
-import { EXAMPLE_PROJECT_NOTIFICATION_SETTINGS } from '@/constants/exampleConstant';
+import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
+
+import { useProjectNotificationsForm } from './useProjectNotificationsForm';
 
 interface NotificationRowProps {
   label: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  disabled?: boolean;
 }
 
-const NotificationRow = ({ label, checked, onCheckedChange }: NotificationRowProps) => {
+const NotificationRow = ({ label, checked, onCheckedChange, disabled }: NotificationRowProps) => {
   return (
     <div className="flex w-40 items-center justify-between gap-2 py-3">
       <span className="text-label-1 text-label-normal">{label}</span>
-      <Switch size="small" checked={checked} onCheckedChange={onCheckedChange} />
+      <Switch
+        size="small"
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        disabled={disabled}
+      />
     </div>
   );
 };
 
+interface NotificationsSettingsPanelProps {
+  projectId: number;
+}
+
 /**
  * 설정 모달 - 알림 탭.
  *
- * 알림 설정 관련 API(`getProjectNotificationSettings`/`updateProjectNotificationSettings` 등)가
- * 아직 generated 되지 않아, UI는 #55 톤 그대로 가져오되 토글 상태는 클라이언트 메모리에만
- * 보관한다. 백엔드 스펙 확정 후 별도 작업에서 폼 훅 + privateApi 호출로 전환 예정.
+ * - 마운트 시 `getNotificationSetting(projectId)` → 초기값 로드.
+ * - 각 토글 변경 시 즉시 `updateNotificationSetting(projectId, { [field]: value })` 호출 (낙관적 업데이트).
+ * - 폼 상태/검증/저장은 `useProjectNotificationsForm` 훅에 분리.
  */
-export const NotificationsSettingsPanel = () => {
-  const [meetingEnabled, setMeetingEnabled] = useState<boolean>(
-    EXAMPLE_PROJECT_NOTIFICATION_SETTINGS.meetingEnabled,
-  );
-  const [nodeEnabled, setNodeEnabled] = useState<boolean>(
-    EXAMPLE_PROJECT_NOTIFICATION_SETTINGS.nodeEnabled,
-  );
-  const [desktopEnabled, setDesktopEnabled] = useState<boolean>(
-    EXAMPLE_PROJECT_NOTIFICATION_SETTINGS.channels.desktop,
-  );
-  const [emailEnabled, setEmailEnabled] = useState<boolean>(
-    EXAMPLE_PROJECT_NOTIFICATION_SETTINGS.channels.email,
-  );
+export const NotificationsSettingsPanel = ({ projectId }: NotificationsSettingsPanelProps) => {
+  const toast = usePositionedToast();
+  const { settings, isLoaded, setField } = useProjectNotificationsForm({
+    projectId,
+    onSaveError: (message) => {
+      toast({
+        content: message,
+        variant: 'negative',
+        placement: 'bottom-left',
+        duration: 'short',
+      });
+    },
+  });
 
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col">
         <NotificationRow
           label="회의 알림"
-          checked={meetingEnabled}
-          onCheckedChange={setMeetingEnabled}
+          checked={settings.meetingEnabled}
+          onCheckedChange={(checked) => void setField('meetingEnabled', checked)}
+          disabled={!isLoaded}
         />
-        <NotificationRow label="노드 알림" checked={nodeEnabled} onCheckedChange={setNodeEnabled} />
+        <NotificationRow
+          label="노드 알림"
+          checked={settings.nodeEnabled}
+          onCheckedChange={(checked) => void setField('nodeEnabled', checked)}
+          disabled={!isLoaded}
+        />
       </div>
 
       <div aria-hidden="true" className="bg-line-normal-normal h-px w-full" />
@@ -60,14 +77,21 @@ export const NotificationsSettingsPanel = () => {
           <label className="flex items-center gap-2 py-3">
             <Checkbox
               size="small"
-              checked={desktopEnabled}
-              onCheckedChange={setDesktopEnabled}
+              checked={settings.desktopEnabled}
+              onCheckedChange={(checked) => void setField('desktopEnabled', checked)}
+              disabled={!isLoaded}
               tight
             />
             <span className="text-caption-1 text-label-normal">데스크톱</span>
           </label>
           <label className="flex items-center gap-2 py-3">
-            <Checkbox size="small" checked={emailEnabled} onCheckedChange={setEmailEnabled} tight />
+            <Checkbox
+              size="small"
+              checked={settings.emailEnabled}
+              onCheckedChange={(checked) => void setField('emailEnabled', checked)}
+              disabled={!isLoaded}
+              tight
+            />
             <span className="text-caption-1 text-label-normal">이메일</span>
           </label>
         </div>
