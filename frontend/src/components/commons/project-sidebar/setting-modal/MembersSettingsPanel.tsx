@@ -2,6 +2,7 @@
 
 import {
   Avatar,
+  Chip,
   Menu,
   MenuContent,
   MenuList,
@@ -9,7 +10,7 @@ import {
   TextField,
   TextFieldButton,
 } from '@wanteddev/wds';
-import { IconChevronDownSmall } from '@wanteddev/wds-icon';
+import { IconChevronDownSmall, IconClose } from '@wanteddev/wds-icon';
 import { useEffect, useState } from 'react';
 
 import { privateApi } from '@/api';
@@ -65,7 +66,17 @@ interface MembersSettingsPanelProps {
 export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanelProps) => {
   const { openDialog, closeDialog } = useDialog();
   const toast = usePositionedToast();
-  const { email, setEmail, isInvalid, canSend, buildPayload, reset } = useMemberInviteForm();
+  const {
+    email,
+    setEmail,
+    pendingEmails,
+    isCurrentInvalid,
+    canSendAll,
+    commitCurrent,
+    removeEmail,
+    buildPayloads,
+    reset,
+  } = useMemberInviteForm();
 
   const [members, setMembers] = useState<MemberRow[]>([]);
   const [openRoleMenuFor, setOpenRoleMenuFor] = useState<number | null>(null);
@@ -106,19 +117,39 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
     };
   }, [projectId, reloadCounter]);
 
+  const handleEmailKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    commitCurrent();
+  };
+
   const handleInviteSend = async () => {
-    if (!canSend) return;
-    try {
-      await privateApi.project.inviteMember(projectId, buildPayload());
-      reset();
+    if (!canSendAll) return;
+    const payloads = buildPayloads();
+    if (payloads.length === 0) return;
+    // 백엔드 `inviteMember` 가 단일 이메일만 받아 일괄 호출은 클라이언트에서 Promise.all 로 처리.
+    const results = await Promise.allSettled(
+      payloads.map((payload) => privateApi.project.inviteMember(projectId, payload)),
+    );
+    const failures = results.filter((r) => r.status === 'rejected');
+    reset();
+    if (failures.length === 0) {
       toast({
-        content: '초대 메일을 전송했어요',
+        content: `${payloads.length}명에게 초대 메일을 전송했어요`,
         variant: 'normal',
         placement: 'bottom-left',
         duration: 'short',
       });
-    } catch (caught) {
-      console.error('멤버 초대에 실패했어요.', caught);
+    } else {
+      failures.forEach((failure) => {
+        console.error('멤버 초대 일부 실패', (failure as PromiseRejectedResult).reason);
+      });
+      toast({
+        content: `${payloads.length - failures.length}명 전송 완료, ${failures.length}명 실패`,
+        variant: 'cautionary',
+        placement: 'bottom-left',
+        duration: 'short',
+      });
     }
   };
 
@@ -179,20 +210,61 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          onKeyDown={handleEmailKeyDown}
           width="100%"
-          placeholder="초대할 이메일 주소"
-          invalid={isInvalid}
+          placeholder="이메일 주소를 입력하고 Enter 로 추가"
+          invalid={isCurrentInvalid}
           trailingButton={
             <TextFieldButton
               variant="normal"
               onClick={handleInviteSend}
-              disabled={!canSend}
+              disabled={!canSendAll}
               aria-label="멤버 초대 전송"
             >
               전송
             </TextFieldButton>
           }
         />
+
+        {/* 추가된 초대 대기 이메일 Chip 목록 */}
+        {pendingEmails.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3 pt-2">
+            {pendingEmails.map((mail) => (
+              <Chip
+                key={mail}
+                size="medium"
+                variant="solid"
+                disableInteraction
+                leadingContent={<Avatar variant="person" size="xsmall" alt={mail} />}
+                trailingContent={
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      removeEmail(mail);
+                    }}
+                    onMouseDown={(event) => event.stopPropagation()}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        removeEmail(mail);
+                      }
+                    }}
+                    aria-label={`${mail} 초대 취소`}
+                    className="text-label-alternative hover:text-label-neutral relative z-10 flex h-4 w-4 cursor-pointer items-center justify-center"
+                  >
+                    <IconClose className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                }
+              >
+                <span className="text-caption-1 text-label-alternative font-medium">{mail}</span>
+              </Chip>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 멤버 목록 */}

@@ -9,7 +9,8 @@ interface UseProjectInfoFormParams {
   maxLength?: number;
 }
 
-const DEFAULT_NAME_MAX_LENGTH = 20;
+// 디자인 시안 기준 50자.
+const DEFAULT_NAME_MAX_LENGTH = 50;
 
 /**
  * 프로젝트 설정 패널의 "이름 수정" 폼 훅.
