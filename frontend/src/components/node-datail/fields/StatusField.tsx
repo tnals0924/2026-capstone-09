@@ -1,7 +1,7 @@
 'use client';
 
+import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
 import { useEffect, useRef, useState } from 'react';
-import { ContentBadge, ThemeColorsToken } from '@wanteddev/wds';
 import { NodeStatusType, NODE_STATUS_INFO } from '@/constants/nodeStatus';
 import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
 import { privateApi } from '@/api';
@@ -39,30 +39,37 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
   };
 
   return (
-    <div ref={containerRef} className="relative">
-      <button
-        type="button"
-        onClick={() => setIsOpen((v) => !v)}
-        className="cursor-pointer rounded hover:opacity-70"
+    <div ref={containerRef} className="relative w-full">
+      <div
+        onClick={() => { if (!isOpen) setIsOpen(true); }}
+        className={`flex w-full cursor-text flex-wrap items-center gap-2.5 rounded-t-sm ${isOpen ? 'bg-line-normal-alternative border-line-solid-normal border border-b-0 p-2.5' : ''}`}
       >
-        <ContentBadge
-          size="xsmall"
-          color="accent"
-          accentColor={getNodeStatusColor(status as NodeStatusType) as ThemeColorsToken}
-          leadingContent={getNodeStatusIcon(status as NodeStatusType)}
-        >
-          {getNodeStatusLabel(status as NodeStatusType)}
-        </ContentBadge>
-      </button>
+        {!status && (
+          <div className="text-label-alternative items-center">
+            <Typography variant="caption1">선택된 상태가 없어요</Typography>
+          </div>
+        )}
+        {status && (
+          <ContentBadge
+            size="xsmall"
+            color="accent"
+            accentColor={getNodeStatusColor(status) as ThemeColorsToken}
+            leadingContent={getNodeStatusIcon(status)}
+          >
+            {getNodeStatusLabel(status)}
+          </ContentBadge>
+        )}
+        {isOpen && <span className="h-4 w-px self-center" />}
+      </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 z-50 mt-1 min-w-32 rounded-md border border-gray-200 bg-white py-1 shadow-md">
+        <div className="border-line-solid-normal absolute top-full left-0 z-50 w-full rounded-b-sm border bg-white py-2 shadow-md">
           {(Object.keys(NODE_STATUS_INFO) as NodeStatusType[]).map((s) => (
             <button
               key={s}
               type="button"
               onClick={() => handleSelect(s)}
-              className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 hover:bg-gray-50"
+              className="flex w-full items-center gap-2 bg-white px-3 py-2 hover:bg-gray-50"
             >
               <ContentBadge
                 size="xsmall"
