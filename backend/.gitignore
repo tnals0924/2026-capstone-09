@@ -48,3 +48,5 @@ docker/certbot/
 docs/
 
 .claude/UX_MESSAGE_GUIDE.md
+
+.etc/
