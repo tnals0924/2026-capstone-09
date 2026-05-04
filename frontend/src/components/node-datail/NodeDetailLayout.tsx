@@ -1,17 +1,6 @@
 'use client';
 
-import {
-  Avatar,
-  ContentBadge,
-  Tab,
-  TabList,
-  TabListItem,
-  TabPanel,
-  ThemeColorsToken,
-  Typography,
-} from '@wanteddev/wds';
-import { EXAMPLE_USERS } from '@/constants/exampleConstant';
-import { Users } from '../commons/user/UserAvatarGroup';
+import { ContentBadge, Tab, TabList, TabListItem, TabPanel, Typography } from '@wanteddev/wds';
 import {
   IconDocumentText,
   IconFire,
@@ -19,21 +8,20 @@ import {
   IconPersons,
   IconTag,
 } from '@wanteddev/wds-icon';
-import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
-import { NodeStatusType } from '@/constants/nodeStatus';
 import { EditorContent } from '@tiptap/react';
-import { useTitleEditor } from './hooks/useTitleEditor';
 import { useEffect, useState } from 'react';
-import { privateApi } from '@/api';
-import { GetNodeResponse } from '@/api/Api';
-import { getColorToken } from '@/utils/getBadgeColorInfo';
-import { ColorType } from '@/constants/badgeColor';
-import { formatDatetoString } from '@/utils/formatData';
 
-interface Tag {
-  tagId: number;
-  name: string;
-}
+import { privateApi } from '@/api';
+import { AssigneeItem, GetNodeResponse, TagItem } from '@/api/Api';
+import { NodeStatusType } from '@/constants/nodeStatus';
+import { EXAMPLE_USERS } from '@/constants/exampleConstant';
+import { formatDatetoString } from '@/utils/formatData';
+import { Users } from '../commons/user/UserAvatarGroup';
+import { useTitleEditor } from './hooks/useTitleEditor';
+import { StatusField } from './fields/StatusField';
+import { DescriptionField } from './fields/DescriptionField';
+import { TagField } from './fields/TagField';
+import { AssigneeField } from './fields/AssigneeField';
 
 interface NodeDetailLayoutProps {
   nodeId: number | null;
@@ -58,17 +46,45 @@ export function NodeDetailLayout({
   useEffect(() => {
     const fetchNodeDetail = async () => {
       try {
-        console.log(projectId, nodeId);
         if (!projectId || !nodeId) return;
-
         const data = await privateApi.node.getNode(projectId, nodeId ?? 0);
         setNodeDetail(data.data.data);
       } catch (error) {
-        console.error('Failed to load flowchart:', error);
+        console.error('Failed to load node detail:', error);
       }
     };
     void fetchNodeDetail();
   }, [nodeId]);
+
+  const handleStatusUpdate = (status: NodeStatusType) => {
+    setNodeDetail((prev) => (prev ? { ...prev, status } : prev));
+  };
+
+  const handleDescriptionUpdate = (description: string) => {
+    setNodeDetail((prev) => (prev ? { ...prev, description } : prev));
+  };
+
+  const handleTagAdd = (tag: TagItem) => {
+    setNodeDetail((prev) => (prev ? { ...prev, tags: [...(prev.tags ?? []), tag] } : prev));
+  };
+
+  const handleTagRemove = (tagId: number) => {
+    setNodeDetail((prev) =>
+      prev ? { ...prev, tags: prev.tags?.filter((t) => t.tagId !== tagId) } : prev,
+    );
+  };
+
+  const handleAssigneeAdd = (assignee: AssigneeItem) => {
+    setNodeDetail((prev) =>
+      prev ? { ...prev, assignees: [...(prev.assignees ?? []), assignee] } : prev,
+    );
+  };
+
+  const handleAssigneeRemove = (userId: number) => {
+    setNodeDetail((prev) =>
+      prev ? { ...prev, assignees: prev.assignees?.filter((a) => a.userId !== userId) } : prev,
+    );
+  };
 
   return (
     <div className="flex h-full flex-col overflow-y-scroll [&::-webkit-scrollbar]:hidden">
@@ -98,56 +114,52 @@ export function NodeDetailLayout({
 
         <div className="flex flex-col gap-5">
           <MetaRow icon={<IconTag />} label="태그">
-            <div className="flex flex-wrap gap-1.5">
-              {nodeDetail?.tags?.map((tag) => (
-                <ContentBadge
-                  key={tag.tagId}
-                  color="accent"
-                  size="xsmall"
-                  accentColor={getColorToken(tag.color as ColorType) as ThemeColorsToken}
-                >
-                  {tag.name}
-                </ContentBadge>
-              ))}
-            </div>
+            {nodeId && (
+              <TagField
+                projectId={projectId}
+                nodeId={nodeId}
+                tags={nodeDetail?.tags ?? []}
+                onAdd={handleTagAdd}
+                onRemove={handleTagRemove}
+              />
+            )}
           </MetaRow>
 
           <MetaRow icon={<IconPersons />} label="노드 담당자">
-            <div className="flex gap-3">
-              {nodeDetail?.assignees?.map((assignee) => (
-                <div key={assignee.userId} className="flex items-center gap-1">
-                  <div className="scale-75">
-                    <Avatar
-                      variant="person"
-                      size="xsmall"
-                      src={assignee.profileImageUrl || undefined}
-                    />
-                  </div>
-                  <Typography variant="label1">{assignee.nickname}</Typography>
-                </div>
-              ))}
-            </div>
+            {nodeId && (
+              <AssigneeField
+                projectId={projectId}
+                nodeId={nodeId}
+                assignees={nodeDetail?.assignees ?? []}
+                onAdd={handleAssigneeAdd}
+                onRemove={handleAssigneeRemove}
+              />
+            )}
           </MetaRow>
 
           <MetaRow icon={<IconDocumentText />} label="노드 설명">
-            <div className="flex">
-              <Typography variant="label1">{nodeDetail?.description}</Typography>
-            </div>
+            {nodeId && (
+              <DescriptionField
+                projectId={projectId}
+                nodeId={nodeId}
+                description={nodeDetail?.description}
+                onUpdate={handleDescriptionUpdate}
+              />
+            )}
           </MetaRow>
 
           <MetaRow icon={<IconFire />} label="진행 상태">
-            <ContentBadge
-              size="xsmall"
-              color="accent"
-              accentColor={
-                getNodeStatusColor(nodeDetail?.status as NodeStatusType) as ThemeColorsToken
-              }
-              leadingContent={getNodeStatusIcon(nodeDetail?.status as NodeStatusType)}
-            >
-              {getNodeStatusLabel(nodeDetail?.status as NodeStatusType)}
-            </ContentBadge>
+            {nodeId && nodeDetail?.status && (
+              <StatusField
+                projectId={projectId}
+                nodeId={nodeId}
+                status={nodeDetail.status as NodeStatusType}
+                onUpdate={handleStatusUpdate}
+              />
+            )}
           </MetaRow>
         </div>
+
         {nodeDetail?.meeting?.meetingId ? (
           // 추후 수정 필요...
           <a
@@ -199,7 +211,7 @@ function MetaRow({
         <span>{icon}</span>
         <Typography variant="label1">{label}</Typography>
       </span>
-      <div>{children}</div>
+      <div className="flex-1">{children}</div>
     </div>
   );
 }
