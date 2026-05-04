@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kr.flowmeet.domain.common.BaseTimeEntity;
-import kr.flowmeet.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,13 +45,6 @@ public class ChatMessage extends BaseTimeEntity {
     @JoinColumn(name = "chat_session_id", insertable = false, updatable = false)
     private ChatSession chatSession;
 
-    @Column(name = "sender_id")
-    private Long senderId;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", insertable = false, updatable = false)
-    private User sender;
-
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
@@ -64,10 +56,9 @@ public class ChatMessage extends BaseTimeEntity {
     private String actionData;
 
     @Builder
-    public ChatMessage(Long chatSessionId, Long senderId, String content,
+    public ChatMessage(Long chatSessionId, String content,
                        ChatMessageType messageType, String actionData) {
         this.chatSessionId = chatSessionId;
-        this.senderId = senderId;
         this.content = content;
         this.messageType = messageType;
         this.actionData = actionData;

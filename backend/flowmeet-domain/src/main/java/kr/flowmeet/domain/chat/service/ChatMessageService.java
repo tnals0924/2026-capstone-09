@@ -20,11 +20,10 @@ public class ChatMessageService {
     }
 
     @Transactional
-    public ChatMessage create(final Long chatSessionId, final Long senderId, final String content) {
+    public ChatMessage create(final Long chatSessionId, final String content) {
         return chatMessageRepository.save(
                 ChatMessage.builder()
                         .chatSessionId(chatSessionId)
-                        .senderId(senderId)
                         .content(content)
                         .messageType(ChatMessageType.USER)
                         .build()

@@ -19,8 +19,6 @@ import kr.flowmeet.domain.chat.service.ChatSessionService;
 import kr.flowmeet.domain.node.entity.Node;
 import kr.flowmeet.domain.node.service.NodeService;
 import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
-import kr.flowmeet.domain.user.entity.User;
-import kr.flowmeet.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +32,6 @@ public class ChatFacade {
     private final ChatMessageService chatMessageService;
     private final ChatSessionNodeService chatSessionNodeService;
     private final NodeService nodeService;
-    private final UserService userService;
     private final ProjectPermissionValidator projectPermissionValidator;
 
     public CursorSliceResponse<ChatSessionSummaryResponse> getAllChatSessions(
@@ -135,10 +132,9 @@ public class ChatFacade {
         projectPermissionValidator.validate(projectId, userId);
         chatSessionService.findByIdAndProjectId(chatSessionId, projectId);
 
-        User user = userService.findById(userId);
-        ChatMessage message = chatMessageService.create(chatSessionId, userId, content);
+        ChatMessage message = chatMessageService.create(chatSessionId, content);
 
-        return SendMessageResponse.of(message, user.getNickname());
+        return SendMessageResponse.from(message);
     }
 
     public GetReferenceNodesResponse getReferenceNodes(final Long userId, final Long projectId) {

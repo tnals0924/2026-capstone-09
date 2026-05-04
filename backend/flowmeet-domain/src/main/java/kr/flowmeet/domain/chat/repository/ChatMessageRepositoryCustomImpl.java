@@ -1,7 +1,6 @@
 package kr.flowmeet.domain.chat.repository;
 
 import static kr.flowmeet.domain.chat.entity.QChatMessage.chatMessage;
-import static kr.flowmeet.domain.user.entity.QUser.user;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,7 +21,6 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
     ) {
         return queryFactory
                 .selectFrom(chatMessage)
-                .leftJoin(chatMessage.sender, user).fetchJoin()
                 .where(
                         chatMessage.chatSessionId.eq(chatSessionId),
                         afterCursor(cursorId)

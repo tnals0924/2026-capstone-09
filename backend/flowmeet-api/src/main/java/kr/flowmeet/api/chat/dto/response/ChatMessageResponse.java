@@ -9,10 +9,6 @@ import kr.flowmeet.domain.chat.entity.ChatMessageType;
 public record ChatMessageResponse(
         @Schema(description = "메시지 ID", example = "5001")
         Long messageId,
-        @Schema(description = "발신자 ID (AI 메시지는 null)", example = "91")
-        Long senderId,
-        @Schema(description = "발신자 닉네임", example = "홍길동")
-        String senderNickname,
         @Schema(description = "메시지 내용")
         String content,
         @Schema(description = "메시지 타입", example = "USER")
@@ -23,14 +19,8 @@ public record ChatMessageResponse(
         LocalDateTime createdAt
 ) {
     public static ChatMessageResponse from(final ChatMessage message) {
-        String nickname = message.getSender() != null
-                ? message.getSender().getNickname()
-                : "AI";
-
         return new ChatMessageResponse(
                 message.getId(),
-                message.getSenderId(),
-                nickname,
                 message.getContent(),
                 message.getMessageType(),
                 message.getActionData(),

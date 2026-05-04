@@ -27,15 +27,13 @@ CREATE INDEX idx_chat_sessions_created_by ON chat_sessions (created_by);
 CREATE TABLE chat_messages (
     chat_message_id BIGSERIAL    PRIMARY KEY,
     chat_session_id BIGINT       NOT NULL,
-    sender_id       BIGINT,
     content         TEXT         NOT NULL,
     message_type    VARCHAR(50)  NOT NULL,
     action_data     TEXT,
     created_at      TIMESTAMP    NOT NULL,
     updated_at      TIMESTAMP    NOT NULL,
     deleted_at      TIMESTAMP,
-    CONSTRAINT fk_chat_messages_session FOREIGN KEY (chat_session_id) REFERENCES chat_sessions (chat_session_id),
-    CONSTRAINT fk_chat_messages_sender  FOREIGN KEY (sender_id)       REFERENCES users (user_id)
+    CONSTRAINT fk_chat_messages_session FOREIGN KEY (chat_session_id) REFERENCES chat_sessions (chat_session_id)
 );
 
 CREATE INDEX idx_chat_messages_chat_session_id ON chat_messages (chat_session_id);
