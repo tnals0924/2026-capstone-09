@@ -126,7 +126,7 @@ public class MeetingService {
                         .build()
         );
 
-        saveParticipants(meeting.getId(), command.participantIds());
+        saveParticipants(meeting.getId(), command.participantUserIds());
         return meeting;
     }
 
@@ -144,7 +144,7 @@ public class MeetingService {
                 command.startedAt().minusMinutes(DEFAULT_REMINDER_MINUTES_BEFORE_START)
         );
 
-        syncParticipants(meeting.getId(), command.participantIds());
+        syncParticipants(meeting.getId(), command.participantUserIds());
     }
 
     private void syncParticipants(final Long meetingId, final List<Long> requestedUserIds) {
@@ -177,11 +177,11 @@ public class MeetingService {
         meetingRepository.delete(meeting);
     }
 
-    private void saveParticipants(final Long meetingId, final List<Long> participantIds) {
-        if (participantIds == null || participantIds.isEmpty()) {
+    private void saveParticipants(final Long meetingId, final List<Long> participantUserIds) {
+        if (participantUserIds == null || participantUserIds.isEmpty()) {
             return;
         }
-        List<MeetingParticipant> participants = participantIds.stream()
+        List<MeetingParticipant> participants = participantUserIds.stream()
                 .distinct()
                 .map(userId -> MeetingParticipant.builder()
                         .meetingId(meetingId)

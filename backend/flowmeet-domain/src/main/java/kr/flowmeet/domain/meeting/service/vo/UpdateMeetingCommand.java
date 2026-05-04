@@ -5,6 +5,6 @@ import java.util.List;
 
 public record UpdateMeetingCommand(
         LocalDateTime startedAt,
-        List<Long> participantIds
+        List<Long> participantUserIds
 ) {
 }

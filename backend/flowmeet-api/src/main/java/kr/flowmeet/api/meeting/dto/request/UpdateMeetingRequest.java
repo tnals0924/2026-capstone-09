@@ -15,9 +15,9 @@ public record UpdateMeetingRequest(
         LocalDateTime startedAt,
         @Schema(description = "참여자 사용자 ID 목록", example = "[10, 20, 30]")
         @NotEmpty(message = ValidationMessage.MEETING_PARTICIPANTS_REQUIRED)
-        List<Long> participantIds
+        List<Long> participantUserIds
 ) {
     public UpdateMeetingCommand toCommand() {
-        return new UpdateMeetingCommand(startedAt, participantIds);
+        return new UpdateMeetingCommand(startedAt, participantUserIds);
     }
 }

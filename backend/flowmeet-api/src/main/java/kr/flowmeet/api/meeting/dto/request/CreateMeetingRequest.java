@@ -15,9 +15,9 @@ public record CreateMeetingRequest(
         LocalDateTime startedAt,
         @Schema(description = "참여자 사용자 ID 목록", example = "[10, 20, 30]")
         @NotEmpty(message = ValidationMessage.MEETING_PARTICIPANTS_REQUIRED)
-        List<Long> participantIds
+        List<Long> participantUserIds
 ) {
     public CreateMeetingCommand toCommand() {
-        return new CreateMeetingCommand(startedAt, participantIds);
+        return new CreateMeetingCommand(startedAt, participantUserIds);
     }
 }

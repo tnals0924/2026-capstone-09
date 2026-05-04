@@ -41,7 +41,7 @@ public class MeetingFacade {
     ) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
         nodeValidator.validateIsIn(nodeId, projectId);
-        projectPermissionValidator.validateAllAreMembers(projectId, request.participantIds());
+        projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
         meetingService.validateCreatable(nodeId, request.startedAt());
 
         Node node = nodeService.findByIdAndProjectId(nodeId, projectId);
@@ -61,7 +61,7 @@ public class MeetingFacade {
         Meeting meeting = meetingService.findById(meetingId);
         nodeValidator.validateIsIn(meeting.getNodeId(), projectId);
         meetingService.validateUpdatable(meeting, userId, isOwner(projectId, userId));
-        projectPermissionValidator.validateAllAreMembers(projectId, request.participantIds());
+        projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
 
         meetingService.updateSchedule(meeting, request.toCommand());
     }
