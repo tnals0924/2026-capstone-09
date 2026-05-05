@@ -180,7 +180,7 @@ export function NodeDetailLayout({
       <Tab value={value} onValueChange={onValueChange} defaultValue="note">
         <TabList size="medium" resize="fill">
           <TabListItem value="note">노트</TabListItem>
-          <TabListItem value="meeting">회의</TabListItem>
+          {nodeDetail?.parentId && <TabListItem value="meeting">회의</TabListItem>}
         </TabList>
         <TabPanel value="note">{noteContent}</TabPanel>
         <TabPanel

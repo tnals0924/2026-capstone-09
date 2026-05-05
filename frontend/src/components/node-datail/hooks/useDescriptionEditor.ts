@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Placeholder } from '@tiptap/extensions';
 import { Extension } from '@tiptap/core';
+import { useEditor } from '@tiptap/react';
 
 export function useDescriptionEditor(
   description: string | undefined,
