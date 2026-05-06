@@ -26,6 +26,7 @@ interface KanbanViewProps {
 }
 
 const KANBAN_STATUSES: NodeStatusType[] = ['WAITING', 'IN_PROGRESS', 'DONE'];
+const SORT_ORDER_GAP = 1024;
 
 export function KanbanView({ projectId }: KanbanViewProps) {
   const toast = usePositionedToast();
@@ -57,10 +58,29 @@ export function KanbanView({ projectId }: KanbanViewProps) {
       setLoading(true);
       const data = await privateApi.node.getKanban(projectId);
       const chartData = data.data.data ?? null;
+
+      // sortOrder가 0인 노드는 createdAt 기준으로 정렬 후 초기화
+      const initializeSortOrder = (nodes: KanbanItem[]) => {
+        const sorted = [...nodes].sort((a, b) => {
+          const aDate = new Date(a.createdAt ?? 0).getTime();
+          const bDate = new Date(b.createdAt ?? 0).getTime();
+          return aDate - bDate;
+        });
+
+        return sorted.map((node, index) => ({
+          ...node,
+          sortOrder: node.sortOrder && node.sortOrder > 0 ? node.sortOrder : (index + 1) * SORT_ORDER_GAP,
+        }));
+      };
+
       setGroupedNodes({
-        WAITING: (chartData?.waiting ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
-        IN_PROGRESS: (chartData?.inProgress ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
-        DONE: (chartData?.done ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
+        WAITING: initializeSortOrder(chartData?.waiting ?? []).sort(
+          (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+        ),
+        IN_PROGRESS: initializeSortOrder(chartData?.inProgress ?? []).sort(
+          (a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)
+        ),
+        DONE: initializeSortOrder(chartData?.done ?? []).sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0)),
       });
     } catch (error) {
       console.error('Failed to load kanban:', error);
@@ -184,30 +204,104 @@ export function KanbanView({ projectId }: KanbanViewProps) {
 
       const nodeId = Number(active.id);
       const currentNodes = groupedNodesRef.current;
-      const targetStatus = findNodeStatus(nodeId, currentNodes);
+
+      const isOverColumn = KANBAN_STATUSES.includes(over.id as NodeStatusType);
+      const targetStatus = isOverColumn
+        ? (over.id as NodeStatusType)
+        : findNodeStatus(Number(over.id), currentNodes);
 
       if (!targetStatus) return;
 
+      const sourceStatus = findNodeStatus(nodeId, currentNodes);
+      if (!sourceStatus) return;
+
+      const currentNode = currentNodes[sourceStatus].find((n) => n.nodeId === nodeId);
+      if (!currentNode) return;
+
       try {
-        const nodes = currentNodes[targetStatus];
-        const nodeIndex = nodes.findIndex((n) => n.nodeId === nodeId);
+        let nodes = currentNodes[targetStatus];
+        if (sourceStatus === targetStatus) {
+          // 같은 컬럼 내 이동
+          nodes = nodes.filter((n) => n.nodeId !== nodeId);
+        }
+
+        let nodeIndex: number;
+        if (isOverColumn) {
+          nodeIndex = nodes.length; // 마지막
+        } else {
+          nodeIndex = nodes.findIndex((n) => n.nodeId === Number(over.id));
+          if (nodeIndex === -1) {
+            nodeIndex = nodes.length;
+          }
+        }
 
         // sortOrder 계산
         let newSortOrder: number;
+        let needsRebalance = false;
 
         if (nodeIndex === 0) {
           // 첫 번째 위치
-          const nextNode = nodes[1];
-          newSortOrder = nextNode ? (nextNode.sortOrder ?? 1024) / 2 : 512;
-        } else if (nodeIndex === nodes.length - 1) {
+          const nextNode = nodes[0];
+          const nextOrder = nextNode?.sortOrder ?? SORT_ORDER_GAP;
+          newSortOrder = nextOrder / 2;
+
+          if (newSortOrder < 1) {
+            needsRebalance = true;
+          }
+        } else if (nodeIndex === nodes.length) {
           // 마지막 위치
-          const prevNode = nodes[nodeIndex - 1];
-          newSortOrder = (prevNode?.sortOrder ?? 0) + 1024;
+          const prevNode = nodes[nodes.length - 1];
+          newSortOrder = (prevNode?.sortOrder ?? 0) + SORT_ORDER_GAP;
         } else {
           // 중간 위치
           const prevNode = nodes[nodeIndex - 1];
-          const nextNode = nodes[nodeIndex + 1];
-          newSortOrder = ((prevNode?.sortOrder ?? 0) + (nextNode?.sortOrder ?? 0)) / 2;
+          const nextNode = nodes[nodeIndex];
+          const prevOrder = prevNode?.sortOrder ?? 0;
+          const nextOrder = nextNode?.sortOrder ?? 0;
+          newSortOrder = (prevOrder + nextOrder) / 2;
+
+          const gap = Math.abs(newSortOrder - prevOrder);
+          if (gap < 1) {
+            needsRebalance = true;
+          }
+        }
+
+        if (needsRebalance) {
+          // 간격이 좁을 경우 리밸런싱
+          const nextNodes = [
+            ...nodes.slice(0, nodeIndex),
+            { ...currentNode, sortOrder: 0 }, // 임시값
+            ...nodes.slice(nodeIndex),
+          ];
+
+          const rebalanced = nextNodes.map((node, index) => ({
+            ...node,
+            sortOrder: (index + 1) * SORT_ORDER_GAP,
+          }));
+
+          setGroupedNodes((prev) => ({
+            ...prev,
+            [targetStatus]: rebalanced,
+            ...(sourceStatus !== targetStatus && {
+              [sourceStatus]: prev[sourceStatus].filter((n) => n.nodeId !== nodeId),
+            }),
+          }));
+
+          newSortOrder = (nodeIndex + 1) * SORT_ORDER_GAP;
+        } else {
+          const nextNodes = [
+            ...nodes.slice(0, nodeIndex),
+            { ...currentNode, sortOrder: newSortOrder },
+            ...nodes.slice(nodeIndex),
+          ];
+
+          setGroupedNodes((prev) => ({
+            ...prev,
+            [targetStatus]: nextNodes,
+            ...(sourceStatus !== targetStatus && {
+              [sourceStatus]: prev[sourceStatus].filter((n) => n.nodeId !== nodeId),
+            }),
+          }));
         }
 
         await privateApi.node.updateNodeKanban(projectId, nodeId, {
@@ -216,8 +310,10 @@ export function KanbanView({ projectId }: KanbanViewProps) {
         });
       } catch (error) {
         console.error('Failed to update node status:', error);
+        const errorMessage =
+          error instanceof Error ? error.message : '노드 상태 변경에 실패했습니다.';
         toast({
-          content: '노드 상태 변경에 실패했습니다.',
+          content: errorMessage,
           variant: 'negative',
           placement: 'top-center',
         });
