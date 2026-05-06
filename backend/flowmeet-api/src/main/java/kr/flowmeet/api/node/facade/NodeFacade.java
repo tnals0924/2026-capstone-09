@@ -24,6 +24,7 @@ import kr.flowmeet.api.node.dto.response.GetNodeListResponse;
 import kr.flowmeet.api.node.dto.response.GetNodeResponse;
 import kr.flowmeet.api.node.dto.response.SearchNodeResponse;
 import kr.flowmeet.domain.meeting.entity.Meeting;
+import kr.flowmeet.domain.meeting.entity.MeetingParticipant;
 import kr.flowmeet.domain.meeting.service.MeetingService;
 import kr.flowmeet.domain.node.entity.Edge;
 import kr.flowmeet.domain.node.entity.Node;
@@ -54,6 +55,7 @@ public class NodeFacade {
     private final ProjectService projectService;
     private final ProjectPermissionValidator projectPermissionValidator;
     private final NodeValidator nodeValidator;
+    private final UserService userService;
 
     public GetFlowchartResponse getFlowchart(final Long userId, final Long projectId) {
         projectPermissionValidator.validate(projectId, userId);
@@ -79,9 +81,21 @@ public class NodeFacade {
 
         List<User> assignees = nodeAssigneeService.findAllUsersByNodeId(nodeId);
         Meeting meeting = meetingService.findByNodeId(nodeId)
-                .orElse(null);
+            .orElse(null);
 
-        return GetNodeResponse.of(node, tags, assignees, meeting);
+        List<MeetingParticipant> participants = List.of();
+        Map<Long, User> meetingUserMap = Map.of();
+
+        if (meeting != null) {
+            participants = meetingService.findAllParticipantsByMeetingId(meeting.getId());
+            List<Long> userIds = new ArrayList<>(participants.stream().map(MeetingParticipant::getUserId).toList());
+
+            userIds.add(meeting.getCreatedById());
+
+            meetingUserMap = userService.findAllByIdsAsMap(userIds);
+        }
+
+        return GetNodeResponse.of(node, tags, assignees, meeting, participants, meetingUserMap);
     }
 
     @Transactional
@@ -153,9 +167,9 @@ public class NodeFacade {
     }
 
     public GetNodeListResponse getNodeList(
-            final Long userId,
-            final Long projectId,
-            final String sort
+        final Long userId,
+        final Long projectId,
+        final String sort
     ) {
         projectPermissionValidator.validate(projectId, userId);
 
@@ -182,7 +196,7 @@ public class NodeFacade {
         Map<Long, List<NodeAssignee>> assigneeMap = nodeAssigneeService.findAllByNodeIdsAsMap(nodeIds);
 
         Map<NodeStatus, List<Node>> statusMap = nodes.stream()
-                .collect(Collectors.groupingBy(Node::getStatus));
+            .collect(Collectors.groupingBy(Node::getStatus));
 
         return GetKanbanResponse.of(statusMap, nodeTagMap, assigneeMap);
     }
@@ -201,10 +215,10 @@ public class NodeFacade {
 
     @Transactional
     public void updateNodeStatus(
-            final Long userId,
-            final Long projectId,
-            final Long nodeId,
-            final UpdateNodeStatusRequest request
+        final Long userId,
+        final Long projectId,
+        final Long nodeId,
+        final UpdateNodeStatusRequest request
     ) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
@@ -224,7 +238,7 @@ public class NodeFacade {
 
     private List<Long> getNodeIdFromNodes(List<Node> nodes) {
         return nodes.stream()
-                .map(Node::getId)
-                .toList();
+            .map(Node::getId)
+            .toList();
     }
 }

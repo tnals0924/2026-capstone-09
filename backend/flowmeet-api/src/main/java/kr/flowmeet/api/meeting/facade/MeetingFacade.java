@@ -1,0 +1,111 @@
+package kr.flowmeet.api.meeting.facade;
+
+import java.time.LocalDateTime;
+import kr.flowmeet.api.meeting.dto.request.CreateMeetingRequest;
+import kr.flowmeet.api.meeting.dto.request.UpdateMeetingRequest;
+import kr.flowmeet.domain.meeting.entity.Meeting;
+import kr.flowmeet.domain.meeting.service.MeetingService;
+import kr.flowmeet.domain.node.entity.Node;
+import kr.flowmeet.domain.node.service.NodeService;
+import kr.flowmeet.domain.node.service.NodeValidator;
+import kr.flowmeet.domain.project.entity.ProjectMember;
+import kr.flowmeet.domain.project.entity.ProjectMemberRole;
+import kr.flowmeet.domain.project.service.ProjectMemberService;
+import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
+import kr.flowmeet.external.meeting.MeetingRoomProvider;
+import kr.flowmeet.external.meeting.dto.CreateMeetingRoomCommand;
+import kr.flowmeet.external.meeting.dto.MeetingRoom;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+public class MeetingFacade {
+
+    private static final long DEFAULT_MEETING_DURATION_MINUTES = 60L;
+
+    private final MeetingService meetingService;
+    private final NodeService nodeService;
+    private final NodeValidator nodeValidator;
+    private final ProjectPermissionValidator projectPermissionValidator;
+    private final ProjectMemberService projectMemberService;
+    private final MeetingRoomProvider meetingRoomProvider;
+
+    public void createMeeting(
+            final Long userId,
+            final Long projectId,
+            final Long nodeId,
+            final CreateMeetingRequest request
+    ) {
+        projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
+        nodeValidator.validateIsIn(nodeId, projectId);
+        projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
+        meetingService.validateCreatable(nodeId, request.startedAt());
+
+        Node node = nodeService.findByIdAndProjectId(nodeId, projectId);
+        MeetingRoom room = meetingRoomProvider.create(toCreateRoomCommand(node, request.startedAt(), null));
+
+        //Meeting 생성 실패 시, 외부로 호출해서 생성한 회의실 삭제
+        try {
+            meetingService.create(nodeId, userId, room.url(), room.externalEventId(), request.toCommand());
+        } catch (RuntimeException e) {
+            try {
+                meetingRoomProvider.delete(room.externalEventId(), null);
+            } catch (RuntimeException cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
+            throw e;
+        }
+    }
+
+    @Transactional
+    public void updateMeeting(
+            final Long userId,
+            final Long projectId,
+            final Long meetingId,
+            final UpdateMeetingRequest request
+    ) {
+        projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
+
+        Meeting meeting = meetingService.findById(meetingId);
+
+        nodeValidator.validateIsIn(meeting.getNodeId(), projectId);
+
+        ProjectMember projectMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+
+        projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
+
+        meetingService.updateMeeting(projectMember, meeting, request.toCommand());
+    }
+
+    public void deleteMeeting(final Long userId, final Long projectId, final Long meetingId) {
+        projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
+
+        Meeting meeting = meetingService.findById(meetingId);
+        nodeValidator.validateIsIn(meeting.getNodeId(), projectId);
+
+        ProjectMember projectMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
+        String externalEventId = meeting.getExternalEventId();
+
+        meetingService.delete(projectMember, meeting);
+
+        if (externalEventId != null && !externalEventId.isBlank()) {
+            meetingRoomProvider.delete(externalEventId, null);
+        }
+    }
+
+    private CreateMeetingRoomCommand toCreateRoomCommand(
+            final Node node,
+            final LocalDateTime startedAt,
+            final String hostRefreshToken
+    ) {
+        return new CreateMeetingRoomCommand(
+                node.getTitle(),
+                startedAt,
+                startedAt.plusMinutes(DEFAULT_MEETING_DURATION_MINUTES),
+                hostRefreshToken
+        );
+    }
+
+}

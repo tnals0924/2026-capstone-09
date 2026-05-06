@@ -3,7 +3,9 @@ package kr.flowmeet.api.node.dto.response;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import kr.flowmeet.domain.meeting.entity.Meeting;
+import kr.flowmeet.domain.meeting.entity.MeetingParticipant;
 import kr.flowmeet.domain.node.entity.Node;
 import kr.flowmeet.domain.node.entity.Tag;
 import kr.flowmeet.domain.user.entity.User;
@@ -40,8 +42,14 @@ public record GetNodeResponse(
         LocalDateTime updatedAt
 ) {
 
-    public static GetNodeResponse of(final Node node, final List<Tag> tags,
-                                     final List<User> assignees, final Meeting meeting) {
+    public static GetNodeResponse of(
+            final Node node,
+            final List<Tag> tags,
+            final List<User> assignees,
+            final Meeting meeting,
+            final List<MeetingParticipant> meetingParticipants,
+            final Map<Long, User> userMap
+    ) {
         return new GetNodeResponse(
                 node.getId(),
                 node.getProjectId(),
@@ -54,7 +62,7 @@ public record GetNodeResponse(
                 node.getSortOrder(),
                 tags.stream().map(TagItem::from).toList(),
                 assignees.stream().map(AssigneeItem::from).toList(),
-                meeting != null ? MeetingItem.from(meeting) : null,
+                meeting != null ? MeetingItem.of(meeting, meetingParticipants, userMap) : null,
                 node.getCreatedAt(),
                 node.getUpdatedAt()
         );
@@ -64,24 +72,83 @@ public record GetNodeResponse(
     public record MeetingItem(
             @Schema(description = "회의 ID", example = "57")
             Long meetingId,
-            @Schema(description = "회의 상태", example = "SCHEDULED")
+            @Schema(description = "회의 상태", example = "SCHEDULED", allowableValues = {"SCHEDULED", "IN_PROGRESS", "ENDED"})
             String status,
             @Schema(description = "회의 시작 시각", example = "2026-04-20T14:00:00")
             LocalDateTime startedAt,
             @Schema(description = "회의 시작 푸시 알림 사용 여부", example = "true")
             boolean isPushEnabled,
             @Schema(description = "푸시 알림 예약 시각", example = "2026-04-20T13:50:00")
-            LocalDateTime pushNotifyAt
+            LocalDateTime pushNotifyAt,
+            @Schema(description = "화상 회의 링크", example = "https://meet.google.com/abc-defg-hij")
+            String meetingUrl,
+            @Schema(description = "AI 요약 (생성 전이라면 null)")
+            String summary,
+            @Schema(description = "참여자 목록")
+            List<ParticipantItem> participants,
+            @Schema(description = "회의 생성자")
+            CreatorItem createdBy,
+            @Schema(description = "생성 시각", example = "2026-04-19T10:15:30")
+            LocalDateTime createdAt
     ) {
 
-        public static MeetingItem from(final Meeting meeting) {
+        public static MeetingItem of(
+                final Meeting meeting,
+                final List<MeetingParticipant> participants,
+                final Map<Long, User> userMap
+        ) {
             return new MeetingItem(
                     meeting.getId(),
                     meeting.getStatus().name(),
                     meeting.getStartedAt(),
                     meeting.isPushEnabled(),
-                    meeting.getPushNotifyAt()
+                    meeting.getPushNotifyAt(),
+                    meeting.getMeetingUrl(),
+                    meeting.getSummary(),
+                    participants.stream()
+                            .map(p -> ParticipantItem.of(p, userMap.get(p.getUserId())))
+                            .toList(),
+                    CreatorItem.from(userMap.get(meeting.getCreatedById())),
+                    meeting.getCreatedAt()
             );
+        }
+    }
+
+    @Schema(description = "회의 참여자")
+    public record ParticipantItem(
+            @Schema(description = "회의 참여자 ID", example = "1")
+            Long meetingParticipantId,
+            @Schema(description = "사용자 ID", example = "10")
+            Long userId,
+            @Schema(description = "닉네임", example = "홍길동")
+            String nickname,
+            @Schema(description = "프로필 이미지 URL", example = "https://cdn.flowmit.com/profiles/10.png")
+            String profileImageUrl
+    ) {
+
+        public static ParticipantItem of(final MeetingParticipant participant, final User user) {
+            return new ParticipantItem(
+                    participant.getId(),
+                    participant.getUserId(),
+                    user != null ? user.getNickname() : null,
+                    user != null ? user.getProfileImageUrl() : null
+            );
+        }
+    }
+
+    @Schema(description = "회의 생성자")
+    public record CreatorItem(
+            @Schema(description = "사용자 ID", example = "10")
+            Long userId,
+            @Schema(description = "닉네임", example = "홍길동")
+            String nickname
+    ) {
+
+        public static CreatorItem from(final User user) {
+            if (user == null) {
+                return null;
+            }
+            return new CreatorItem(user.getId(), user.getNickname());
         }
     }
 }
