@@ -42,7 +42,19 @@ export function NodeDetailLayout({
   onValueChange,
 }: NodeDetailLayoutProps) {
   const [nodeDetail, setNodeDetail] = useState<GetNodeResponse | undefined>(undefined);
-  const titleEditor = useTitleEditor(nodeDetail?.title);
+
+  const handleTitleUpdate = async (title: string) => {
+    if (!nodeId || title === (nodeDetail?.title ?? '')) return;
+    const previous = nodeDetail?.title ?? '';
+    setNodeDetail((prev) => (prev ? { ...prev, title } : prev));
+    try {
+      await privateApi.node.updateNodeTitle(projectId, nodeId, { title });
+    } catch {
+      setNodeDetail((prev) => (prev ? { ...prev, title: previous } : prev));
+    }
+  };
+
+  const titleEditor = useTitleEditor(nodeDetail?.title, handleTitleUpdate);
 
   useEffect(() => {
     const fetchNodeDetail = async () => {
