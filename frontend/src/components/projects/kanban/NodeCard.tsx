@@ -61,11 +61,33 @@ export function NodeCard({
               size="xsmall"
               variant="solid"
             >
-              #{nodeNumber}
+              <span
+                style={{
+                  display: 'inline-block',
+                  maxWidth: '220px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  verticalAlign: 'bottom',
+                }}
+              >
+                #{nodeNumber}
+              </span>
             </ContentBadge>
           ) : (
             <ContentBadge color="neutral" size="xsmall" variant="outlined">
-              #{nodeNumber}
+              <span
+                style={{
+                  display: 'inline-block',
+                  maxWidth: '220px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  verticalAlign: 'bottom',
+                }}
+              >
+                #{nodeNumber}
+              </span>
             </ContentBadge>
           )}
           <div className="text-caption-2 text-label-alternative font-normal">
