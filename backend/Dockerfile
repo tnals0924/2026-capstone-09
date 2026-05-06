@@ -17,7 +17,7 @@ COPY flowmeet-domain/build.gradle        flowmeet-domain/
 COPY flowmeet-external/build.gradle      flowmeet-external/
 COPY flowmeet-global-utils/build.gradle  flowmeet-global-utils/
 
-RUN chmod +x gradlew && ./gradlew --no-daemon :flowmeet-api:dependencies > /dev/null 2>&1 || true
+RUN chmod +x gradlew && ./gradlew --no-daemon :flowmeet-api:dependencies
 
 # 소스 복사 후 bootJar
 COPY flowmeet-api/src           flowmeet-api/src
