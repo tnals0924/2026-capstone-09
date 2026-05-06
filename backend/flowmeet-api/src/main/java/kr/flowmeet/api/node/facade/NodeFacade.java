@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.api.common.exception.ApiException;
 import kr.flowmeet.api.node.dto.request.CreateNodeRequest;
 import kr.flowmeet.api.node.dto.request.UpdateNodeKanbanRequest;
-import kr.flowmeet.api.node.dto.request.UpdateNodeRequest;
 import kr.flowmeet.api.node.dto.request.UpdateNodeStatusRequest;
 import kr.flowmeet.api.node.dto.response.GetFlowchartResponse;
 import kr.flowmeet.api.node.dto.response.GetKanbanResponse;
@@ -102,15 +101,39 @@ public class NodeFacade {
     }
 
     @Transactional
-    public void updateNode(
+    public void updateNodeTitle(
             final Long userId,
             final Long projectId,
             final Long nodeId,
-            final UpdateNodeRequest request
+            final String title
     ) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
-        nodeService.updateNode(projectId, nodeId, request.toCommand());
+        nodeService.updateNodeTitle(projectId, nodeId, title);
+    }
+
+    @Transactional
+    public void updateNodeDescription(
+            final Long userId,
+            final Long projectId,
+            final Long nodeId,
+            final String description
+    ) {
+        projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
+
+        nodeService.updateNodeDescription(projectId, nodeId, description);
+    }
+
+    @Transactional
+    public void updateNodeNote(
+            final Long userId,
+            final Long projectId,
+            final Long nodeId,
+            final String noteContent
+    ) {
+        projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
+
+        nodeService.updateNodeNote(projectId, nodeId, noteContent);
     }
 
     @Transactional
