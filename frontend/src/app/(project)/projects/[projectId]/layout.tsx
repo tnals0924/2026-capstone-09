@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { ProjectDetailHeader } from '@/components/projects/project-detail/ProjectDetailHeader';
 import { ProjectDetailLinks } from '@/components/projects/project-detail/ProjectDetailLinks';
@@ -32,8 +32,10 @@ export default function ProjectDetailLayout({ children }: ProjectDetailLayoutPro
     localStorage.setItem(STORAGE_KEY, activeView);
   }, [activeView]);
 
+  const contextValue = useMemo(() => ({ activeView }), [activeView]);
+
   return (
-    <ProjectDetailLayoutContext.Provider value={{ activeView }}>
+    <ProjectDetailLayoutContext.Provider value={contextValue}>
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden">
         <ProjectDetailHeader activeView={activeView} onlineUsers={EXAMPLE_USERS} onViewChange={setActiveView} />
         <ProjectDetailLinks />

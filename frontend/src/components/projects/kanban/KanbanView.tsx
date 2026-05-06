@@ -10,6 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 import { privateApi } from '@/api';
 import { KanbanItem } from '@/api/Api';
@@ -78,41 +79,34 @@ export function KanbanView({ projectId }: KanbanViewProps) {
   }, []);
 
   const findNodeStatus = useCallback(
-    (nodeId: number): NodeStatusType | null => {
+    (nodeId: number, nodes: Record<NodeStatusType, KanbanItem[]>): NodeStatusType | null => {
       for (const status of ['WAITING', 'IN_PROGRESS', 'DONE'] as NodeStatusType[]) {
-        if (groupedNodes[status].some((n) => n.nodeId === nodeId)) {
+        if (nodes[status].some((n) => n.nodeId === nodeId)) {
           return status;
         }
       }
       return null;
     },
-    [groupedNodes]
+    []
   );
 
-  const handleDragOver = useCallback(
-    (event: DragOverEvent) => {
-      const { active, over } = event;
+  const updateNodePosition = useCallback(
+    (activeId: number, overId: string | number) => {
+      setGroupedNodes((prev) => {
+        const activeStatus = findNodeStatus(activeId, prev);
+        if (!activeStatus) return prev;
 
-      if (!over) return;
+        const isOverColumn = ['WAITING', 'IN_PROGRESS', 'DONE'].includes(overId as string);
+        const overStatus = isOverColumn ? (overId as NodeStatusType) : findNodeStatus(Number(overId), prev);
 
-      const activeId = Number(active.id);
-      const overId = over.id;
+        if (!overStatus) return prev;
 
-      const activeStatus = findNodeStatus(activeId);
-      if (!activeStatus) return;
+        // 같은 컬럼 내에서 이동
+        if (activeStatus === overStatus) {
+          if (isOverColumn) {
+            return prev; // 같은 컬럼으로 드롭하면 무시
+          }
 
-      const isOverColumn = ['WAITING', 'IN_PROGRESS', 'DONE'].includes(overId as string);
-      const overStatus = isOverColumn ? (overId as NodeStatusType) : findNodeStatus(Number(overId));
-
-      if (!overStatus) return;
-
-      // 같은 컬럼 내에서 이동
-      if (activeStatus === overStatus) {
-        if (isOverColumn) {
-          return; // 같은 컬럼으로 드롭하면 무시
-        }
-
-        setGroupedNodes((prev) => {
           const oldIndex = prev[activeStatus].findIndex((n) => n.nodeId === activeId);
           const newIndex = prev[overStatus].findIndex((n) => n.nodeId === Number(overId));
 
@@ -124,10 +118,8 @@ export function KanbanView({ projectId }: KanbanViewProps) {
             ...prev,
             [activeStatus]: arrayMove(prev[activeStatus], oldIndex, newIndex),
           };
-        });
-      } else {
-        // 다른 컬럼으로 이동
-        setGroupedNodes((prev) => {
+        } else {
+          // 다른 컬럼으로 이동
           const activeNode = prev[activeStatus].find((n) => n.nodeId === activeId);
           if (!activeNode) return prev;
 
@@ -152,10 +144,27 @@ export function KanbanView({ projectId }: KanbanViewProps) {
             [activeStatus]: sourceNodes,
             [overStatus]: destNodes,
           };
-        });
-      }
+        }
+      });
     },
     [findNodeStatus]
+  );
+
+  // 0ms 디바운스로 무한 루프 방지 (dnd-kit sortable 이슈)
+  const debouncedUpdateNodePosition = useDebouncedCallback(updateNodePosition, 0);
+
+  const handleDragOver = useCallback(
+    (event: DragOverEvent) => {
+      const { active, over } = event;
+
+      if (!over) return;
+
+      const activeId = Number(active.id);
+      const overId = over.id;
+
+      debouncedUpdateNodePosition(activeId, overId);
+    },
+    [debouncedUpdateNodePosition]
   );
 
   // 드래그 종료 후 서버 저장
@@ -168,7 +177,7 @@ export function KanbanView({ projectId }: KanbanViewProps) {
       }
 
       const nodeId = Number(active.id);
-      const targetStatus = findNodeStatus(nodeId);
+      const targetStatus = findNodeStatus(nodeId, groupedNodes);
 
       if (!targetStatus) return;
 
