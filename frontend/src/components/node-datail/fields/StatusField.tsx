@@ -2,9 +2,11 @@
 
 import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
 import { useEffect, useRef, useState } from 'react';
+
+import { privateApi } from '@/api';
+import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { NodeStatusType, NODE_STATUS_INFO } from '@/constants/nodeStatus';
 import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
-import { privateApi } from '@/api';
 
 interface StatusFieldProps {
   projectId: number;
@@ -16,6 +18,7 @@ interface StatusFieldProps {
 export function StatusField({ projectId, nodeId, status, onUpdate }: StatusFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const toast = usePositionedToast();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -32,9 +35,10 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
     onUpdate(newStatus);
     try {
       await privateApi.node.updateNodeStatus(projectId, nodeId, { status: newStatus });
-    } catch {
-      // TODO: 에러 토스트 알림 추가 필요
+    } catch (err) {
       if (previous) onUpdate(previous);
+      const message = (err as { message?: string })?.message ?? '상태 업데이트에 실패했습니다.';
+      toast({ content: message, variant: 'negative', placement: 'bottom-right' });
     }
   };
 
