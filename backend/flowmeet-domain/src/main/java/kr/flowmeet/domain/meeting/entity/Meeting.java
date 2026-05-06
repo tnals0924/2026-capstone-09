@@ -120,4 +120,7 @@ public class Meeting extends BaseTimeEntity {
         return this.status == MeetingStatus.SCHEDULED;
     }
 
+    public void updatePushEnabled(boolean isPushEnabled) {
+        this.isPushEnabled = isPushEnabled;
+    }
 }

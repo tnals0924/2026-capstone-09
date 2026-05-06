@@ -144,6 +144,8 @@ public class MeetingService {
                 command.startedAt().minusMinutes(DEFAULT_REMINDER_MINUTES_BEFORE_START)
         );
 
+        meeting.updatePushEnabled(command.isPushEnabled());
+
         syncParticipants(meeting.getId(), command.participantUserIds());
     }
 
