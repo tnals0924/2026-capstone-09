@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Avatar, Typography } from '@wanteddev/wds';
+import { Avatar, Theme, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
 
 import { privateApi } from '@/api';
@@ -128,13 +128,26 @@ export function AssigneeField({
                 key={member.userId}
                 type="button"
                 onClick={() => handleAdd(member)}
-                className="flex w-full items-center gap-2 bg-white px-3 py-2 hover:bg-gray-50"
+                className="flex w-full items-center justify-between gap-2 bg-white px-3 py-2 hover:bg-gray-50"
               >
-                <Avatar variant="person" size="xsmall" src={member.profileImageUrl || undefined} />
-                <div className="flex flex-col text-left">
-                  <Typography variant="label1">{member.nickname}</Typography>
-                  <span className="text-xs text-gray-400">{member.email}</span>
+                <div className="flex items-center gap-3">
+                  <Avatar
+                    variant="person"
+                    size="xsmall"
+                    src={member.profileImageUrl || undefined}
+                  />
+                  <div className="flex flex-col text-left">
+                    <Typography variant="label2">{member.nickname}</Typography>
+                  </div>
                 </div>
+                <Typography
+                  variant="caption1"
+                  sx={(theme: Theme) => ({
+                    color: theme.semantic.label.alternative,
+                  })}
+                >
+                  {member.email}
+                </Typography>
               </button>
             ))
           )}
