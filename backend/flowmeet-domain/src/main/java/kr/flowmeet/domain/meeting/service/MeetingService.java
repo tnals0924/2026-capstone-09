@@ -142,21 +142,19 @@ public class MeetingService {
                 ? Set.of()
                 : new HashSet<>(requestedUserIds);
 
-        List<MeetingParticipant> existingParticipants =
-                meetingParticipantRepository.findAllByMeetingId(meetingId);
-        Set<Long> existingUserIdSet = existingParticipants.stream()
+        Set<Long> existingUserIdSet = meetingParticipantRepository.findAllByMeetingId(meetingId).stream()
                 .map(MeetingParticipant::getUserId)
                 .collect(Collectors.toSet());
 
-        List<MeetingParticipant> participantsToRemove = existingParticipants.stream()
-                .filter(p -> !requestedUserIdSet.contains(p.getUserId()))
+        List<Long> userIdsToRemove = existingUserIdSet.stream()
+                .filter(userId -> !requestedUserIdSet.contains(userId))
                 .toList();
         List<Long> userIdsToAdd = requestedUserIdSet.stream()
                 .filter(userId -> !existingUserIdSet.contains(userId))
                 .toList();
 
-        if (!participantsToRemove.isEmpty()) {
-            meetingParticipantRepository.deleteAll(participantsToRemove);
+        if (!userIdsToRemove.isEmpty()) {
+            meetingParticipantRepository.softDeleteAllByMeetingIdAndUserIdIn(meetingId, userIdsToRemove);
         }
         saveParticipants(meetingId, userIdsToAdd);
     }
