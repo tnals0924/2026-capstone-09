@@ -1,5 +1,6 @@
 'use client';
 
+import { EditorContent } from '@tiptap/react';
 import { ContentBadge, Tab, TabList, TabListItem, TabPanel, Typography } from '@wanteddev/wds';
 import {
   IconDocumentText,
@@ -8,20 +9,20 @@ import {
   IconPersons,
   IconTag,
 } from '@wanteddev/wds-icon';
-import { EditorContent } from '@tiptap/react';
 import { useEffect, useState } from 'react';
 
 import { privateApi } from '@/api';
 import { AssigneeItem, GetNodeResponse, TagItem } from '@/api/Api';
-import { NodeStatusType } from '@/constants/nodeStatus';
+import GoogleMeetIcon from '@/assets/svgs/google-meet.svg';
 import { EXAMPLE_USERS } from '@/constants/exampleConstant';
+import { NodeStatusType } from '@/constants/nodeStatus';
 import { formatDatetoString } from '@/utils/formatData';
-import { Users } from '../commons/user/UserAvatarGroup';
-import { useTitleEditor } from './hooks/useTitleEditor';
-import { StatusField } from './fields/StatusField';
-import { DescriptionField } from './fields/DescriptionField';
-import { TagField } from './fields/TagField';
 import { AssigneeField } from './fields/AssigneeField';
+import { DescriptionField } from './fields/DescriptionField';
+import { StatusField } from './fields/StatusField';
+import { TagField } from './fields/TagField';
+import { useTitleEditor } from './hooks/useTitleEditor';
+import { Users } from '../commons/user/UserAvatarGroup';
 
 interface NodeDetailLayoutProps {
   nodeId: number | null;
@@ -167,10 +168,11 @@ export function NodeDetailLayout({
             className="text-label-1-normal flex items-center justify-between rounded-lg border border-gray-200 p-3"
           >
             <div>{formatDatetoString(nodeDetail?.meeting?.startedAt)}에 회의 예정</div>
-            <img
+            {/* <img
               className="h-5 w-5"
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Google_Meet_icon_%282020%29.svg/250px-Google_Meet_icon_%282020%29.svg.png"
-            />
+            /> */}
+            <GoogleMeetIcon />
           </a>
         ) : (
           <></>
