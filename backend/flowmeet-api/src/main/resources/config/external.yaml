@@ -14,6 +14,10 @@ cloud:
       bucket: ${S3_BUCKET:flowmeet-bucket}
       region: ${S3_REGION:ap-northeast-2}
       cdn-url: ${S3_CDN_URL:}
+    sqs:
+      request-queue-url: ${SQS_REQUEST_QUEUE_URL:}
+      response-queue-url: ${SQS_RESPONSE_QUEUE_URL:}
+      region: ${SQS_REGION:ap-northeast-2}
 
 google:
   meet:
