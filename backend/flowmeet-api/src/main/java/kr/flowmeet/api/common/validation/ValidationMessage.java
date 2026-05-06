@@ -33,6 +33,7 @@ public final class ValidationMessage {
 
     public static final String EMAIL_REQUIRED = "이메일은 필수로 입력해 주세요.";
     public static final String EMAIL_INVALID = "이메일 형식을 다시 확인해 주세요.";
+    public static final String EMAIL_VERIFICATION_CODE_REQUIRED = "인증 코드는 필수로 입력해 주세요.";
 
     public static final String NICKNAME_REQUIRED = "닉네임은 필수로 입력해 주세요.";
     public static final String NICKNAME_MAX_LENGTH = "닉네임은 최대 20자까지 입력할 수 있어요.";

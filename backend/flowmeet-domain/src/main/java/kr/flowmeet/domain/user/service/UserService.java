@@ -51,6 +51,17 @@ public class UserService {
         }
     }
 
+    public void validateEmailChangeable(final String newEmail, final String currentEmail) {
+        if (newEmail.equals(currentEmail)) {
+            throw new BusinessException(UserErrorCode.USER_EMAIL_SAME_AS_CURRENT);
+        }
+
+        userRepository.findByEmail(newEmail)
+                .ifPresent(existing -> {
+                    throw new BusinessException(UserErrorCode.USER_EMAIL_DUPLICATED);
+                });
+    }
+
     @Transactional
     public void delete(final User user) {
         userRepository.delete(user);
