@@ -99,13 +99,16 @@ public class Node extends BaseTimeEntity {
         return this.childSeq;
     }
 
-    public void update(final String title, final String description, final String noteContent,
-                       final NodeStatus status, final Integer sortOrder) {
+    public void updateTitle(final String title) {
         this.title = title;
+    }
+
+    public void updateDescription(final String description) {
         this.description = description;
+    }
+
+    public void updateNoteContent(final String noteContent) {
         this.noteContent = noteContent;
-        this.status = status;
-        this.sortOrder = sortOrder;
     }
 
     public void updateKanban(final NodeStatus status, final int sortOrder) {

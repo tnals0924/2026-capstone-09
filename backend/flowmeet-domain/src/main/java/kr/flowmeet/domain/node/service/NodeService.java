@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import kr.flowmeet.domain.node.entity.NodeStatus;
 import kr.flowmeet.domain.node.service.vo.CreateNodeCommand;
-import kr.flowmeet.domain.node.service.vo.UpdateNodeCommand;
 import kr.flowmeet.domain.node.service.vo.UpdateNodeKanbanCommand;
 import kr.flowmeet.domain.node.service.vo.UpdateNodeStatusCommand;
 import lombok.RequiredArgsConstructor;
@@ -155,16 +154,24 @@ public class NodeService {
     }
 
     @Transactional
-    public void updateNode(final Long projectId, final Long nodeId, final UpdateNodeCommand command) {
+    public void updateNodeTitle(final Long projectId, final Long nodeId, final String title) {
         Node node = findByIdAndProjectId(nodeId, projectId);
 
-        node.update(
-                command.title(),
-                command.description(),
-                command.noteContent(),
-                command.status(),
-                command.sortOrder()
-        );
+        node.updateTitle(title);
+    }
+
+    @Transactional
+    public void updateNodeDescription(final Long projectId, final Long nodeId, final String description) {
+        Node node = findByIdAndProjectId(nodeId, projectId);
+
+        node.updateDescription(description);
+    }
+
+    @Transactional
+    public void updateNodeNote(final Long projectId, final Long nodeId, final String noteContent) {
+        Node node = findByIdAndProjectId(nodeId, projectId);
+
+        node.updateNoteContent(noteContent);
     }
 
     @Transactional
