@@ -31,7 +31,7 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
     const previous = status;
     onUpdate(newStatus);
     try {
-      await privateApi.node.updateNode(projectId, nodeId, { status: newStatus });
+      await privateApi.node.updateNodeStatus(projectId, nodeId, { status: newStatus });
     } catch {
       // TODO: 에러 토스트 알림 추가 필요
       if (previous) onUpdate(previous);
@@ -41,7 +41,9 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
   return (
     <div ref={containerRef} className="relative w-full">
       <div
-        onClick={() => { if (!isOpen) setIsOpen(true); }}
+        onClick={() => {
+          if (!isOpen) setIsOpen(true);
+        }}
         className={`flex w-full cursor-text flex-wrap items-center gap-2.5 rounded-t-sm ${isOpen ? 'bg-line-normal-alternative border-line-solid-normal border border-b-0 p-2.5' : ''}`}
       >
         {!status && (
