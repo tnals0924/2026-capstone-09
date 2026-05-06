@@ -171,7 +171,6 @@ export function KanbanView({ projectId }: KanbanViewProps) {
       const { active, over } = event;
 
       if (!over) {
-        await loadKanbanData();
         return;
       }
 
