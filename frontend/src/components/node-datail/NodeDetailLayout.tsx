@@ -1,3 +1,6 @@
+'use client';
+
+import { EditorContent } from '@tiptap/react';
 import {
   Avatar,
   ContentBadge,
@@ -8,8 +11,6 @@ import {
   ThemeColorsToken,
   Typography,
 } from '@wanteddev/wds';
-import { EXAMPLE_USERS } from '@/constants/exampleConstant';
-import { Users } from '../commons/user/UserAvatarGroup';
 import {
   IconDocumentText,
   IconFire,
@@ -17,21 +18,18 @@ import {
   IconPersons,
   IconTag,
 } from '@wanteddev/wds-icon';
-import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
-import { NodeStatusType } from '@/constants/nodeStatus';
-import { EditorContent } from '@tiptap/react';
-import { useTitleEditor } from './hooks/useTitleEditor';
-import { useEffect, useState } from 'react';
-import { privateApi } from '@/api';
-import { GetNodeResponse } from '@/api/Api';
-import { getColorToken } from '@/utils/getBadgeColorInfo';
-import { ColorType } from '@/constants/badgeColor';
-import { formatDatetoString } from '@/utils/formatData';
+import { useEffect } from 'react';
 
-interface Tag {
-  tagId: number;
-  name: string;
-}
+import { ColorType } from '@/constants/badgeColor';
+import { EXAMPLE_USERS } from '@/constants/exampleConstant';
+import { NodeStatusType } from '@/constants/nodeStatus';
+import { useErrorToast } from '@/hooks/useErrorToast';
+import { useNodeDetailQuery } from '@/queries/node';
+import { formatDatetoString } from '@/utils/formatData';
+import { getColorToken } from '@/utils/getBadgeColorInfo';
+import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
+import { useTitleEditor } from './hooks/useTitleEditor';
+import { Users } from '../commons/user/UserAvatarGroup';
 
 interface NodeDetailLayoutProps {
   nodeId: number | null;
@@ -50,23 +48,13 @@ export function NodeDetailLayout({
   value,
   onValueChange,
 }: NodeDetailLayoutProps) {
-  const [nodeDetail, setNodeDetail] = useState<GetNodeResponse | undefined>(undefined);
+  const { data: nodeDetail, error } = useNodeDetailQuery(projectId, nodeId);
+  const showErrorToast = useErrorToast();
   const titleEditor = useTitleEditor(nodeDetail?.title);
 
   useEffect(() => {
-    const fetchNodeDetail = async () => {
-      try {
-        console.log(projectId, nodeId);
-        if (!projectId || !nodeId) return;
-
-        const data = await privateApi.node.getNode(projectId, nodeId ?? 0);
-        setNodeDetail(data.data.data);
-      } catch (error) {
-        console.error('Failed to load flowchart:', error);
-      }
-    };
-    void fetchNodeDetail();
-  }, [nodeId]);
+    if (error) showErrorToast(error, '노드 정보를 불러오는데 실패했어요.');
+  }, [error, showErrorToast]);
 
   return (
     <div className="flex h-full flex-col">
@@ -146,6 +134,7 @@ export function NodeDetailLayout({
             </ContentBadge>
           </MetaRow>
         </div>
+
         {nodeDetail?.meeting?.meetingId ? (
           // 추후 수정 필요...
           <a
@@ -169,12 +158,7 @@ export function NodeDetailLayout({
           <TabListItem value="meeting">회의</TabListItem>
         </TabList>
         <TabPanel value="note">{noteContent}</TabPanel>
-        <TabPanel
-          value="meeting"
-          sx={{
-            flex: 1,
-          }}
-        >
+        <TabPanel value="meeting" sx={{ flex: 1 }}>
           {meetingContent}
         </TabPanel>
       </Tab>
