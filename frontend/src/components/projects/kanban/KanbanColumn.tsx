@@ -20,7 +20,8 @@ export function KanbanColumn({ status, nodes, borderColor, onNodeDoubleClick }: 
     id: status,
   });
 
-  const nodeIds = nodes.map((node) => node.nodeId ?? 0);
+  const validNodes = nodes.filter((node): node is KanbanItem & { nodeId: number } => node.nodeId != null);
+  const nodeIds = validNodes.map((node) => node.nodeId);
 
   return (
     <div className="flex flex-col flex-1 min-w-0 h-full">
@@ -42,10 +43,10 @@ export function KanbanColumn({ status, nodes, borderColor, onNodeDoubleClick }: 
             ref={setNodeRef}
             className="flex-1 min-h-0 overflow-y-auto pr-6 pb-3 pl-3 flex flex-col gap-2.5 mt-2.5"
           >
-            {nodes.map((node) => (
+            {validNodes.map((node) => (
               <NodeCard
                 key={node.nodeId}
-                nodeId={node.nodeId ?? 0}
+                nodeId={node.nodeId}
                 nodeNumber={node.number || ''}
                 date=""
                 title={node.title || '제목 없음'}
@@ -55,10 +56,10 @@ export function KanbanColumn({ status, nodes, borderColor, onNodeDoubleClick }: 
                   color: tag.color ?? 'neutral',
                 }))}
                 isMainNode={!(node.number || '').includes('.')}
-                onDoubleClick={() => onNodeDoubleClick?.(node.nodeId ?? 0)}
+                onDoubleClick={() => onNodeDoubleClick?.(node.nodeId)}
               />
             ))}
-            {nodes.length === 0 && (
+            {validNodes.length === 0 && (
               <div className="flex items-center justify-center h-32 text-label-alternative/40">
                 <Typography variant="label1">카드가 없습니다</Typography>
               </div>
