@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.domain.common.exception.BusinessException;
+import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
 import kr.flowmeet.domain.user.repository.UserRepository;
@@ -34,21 +35,31 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    public User findBySocialEmail(final String socialEmail) {
-        return userRepository.findBySocialEmail(socialEmail)
-                .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
+    public Optional<User> findOptionalBySocialProviderAndSocialId(
+            final SocialProvider socialProvider, final String socialId) {
+        return userRepository.findBySocialProviderAndSocialId(socialProvider, socialId);
     }
 
     public Optional<User> findOptionalByEmail(final String email) {
         return userRepository.findByEmail(email);
     }
 
-
-
     public void validateNicknameNotDuplicated(final String nickname, final String currentNickname) {
         if (!nickname.equals(currentNickname) && userRepository.existsByNickname(nickname)) {
             throw new BusinessException(UserErrorCode.USER_NICKNAME_DUPLICATED);
         }
+    }
+
+    public void validateNicknameNotDuplicated(final String nickname) {
+        if (userRepository.existsByNickname(nickname)) {
+            throw new BusinessException(UserErrorCode.USER_NICKNAME_DUPLICATED);
+        }
+    }
+
+    public void validateEmailNotDuplicated(final String email) {
+        userRepository.findByEmail(email).ifPresent(existing -> {
+            throw new BusinessException(UserErrorCode.USER_EMAIL_DUPLICATED);
+        });
     }
 
     public void validateEmailChangeable(final String newEmail, final String currentEmail) {
@@ -60,6 +71,11 @@ public class UserService {
                 .ifPresent(existing -> {
                     throw new BusinessException(UserErrorCode.USER_EMAIL_DUPLICATED);
                 });
+    }
+
+    @Transactional
+    public User save(final User user) {
+        return userRepository.save(user);
     }
 
     @Transactional
