@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class MeetingFacade {
 
     private static final long DEFAULT_MEETING_DURATION_MINUTES = 60L;
@@ -33,7 +32,6 @@ public class MeetingFacade {
     private final ProjectMemberService projectMemberService;
     private final MeetingRoomProvider meetingRoomProvider;
 
-    @Transactional
     public void createMeeting(
             final Long userId,
             final Long projectId,
@@ -43,10 +41,22 @@ public class MeetingFacade {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
         nodeValidator.validateIsIn(nodeId, projectId);
         projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
+        meetingService.validateCreatable(nodeId, request.startedAt());
 
         Node node = nodeService.findByIdAndProjectId(nodeId, projectId);
         MeetingRoom room = meetingRoomProvider.create(toCreateRoomCommand(node, request.startedAt(), null));
-        meetingService.create(nodeId, userId, room.url(), room.externalEventId(), request.toCommand());
+
+        //Meeting 생성 실패 시, 외부로 호출해서 생성한 회의실 삭제
+        try {
+            meetingService.create(nodeId, userId, room.url(), room.externalEventId(), request.toCommand());
+        } catch (RuntimeException e) {
+            try {
+                meetingRoomProvider.delete(room.externalEventId(), null);
+            } catch (RuntimeException cleanupError) {
+                e.addSuppressed(cleanupError);
+            }
+            throw e;
+        }
     }
 
     @Transactional
@@ -69,7 +79,6 @@ public class MeetingFacade {
         meetingService.updateMeeting(projectMember, meeting, request.toCommand());
     }
 
-    @Transactional
     public void deleteMeeting(final Long userId, final Long projectId, final Long meetingId) {
         projectPermissionValidator.validate(projectId, userId, ProjectMemberRole.MEMBER);
 
@@ -99,7 +108,4 @@ public class MeetingFacade {
         );
     }
 
-    private boolean isOwner(final Long projectId, final Long userId) {
-        return projectMemberService.findMemberRole(projectId, userId) == ProjectMemberRole.OWNER;
-    }
 }
