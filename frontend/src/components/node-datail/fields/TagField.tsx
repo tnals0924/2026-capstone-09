@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { privateApi } from '@/api';
 import { TagItem } from '@/api/Api';
-import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { ColorType } from '@/constants/badgeColor';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
 
 interface TagFieldProps {
@@ -22,12 +22,7 @@ export function TagField({ projectId, nodeId, tags, onAdd, onRemove }: TagFieldP
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [allTags, setAllTags] = useState<TagItem[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const toast = usePositionedToast();
-
-  const showErrorToast = (err: unknown, fallback: string) => {
-    const message = (err as { error?: { message?: string } })?.error?.message ?? fallback;
-    toast({ content: message, variant: 'negative', placement: 'top-center' });
-  };
+  const showErrorToast = useErrorToast();
 
   useEffect(() => {
     if (!isPickerOpen) return;

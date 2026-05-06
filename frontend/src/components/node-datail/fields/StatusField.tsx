@@ -4,8 +4,8 @@ import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
 import { useEffect, useRef, useState } from 'react';
 
 import { privateApi } from '@/api';
-import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { NodeStatusType, NODE_STATUS_INFO } from '@/constants/nodeStatus';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
 
 interface StatusFieldProps {
@@ -18,7 +18,7 @@ interface StatusFieldProps {
 export function StatusField({ projectId, nodeId, status, onUpdate }: StatusFieldProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const toast = usePositionedToast();
+  const showErrorToast = useErrorToast();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -37,14 +37,7 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
       await privateApi.node.updateNodeStatus(projectId, nodeId, { status: newStatus });
     } catch (err) {
       if (previous) onUpdate(previous);
-      const message =
-        (err as { error?: { message?: string } })?.error?.message ??
-        '상태 업데이트에 실패했습니다.';
-
-      // const message = '문제가 발생했어요. 다시 시도해 주세요.';
-
-      // 일단 중앙 상단... 인데 아진짜중앙상단괜찮나
-      toast({ content: message, variant: 'negative', placement: 'top-center' });
+      showErrorToast(err, '상태 업데이트에 실패했어요.');
     }
   };
 

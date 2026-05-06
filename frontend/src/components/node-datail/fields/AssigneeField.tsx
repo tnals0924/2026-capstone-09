@@ -6,7 +6,7 @@ import { IconClose } from '@wanteddev/wds-icon';
 
 import { privateApi } from '@/api';
 import { AssigneeItem, ProjectMemberInfo } from '@/api/Api';
-import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
+import { useErrorToast } from '@/hooks/useErrorToast';
 
 interface AssigneeFieldProps {
   projectId: number;
@@ -26,7 +26,7 @@ export function AssigneeField({
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [members, setMembers] = useState<ProjectMemberInfo[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const toast = usePositionedToast();
+  const showErrorToast = useErrorToast();
 
   useEffect(() => {
     if (!isPickerOpen) return;
@@ -36,11 +36,6 @@ export function AssigneeField({
     document.addEventListener('mousedown', handleMouseDown);
     return () => document.removeEventListener('mousedown', handleMouseDown);
   }, [isPickerOpen]);
-
-  const showErrorToast = (err: unknown, fallback: string) => {
-    const message = (err as { error?: { message?: string } })?.error?.message ?? fallback;
-    toast({ content: message, variant: 'negative', placement: 'top-center' });
-  };
 
   const openPicker = async () => {
     if (members.length === 0) {
