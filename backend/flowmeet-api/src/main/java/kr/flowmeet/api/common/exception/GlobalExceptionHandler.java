@@ -1,8 +1,11 @@
 package kr.flowmeet.api.common.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.common.exception.CustomException;
 import kr.flowmeet.common.exception.ErrorCode;
+import kr.flowmeet.external.notification.ErrorNotifier;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +17,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ErrorNotifier errorNotifier;
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<CommonResponse<?>> handleCustomException(final CustomException exception) {
@@ -28,11 +34,20 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<?>> handleException(final Exception exception) {
+    public ResponseEntity<CommonResponse<?>> handleException(
+            final HttpServletRequest request,
+            final Exception exception
+    ) {
 
         log.error("에러 발생: ({}) {}", exception.getClass().getSimpleName(), exception.getMessage());
 
         exception.printStackTrace();
+
+        errorNotifier.notifyError(
+                "[" + exception.getClass().getSimpleName() + "] (" + request.getMethod() + ") " + request.getRequestURI(),
+                exception.getMessage(),
+                exception
+        );
 
         CommonResponse<?> response = CommonResponse.error(exception);
 
