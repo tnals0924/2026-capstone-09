@@ -1,9 +1,6 @@
 package kr.flowmeet.api.auth.facade;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +9,7 @@ import kr.flowmeet.api.auth.dto.request.SignupRequest;
 import kr.flowmeet.api.auth.dto.request.SocialLoginRequest;
 import kr.flowmeet.api.auth.dto.response.SignupRequiredResponse;
 import kr.flowmeet.api.auth.dto.response.TokenResponse;
+import kr.flowmeet.api.auth.oauth.SocialOAuthGateway;
 import kr.flowmeet.auth.exception.AuthErrorCode;
 import kr.flowmeet.auth.exception.AuthException;
 import kr.flowmeet.auth.jwt.JwtProvider;
@@ -21,50 +19,24 @@ import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.service.UserService;
 import kr.flowmeet.domain.user.service.vo.CreateUserCommand;
-import kr.flowmeet.external.exception.ExternalException;
-import kr.flowmeet.external.oauth.SocialOAuthClient;
-import kr.flowmeet.external.oauth.SocialOAuthErrorCode;
 import kr.flowmeet.external.oauth.dto.SocialTokens;
 import kr.flowmeet.external.oauth.dto.SocialUserInfo;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthFacade {
 
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
     private final JwtProvider jwtProvider;
-    private final Map<SocialProvider, SocialOAuthClient> oauthClients;
-
-    public AuthFacade(
-            UserService userService,
-            RefreshTokenService refreshTokenService,
-            JwtProvider jwtProvider,
-            List<SocialOAuthClient> oauthClients
-    ) {
-        this.userService = userService;
-        this.refreshTokenService = refreshTokenService;
-        this.jwtProvider = jwtProvider;
-        this.oauthClients = oauthClients.stream()
-                .collect(Collectors.toMap(
-                        client -> SocialProvider.valueOf(client.getProviderName()),
-                        Function.identity()
-                ));
-    }
+    private final SocialOAuthGateway oauthGateway;
 
     @Transactional
     public LoginResult login(final SocialProvider provider, final SocialLoginRequest request) {
-        SocialOAuthClient client = resolveClient(provider);
-
-        SocialTokens tokens;
-        SocialUserInfo userInfo;
-        try {
-            tokens = client.exchangeCode(request.code(), request.redirectUri());
-            userInfo = client.fetchUserInfo(tokens.accessToken());
-        } catch (ExternalException e) {
-            throw new AuthException(translateOAuthError(e));
-        }
+        SocialTokens tokens = oauthGateway.exchangeCode(provider, request.code(), request.redirectUri());
+        SocialUserInfo userInfo = oauthGateway.fetchUserInfo(provider, tokens.accessToken());
 
         return userService.findOptionalBySocialProviderAndSocialId(provider, userInfo.socialId())
                 .map(user -> handleExistingUser(user, tokens))
@@ -73,14 +45,8 @@ public class AuthFacade {
 
     @Transactional
     public TokenResponse signup(final SignupRequest request) {
-        SocialOAuthClient client = resolveClient(request.socialProvider());
-
-        SocialUserInfo userInfo;
-        try {
-            userInfo = client.fetchUserInfo(request.socialAccessToken());
-        } catch (ExternalException e) {
-            throw new AuthException(translateOAuthError(e));
-        }
+        SocialUserInfo userInfo = oauthGateway.fetchUserInfo(
+                request.socialProvider(), request.socialAccessToken());
 
         userService.findOptionalBySocialProviderAndSocialId(request.socialProvider(), userInfo.socialId())
                 .ifPresent(existing -> {
@@ -148,25 +114,5 @@ public class AuthFacade {
         String refreshToken = jwtProvider.generateRefreshToken(userId);
         refreshTokenService.issue(userId, refreshToken, jwtProvider.refreshTokenExpiresAt());
         return TokenResponse.of(accessToken, refreshToken);
-    }
-
-    private SocialOAuthClient resolveClient(final SocialProvider provider) {
-        SocialOAuthClient client = oauthClients.get(provider);
-        if (client == null) {
-            throw new AuthException(AuthErrorCode.AUTH_PROVIDER_UNSUPPORTED);
-        }
-        return client;
-    }
-
-    private AuthErrorCode translateOAuthError(final ExternalException e) {
-        if (e.getErrorCode() instanceof SocialOAuthErrorCode code) {
-            return switch (code) {
-                case SOCIAL_OAUTH_INVALID_CODE -> AuthErrorCode.AUTH_INVALID_CODE;
-                case SOCIAL_OAUTH_INVALID_TOKEN -> AuthErrorCode.AUTH_INVALID_SOCIAL_TOKEN;
-                case SOCIAL_OAUTH_PROVIDER_UNSUPPORTED -> AuthErrorCode.AUTH_PROVIDER_UNSUPPORTED;
-                case SOCIAL_OAUTH_PROVIDER_ERROR -> AuthErrorCode.AUTH_PROVIDER_ERROR;
-            };
-        }
-        return AuthErrorCode.AUTH_PROVIDER_ERROR;
     }
 }
