@@ -13,6 +13,7 @@ import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
 import kr.flowmeet.domain.user.repository.UserRepository;
+import kr.flowmeet.domain.user.service.vo.CreateUserCommand;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +75,19 @@ public class UserService {
     }
 
     @Transactional
-    public User save(final User user) {
+    public User create(final CreateUserCommand command) {
+        validateNicknameNotDuplicated(command.nickname());
+        validateEmailNotDuplicated(command.email());
+
+        User user = User.builder()
+                .socialProvider(command.socialProvider())
+                .socialId(command.socialId())
+                .socialEmail(command.socialEmail())
+                .email(command.email())
+                .nickname(command.nickname())
+                .profileImageUrl(command.profileImageUrl())
+                .build();
+
         return userRepository.save(user);
     }
 

@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.api.auth.dto.request.RefreshTokenRequest;
 import kr.flowmeet.api.auth.dto.request.SignupRequest;
 import kr.flowmeet.api.auth.dto.request.SocialLoginRequest;
@@ -17,14 +20,12 @@ import kr.flowmeet.domain.auth.service.RefreshTokenService;
 import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.service.UserService;
+import kr.flowmeet.domain.user.service.vo.CreateUserCommand;
 import kr.flowmeet.external.exception.ExternalException;
 import kr.flowmeet.external.oauth.SocialOAuthClient;
 import kr.flowmeet.external.oauth.SocialOAuthErrorCode;
 import kr.flowmeet.external.oauth.dto.SocialTokens;
 import kr.flowmeet.external.oauth.dto.SocialUserInfo;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -86,19 +87,16 @@ public class AuthFacade {
                     throw new AuthException(AuthErrorCode.AUTH_INVALID_SOCIAL_TOKEN);
                 });
 
-        userService.validateNicknameNotDuplicated(request.nickname());
-        userService.validateEmailNotDuplicated(request.email());
+        CreateUserCommand command = CreateUserCommand.of(
+                request.socialProvider(),
+                userInfo.socialId(),
+                userInfo.email(),
+                request.email(),
+                request.nickname(),
+                userInfo.profileImageUrl()
+        );
 
-        User user = User.builder()
-                .socialProvider(request.socialProvider())
-                .socialId(userInfo.socialId())
-                .socialEmail(userInfo.email())
-                .email(request.email())
-                .nickname(request.nickname())
-                .profileImageUrl(userInfo.profileImageUrl())
-                .build();
-
-        User saved = userService.save(user);
+        User saved = userService.create(command);
 
         return issueTokens(saved.getId(), saved.getEmail(), saved.getNickname());
     }
