@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kr.flowmeet.domain.common.BaseTimeEntity;
+import kr.flowmeet.domain.node.entity.Node;
 import kr.flowmeet.domain.user.entity.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,6 +34,13 @@ public class AiTask extends BaseTimeEntity {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
+    @Column(name = "node_id", nullable = false)
+    private Long nodeId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "node_id", insertable = false, updatable = false)
+    private Node node;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AiTaskType taskType;
@@ -50,9 +58,10 @@ public class AiTask extends BaseTimeEntity {
     private String errorMessage;
 
     @Builder
-    public AiTask(String id, Long userId, AiTaskType taskType) {
+    public AiTask(String id, Long userId, Long nodeId, AiTaskType taskType) {
         this.id = id;
         this.userId = userId;
+        this.nodeId = nodeId;
         this.taskType = taskType;
         this.status = AiTaskStatus.PENDING;
     }
