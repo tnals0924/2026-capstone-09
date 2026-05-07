@@ -31,7 +31,8 @@ export function ListView({ projectId }: ListViewProps) {
   const loadListData = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await privateApi.node.getNodeList(projectId);
+      const sortParam = sortBy === 'latest' ? 'LATEST' : 'NAME';
+      const data = await privateApi.node.getNodeList(projectId, { sort: sortParam });
       const listData = data.data.data ?? null;
 
       setNodes(listData?.nodes ?? []);
@@ -47,7 +48,7 @@ export function ListView({ projectId }: ListViewProps) {
     } finally {
       setLoading(false);
     }
-  }, [projectId, toast]);
+  }, [projectId, sortBy, toast]);
 
   useEffect(() => {
     void loadListData();
@@ -67,17 +68,6 @@ export function ListView({ projectId }: ListViewProps) {
   const filteredNodes = nodes.filter((node) =>
     node.title?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const sortedNodes = [...filteredNodes].sort((a, b) => {
-    switch (sortBy) {
-      case 'latest':
-        return new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime();
-      case 'alphabetical':
-        return (a.title || '').localeCompare(b.title || '');
-      default:
-        return 0;
-    }
-  });
 
   if (loading) {
     return <Loading />;
@@ -134,9 +124,9 @@ export function ListView({ projectId }: ListViewProps) {
           </div>
         </div>
 
-        {sortedNodes.length > 0 ? (
+        {filteredNodes.length > 0 ? (
           <div className="flex flex-col gap-3">
-            {sortedNodes.map((node) => (
+            {filteredNodes.map((node) => (
               <ListCard
                 key={node.nodeId}
                 nodeId={node.nodeId ?? 0}
