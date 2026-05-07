@@ -14,7 +14,6 @@ import kr.flowmeet.api.auth.oauth.SocialOAuthGateway;
 import kr.flowmeet.auth.exception.AuthErrorCode;
 import kr.flowmeet.auth.exception.AuthException;
 import kr.flowmeet.auth.jwt.JwtProvider;
-import kr.flowmeet.domain.auth.entity.RefreshToken;
 import kr.flowmeet.domain.auth.service.RefreshTokenService;
 import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
@@ -73,15 +72,9 @@ public class AuthFacade {
     @Transactional
     public TokenResponse refresh(final RefreshTokenRequest request) {
         Long userId = jwtProvider.parseRefreshTokenSubject(request.refreshToken());
-        RefreshToken stored = refreshTokenService.findValid(request.refreshToken());
-
-        if (!stored.getUserId().equals(userId)) {
-            throw new AuthException(AuthErrorCode.AUTH_INVALID_TOKEN);
-        }
+        refreshTokenService.consume(request.refreshToken(), userId);
 
         User user = userService.findById(userId);
-        refreshTokenService.revoke(stored);
-
         return issueTokens(user.getId(), user.getEmail(), user.getNickname());
     }
 

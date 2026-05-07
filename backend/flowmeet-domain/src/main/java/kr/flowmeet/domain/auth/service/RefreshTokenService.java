@@ -31,21 +31,13 @@ public class RefreshTokenService {
         );
     }
 
-    public RefreshToken findValid(final String token) {
-        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(hash(token))
-                .orElseThrow(() -> new BusinessException(AuthDomainErrorCode.AUTH_INVALID_TOKEN));
-
-        if (refreshToken.isExpired(LocalDateTime.now())) {
-            refreshTokenRepository.delete(refreshToken);
-            throw new BusinessException(AuthDomainErrorCode.AUTH_EXPIRED_TOKEN);
-        }
-
-        return refreshToken;
-    }
-
     @Transactional
-    public void revoke(final RefreshToken refreshToken) {
-        refreshTokenRepository.delete(refreshToken);
+    public void consume(final String token, final Long userId) {
+        int deleted = refreshTokenRepository.deleteByTokenHashAndUserIdAndExpiresAtAfter(
+                hash(token), userId, LocalDateTime.now());
+        if (deleted == 0) {
+            throw new BusinessException(AuthDomainErrorCode.AUTH_INVALID_TOKEN);
+        }
     }
 
     @Transactional
