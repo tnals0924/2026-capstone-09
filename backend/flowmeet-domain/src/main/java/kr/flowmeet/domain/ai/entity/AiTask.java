@@ -42,9 +42,6 @@ public class AiTask extends BaseTimeEntity {
     private AiTaskStatus status;
 
     @Column(columnDefinition = "TEXT")
-    private String requestText;
-
-    @Column(columnDefinition = "TEXT")
     private String result;
 
     @Column(columnDefinition = "TEXT")
@@ -53,12 +50,11 @@ public class AiTask extends BaseTimeEntity {
     private String errorMessage;
 
     @Builder
-    public AiTask(String id, Long userId, AiTaskType taskType, String requestText) {
+    public AiTask(String id, Long userId, AiTaskType taskType) {
         this.id = id;
         this.userId = userId;
         this.taskType = taskType;
         this.status = AiTaskStatus.PENDING;
-        this.requestText = requestText;
     }
 
     public void markProcessing() {
