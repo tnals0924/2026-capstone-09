@@ -9,11 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import kr.flowmeet.domain.common.exception.BusinessException;
-import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.exception.UserErrorCode;
 import kr.flowmeet.domain.user.repository.UserRepository;
 import kr.flowmeet.domain.user.service.vo.CreateUserCommand;
+import kr.flowmeet.domain.user.service.vo.SocialIdentity;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +36,12 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    public Optional<User> findOptionalBySocialProviderAndSocialId(
-            final SocialProvider socialProvider, final String socialId) {
-        return userRepository.findBySocialProviderAndSocialId(socialProvider, socialId);
+    public Optional<User> findBySocialIdentity(final SocialIdentity identity) {
+        return userRepository.findBySocialProviderAndSocialId(identity.provider(), identity.id());
+    }
+
+    public boolean existsBySocialIdentity(final SocialIdentity identity) {
+        return userRepository.existsBySocialProviderAndSocialId(identity.provider(), identity.id());
     }
 
     public Optional<User> findOptionalByEmail(final String email) {

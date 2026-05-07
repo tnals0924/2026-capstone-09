@@ -1,5 +1,6 @@
 package kr.flowmeet.api.auth.facade;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import kr.flowmeet.domain.user.entity.SocialProvider;
 import kr.flowmeet.domain.user.entity.User;
 import kr.flowmeet.domain.user.service.UserService;
 import kr.flowmeet.domain.user.service.vo.CreateUserCommand;
+import kr.flowmeet.domain.user.service.vo.SocialIdentity;
 import kr.flowmeet.external.oauth.dto.SocialTokens;
 import kr.flowmeet.external.oauth.dto.SocialUserInfo;
 
@@ -37,7 +39,9 @@ public class AuthFacade {
         SocialTokens tokens = oauthGateway.exchangeCode(provider, request.code(), request.redirectUri());
         SocialUserInfo userInfo = oauthGateway.fetchUserInfo(provider, tokens.accessToken());
 
-        return userService.findOptionalBySocialProviderAndSocialId(provider, userInfo.socialId())
+        Optional<User> existing = userService.findBySocialIdentity(new SocialIdentity(provider, userInfo.socialId()));
+
+        return existing
                 .map(user -> handleExistingUser(user, tokens))
                 .orElseGet(() -> handleNewUser(provider, tokens, userInfo));
     }
@@ -46,10 +50,11 @@ public class AuthFacade {
         SocialUserInfo userInfo = oauthGateway.fetchUserInfo(
                 request.socialProvider(), request.socialAccessToken());
 
-        userService.findOptionalBySocialProviderAndSocialId(request.socialProvider(), userInfo.socialId())
-                .ifPresent(existing -> {
-                    throw new AuthException(AuthErrorCode.AUTH_INVALID_SOCIAL_TOKEN);
-                });
+        SocialIdentity identity = new SocialIdentity(request.socialProvider(), userInfo.socialId());
+
+        if (userService.existsBySocialIdentity(identity)) {
+            throw new AuthException(AuthErrorCode.AUTH_INVALID_SOCIAL_TOKEN);
+        }
 
         CreateUserCommand command = CreateUserCommand.of(
                 request.socialProvider(),
