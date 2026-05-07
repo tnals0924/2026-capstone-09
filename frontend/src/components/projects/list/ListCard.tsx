@@ -20,7 +20,6 @@ interface ListCardAssignee {
 }
 
 interface ListCardProps {
-  nodeId: number;
   nodeNumber: string;
   status: NodeStatusType;
   date: string;
@@ -33,7 +32,6 @@ interface ListCardProps {
 }
 
 export function ListCard({
-  nodeId,
   nodeNumber,
   status,
   date,
