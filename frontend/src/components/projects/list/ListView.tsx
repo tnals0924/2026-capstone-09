@@ -147,24 +147,6 @@ export function ListView({ projectId }: ListViewProps) {
                 isMainNode={!(node.number || '').includes('.')}
                 hasMeeting={node.hasMeeting}
                 onDoubleClick={() => handleNodeDoubleClick(node.nodeId ?? 0)}
-                onCreateSubNode={() => {
-                  // TODO: 서브 노드 생성 모달
-                }}
-                onCreateMeeting={() => {
-                  // TODO: 회의 생성 모달
-                }}
-                onEditMeeting={() => {
-                  // TODO: 회의 수정 모달
-                }}
-                onDeleteMeeting={() => {
-                  // TODO: 회의 삭제 모달
-                }}
-                onCreateReference={() => {
-                  // TODO: 참조 노드 모달
-                }}
-                onDelete={() => {
-                  // TODO: 삭제 모달
-                }}
               />
             ))}
           </div>

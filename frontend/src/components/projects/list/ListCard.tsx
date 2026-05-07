@@ -29,14 +29,7 @@ interface ListCardProps {
   assignees?: ListCardAssignee[];
   isMainNode?: boolean;
   hasMeeting?: boolean;
-  onClick?: () => void;
   onDoubleClick?: () => void;
-  onCreateSubNode?: (nodeId: number) => void;
-  onCreateMeeting?: () => void;
-  onEditMeeting?: () => void;
-  onDeleteMeeting?: () => void;
-  onCreateReference?: () => void;
-  onDelete?: () => void;
 }
 
 export function ListCard({
@@ -49,14 +42,7 @@ export function ListCard({
   assignees = [],
   isMainNode = false,
   hasMeeting = false,
-  onClick,
   onDoubleClick,
-  onCreateSubNode,
-  onCreateMeeting,
-  onEditMeeting,
-  onDeleteMeeting,
-  onCreateReference,
-  onDelete,
 }: ListCardProps) {
   const { visibleTags, remainingTagsCount } = getVisibleTags(tags, 8);
 
@@ -66,17 +52,28 @@ export function ListCard({
       ? 'sub-with-meeting'
       : 'sub-without-meeting';
 
-  const handleCreateSubNode = () => onCreateSubNode?.(nodeId);
-  const handleCreateMeeting = () => onCreateMeeting?.();
-  const handleEditMeeting = () => onEditMeeting?.();
-  const handleDeleteMeeting = () => onDeleteMeeting?.();
-  const handleCreateReference = () => onCreateReference?.();
-  const handleDelete = () => onDelete?.();
+  const handleCreateSubNode = () => {
+    // TODO: 서브 노드 생성 모달
+  };
+  const handleCreateMeeting = () => {
+    // TODO: 회의 생성 모달
+  };
+  const handleEditMeeting = () => {
+    // TODO: 회의 수정 모달
+  };
+  const handleDeleteMeeting = () => {
+    // TODO: 회의 삭제 모달
+  };
+  const handleCreateReference = () => {
+    // TODO: 참조 노드 모달
+  };
+  const handleDelete = () => {
+    // TODO: 삭제 모달
+  };
 
   return (
     <div
       className="p-4 bg-white rounded-xl outline outline-1 outline-offset-[-1px] outline-neutral-200 cursor-pointer hover:shadow-sm transition-shadow"
-      onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
       <div className="pb-1 flex items-center gap-2">
