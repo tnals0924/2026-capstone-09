@@ -6,10 +6,12 @@ import kr.flowmeet.domain.ai.service.AiTaskService;
 import kr.flowmeet.external.sqs.dto.LlmResponseMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@ConditionalOnProperty("cloud.aws.sqs.response-queue-url")
 @RequiredArgsConstructor
 public class LlmResponseListener {
 
