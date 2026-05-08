@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Avatar, Theme, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
 
 import { privateApi } from '@/api';
 import { AssigneeItem, ProjectMemberInfo } from '@/api/Api';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
 
 interface AssigneeFieldProps {
@@ -28,14 +29,7 @@ export function AssigneeField({
   const containerRef = useRef<HTMLDivElement>(null);
   const showErrorToast = useErrorToast();
 
-  useEffect(() => {
-    if (!isPickerOpen) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setIsPickerOpen(false);
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [isPickerOpen]);
+  useClickOutside(containerRef, isPickerOpen, () => setIsPickerOpen(false));
 
   const openPicker = async () => {
     if (members.length === 0) {

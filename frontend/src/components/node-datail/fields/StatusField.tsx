@@ -1,10 +1,11 @@
 'use client';
 
 import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { privateApi } from '@/api';
 import { NodeStatusType, NODE_STATUS_INFO } from '@/constants/nodeStatus';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { getNodeStatusColor, getNodeStatusIcon, getNodeStatusLabel } from '@/utils/getNodeStatus';
 
@@ -20,14 +21,7 @@ export function StatusField({ projectId, nodeId, status, onUpdate }: StatusField
   const containerRef = useRef<HTMLDivElement>(null);
   const showErrorToast = useErrorToast();
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [isOpen]);
+  useClickOutside(containerRef, isOpen, () => setIsOpen(false));
 
   const handleSelect = async (newStatus: NodeStatusType) => {
     setIsOpen(false);

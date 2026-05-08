@@ -2,11 +2,12 @@
 
 import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { privateApi } from '@/api';
 import { TagItem } from '@/api/Api';
 import { ColorType } from '@/constants/badgeColor';
+import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
 
@@ -24,14 +25,7 @@ export function TagField({ projectId, nodeId, tags, onAdd, onRemove }: TagFieldP
   const containerRef = useRef<HTMLDivElement>(null);
   const showErrorToast = useErrorToast();
 
-  useEffect(() => {
-    if (!isPickerOpen) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (!containerRef.current?.contains(e.target as Node)) setIsPickerOpen(false);
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [isPickerOpen]);
+  useClickOutside(containerRef, isPickerOpen, () => setIsPickerOpen(false));
 
   const openPicker = async () => {
     if (allTags.length === 0) {
