@@ -62,19 +62,15 @@ public class TagService {
         String newName = command.name();
 
         if (!tag.getName().equals(newName)) {
-            validateNameNotDuplicated(projectId, newName);
+            tagRepository.findByProjectIdAndNameIncludingDeleted(projectId, newName)
+                    .ifPresent(existing -> {
+                        if (existing.getDeletedAt() == null) {
+                            throw new BusinessException(TagErrorCode.TAG_NAME_DUPLICATED);
+                        }
+                        tagRepository.hardDeleteById(existing.getId());
+                    });
         }
 
         tag.update(newName, command.color());
-    }
-
-    private void validateNameNotDuplicated(final Long projectId, final String name) {
-        tagRepository.findByProjectIdAndNameIncludingDeleted(projectId, name)
-                .ifPresent(existing -> {
-                    if (existing.getDeletedAt() == null) {
-                        throw new BusinessException(TagErrorCode.TAG_NAME_DUPLICATED);
-                    }
-                    tagRepository.hardDeleteById(existing.getId());
-                });
     }
 }
