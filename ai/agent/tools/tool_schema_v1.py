@@ -11,7 +11,8 @@ tool_schema = [
                 "type": {"type": "string", "enum": ["MAIN", "SUB"], "description": "노드 유형. MAIN은 최상위 노드, SUB는 하위 노드"},
                 "parentId": {"type": "integer", "description": "상위 노드의 ID. 최상위 노드인 경우 생략"}
             },
-            "required": ["projectId", "title"]
+            "required": ["projectId", "title", "type"],
+            "additionalProperties": False
         }
     },
     {
@@ -23,11 +24,12 @@ tool_schema = [
                 "projectId": {"type": "integer", "description": "멤버를 초대할 프로젝트의 ID"},
                 "email": {"type": "string", "format": "email", "description": "초대할 사용자의 이메일 주소"}
             },
-            "required": ["projectId", "email"]
+            "required": ["projectId", "email"],
+            "additionalProperties": False
         }
     },
     {
-        "name": "delete_member",
+        "name": "remove_project_member",
         "description": "프로젝트에서 멤버를 삭제합니다. OWNER 권한을 가진 사용자만 실행할 수 있습니다.",
         "input_schema": {
             "type": "object",
@@ -35,7 +37,8 @@ tool_schema = [
                 "projectId": {"type": "integer", "description": "멤버를 삭제할 프로젝트의 ID"},
                 "memberId": {"type": "integer", "description": "삭제할 멤버의 ID"}
             },
-            "required": ["projectId", "memberId"]
+            "required": ["projectId", "memberId"],
+            "additionalProperties": False
         }
     },
     {
@@ -48,7 +51,8 @@ tool_schema = [
                 "nodeId": {"type": "integer", "description": "수정할 노드의 ID"},
                 "title": {"type": "string", "description": "변경할 노드 제목"},
             },
-            "required": ["projectId", "nodeId", "title"]
+            "required": ["projectId", "nodeId", "title"],
+            "additionalProperties": False
         }
     },
     {
@@ -61,7 +65,8 @@ tool_schema = [
                 "nodeId": {"type": "integer", "description": "수정할 노드의 ID"},
                 "description": {"type": "string", "description": "변경할 노드 설명(마크다운 형식 지원)"},
             },
-            "required": ["projectId", "nodeId", "description"]
+            "required": ["projectId", "nodeId", "description"],
+            "additionalProperties": False
         }
     },
     {
@@ -74,7 +79,8 @@ tool_schema = [
                 "nodeId": {"type": "integer", "description": "수정할 노드의 ID"},
                 "status": {"type": "string", "enum": ["WAITING", "IN_PROGRESS", "DONE"], "description": "변경할 노드 진행 상태"}
             },
-            "required": ["projectId", "nodeId", "status"]
+            "required": ["projectId", "nodeId", "status"],
+            "additionalProperties": False
         }
     },
     {
@@ -87,7 +93,8 @@ tool_schema = [
                 "nodeId": {"type": "integer", "description": "담당자를 추가할 노드의 ID"},
                 "userId": {"type": "integer", "description": "담당자로 지정할 사용자의 ID"}
             },
-            "required": ["projectId", "nodeId", "userId"]
+            "required": ["projectId", "nodeId", "userId"],
+            "additionalProperties": False
         }
     },
     {
@@ -99,7 +106,8 @@ tool_schema = [
                 "projectId": {"type": "integer", "description": "조회할 노드가 속한 프로젝트의 ID"},
                 "nodeId": {"type": "integer", "description": "조회할 노드의 ID"}
             },
-            "required": ["projectId", "nodeId"]
+            "required": ["projectId", "nodeId"],
+            "additionalProperties": False
         }
     },
     {
@@ -114,7 +122,8 @@ tool_schema = [
                 "participantUserIds": {"type": "array", "items": {"type": "integer"}, "description": "참여자 사용자 ID 목록 (1명 이상 필수)", "minItems": 1},
                 "isPushEnabled": {"type": "boolean", "description": "회의 시작 전 푸시 알림 사용 여부"}
             },
-            "required": ["projectId", "nodeId", "startedAt", "participantUserIds", "isPushEnabled"]
+            "required": ["projectId", "nodeId", "startedAt", "participantUserIds", "isPushEnabled"],
+            "additionalProperties": False
         }
     },
     {
@@ -128,7 +137,8 @@ tool_schema = [
                 "endNodeId": {"type": "integer", "description": "연결선의 종료 노드 ID"},
                 "comment": {"type": "string", "description": "연결선에 대한 설명 (예: 로그인 성공 시 대시보드로 이동)"}
             },
-            "required": ["projectId", "startNodeId", "endNodeId"]
+            "required": ["projectId", "startNodeId", "endNodeId"],
+            "additionalProperties": False
         }
     },
     {
@@ -140,7 +150,8 @@ tool_schema = [
                 "projectId": {"type": "integer", "description": "연결선이 속한 프로젝트의 ID"},
                 "edgeId": {"type": "integer", "description": "삭제할 연결선의 ID"}
             },
-            "required": ["projectId", "edgeId"]
+            "required": ["projectId", "edgeId"],
+            "additionalProperties": False
         }
     }
 ]
