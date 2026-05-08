@@ -1,4 +1,4 @@
-import { DragEndEvent, DragOverEvent, DragStartEvent } from '@dnd-kit/core';
+import { DragEndEvent, DragOverEvent } from '@dnd-kit/core';
 import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useRef, useEffect } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -141,13 +141,6 @@ export function useKanbanDragDrop({
   // 0ms 디바운스로 무한 루프 방지 (dnd-kit sortable 이슈)
   const debouncedUpdateNodePosition = useDebouncedCallback(updateNodePosition, 0);
 
-  const handleDragStart = useCallback(
-    (_event: DragStartEvent) => {
-      // 드래그 시작 시 특별한 처리 없음
-    },
-    []
-  );
-
   const handleDragOver = useCallback(
     (event: DragOverEvent) => {
       const { active, over } = event;
@@ -243,7 +236,6 @@ export function useKanbanDragDrop({
   );
 
   return {
-    handleDragStart,
     handleDragOver,
     handleDragEnd,
   };

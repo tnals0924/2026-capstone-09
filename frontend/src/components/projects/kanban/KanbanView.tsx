@@ -59,7 +59,7 @@ export function KanbanView({ projectId }: KanbanViewProps) {
     void loadKanbanData();
   }, [loadKanbanData]);
 
-  const { handleDragStart, handleDragOver, handleDragEnd } = useKanbanDragDrop({
+  const { handleDragOver, handleDragEnd } = useKanbanDragDrop({
     groupedNodes,
     setGroupedNodes,
     projectId,
@@ -84,7 +84,7 @@ export function KanbanView({ projectId }: KanbanViewProps) {
   }
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <div className="flex-1 h-full w-full p-10 bg-surface-canvas">
         <div className="flex gap-2.5 h-full">
           {KANBAN_STATUSES.map((status) => (
