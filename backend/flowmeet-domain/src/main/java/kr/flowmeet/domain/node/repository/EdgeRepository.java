@@ -24,4 +24,8 @@ public interface EdgeRepository extends JpaRepository<Edge, Long> {
 
     @Query("SELECT e FROM Edge e JOIN FETCH e.createdBy WHERE e.projectId = :projectId")
     List<Edge> findAllWithCreatedBy(@Param("projectId") Long projectId);
+
+    @Query("SELECT e FROM Edge e JOIN FETCH e.startNode JOIN FETCH e.endNode JOIN FETCH e.createdBy "
+            + "WHERE e.projectId = :projectId AND (e.startNodeId = :nodeId OR e.endNodeId = :nodeId)")
+    List<Edge> findAllLinkedByNodeId(@Param("projectId") Long projectId, @Param("nodeId") Long nodeId);
 }
