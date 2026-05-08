@@ -35,7 +35,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
     // SQS (LlmResponseListener에서 @SqsListener 사용)
-    implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
+    implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:4.0.0')
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
     // H2 Console
