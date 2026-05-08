@@ -30,7 +30,7 @@ class MCPClient:
             {
                 "name": tool.name,
                 "description": tool.description,
-                "input_schema": tool.inputSchema,
+                "input_schema": dict(tool.inputSchema) if tool.inputSchema else {},
             }
             for tool in response.tools
         ]
@@ -42,7 +42,10 @@ class MCPClient:
         
         response = await self.session.call_tool(tool_name, arguments)
         
-        # 결과를 문자열로 합쳐서 반환
+        # 에러 체크 추가
+        if response.isError:
+            raise RuntimeError(f"Tool '{tool_name}' 실행 실패: {response.content}")
+        
         result = "\n".join(
             block.text for block in response.content if hasattr(block, "text")
         )

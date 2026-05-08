@@ -1,18 +1,21 @@
 import asyncio
 from client import MCPClient
 from agent import Agent
+import sys
  
  
 async def main():
     mcp_client = MCPClient()
  
     try:
-        await mcp_client.connect_sse("")  #mcp server url
+        await mcp_client.connect_sse("")  #mcp server url 추가해주세요
  
         agent = Agent(mcp_client=mcp_client)
  
         while True:
-            user_input = input("You: ").strip()
+            user_input = await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)
+            user_input = user_input.strip()
+
             if user_input.lower() in ("exit", "quit"):
                 break
             if not user_input:
