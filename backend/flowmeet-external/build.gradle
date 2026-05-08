@@ -16,4 +16,7 @@ dependencies {
     implementation 'com.google.http-client:google-http-client-gson:1.45.0'
 
     implementation 'net.dv8tion:JDA:5.2.2'
+
+    implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.3.0')
+    implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 }

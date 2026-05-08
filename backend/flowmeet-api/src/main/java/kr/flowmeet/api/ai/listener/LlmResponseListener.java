@@ -1,0 +1,45 @@
+package kr.flowmeet.api.ai.listener;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.awspring.cloud.sqs.annotation.SqsListener;
+import kr.flowmeet.domain.ai.service.AiTaskService;
+import kr.flowmeet.external.sqs.dto.LlmResponseMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class LlmResponseListener {
+
+    private final ObjectMapper objectMapper;
+    private final AiTaskService aiTaskService;
+
+    @SqsListener("${cloud.aws.sqs.response-queue-url}")
+    public void handle(final String payload) {
+        try {
+            LlmResponseMessage response = objectMapper.readValue(payload, LlmResponseMessage.class);
+            log.info("LLM 응답 수신 - jobId: {}, status: {}", response.jobId(), response.status());
+
+            if (!response.isSuccess()) {
+                log.error("LLM 처리 실패 - jobId: {}, error: {}", response.jobId(), response.error());
+                aiTaskService.fail(response.jobId(), response.error());
+                return;
+            }
+
+            if (response.isSubSummary()) {
+                String summary = response.result().get("summary").asText();
+                String mermaidCode = response.result().get("mermaidCode").asText();
+                aiTaskService.complete(response.jobId(), summary, mermaidCode);
+            } else {
+                String result = response.result().asText();
+                aiTaskService.complete(response.jobId(), result, null);
+            }
+
+            log.info("LLM 처리 완료 - jobId: {}, taskType: {}", response.jobId(), response.taskType());
+        } catch (Exception e) {
+            log.error("LLM 응답 처리 실패 - payload: {}", payload, e);
+        }
+    }
+}
