@@ -97,8 +97,9 @@ const server = createServer();
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws, req) => {
-  // URL 경로에서 룸 이름 추출 (예: /node-42 → "node-42")
-  const roomName = (req.url ?? '/').slice(1) || 'default';
+  // 쿼리스트링 제거 후 룸 이름 추출 (예: /node-42?token=... → "node-42")
+  const url = new URL(`http://localhost${req.url ?? '/'}`);
+  const roomName = url.pathname.slice(1) || 'default';
   setupConnection(ws, roomName);
 });
 
