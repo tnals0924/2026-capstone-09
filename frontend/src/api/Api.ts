@@ -248,6 +248,179 @@ export interface CreateEdgeRequest {
   comment?: string;
 }
 
+/** 채팅 세션 생성 요청 */
+export interface CreateChatSessionRequest {
+  /**
+   * 채팅 제목 (미입력 시 자동 생성)
+   * @example "기획 방향성 질문"
+   */
+  title?: string;
+  /**
+   * 참조할 노드 ID 목록
+   * @example [101,102]
+   */
+  nodeIds?: number[];
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseCreateChatSessionResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: CreateChatSessionResponse;
+}
+
+/** 채팅 세션 생성 응답 */
+export interface CreateChatSessionResponse {
+  /**
+   * 채팅 세션 ID
+   * @format int64
+   * @example 301
+   */
+  chatSessionId?: number;
+  /**
+   * 채팅 제목
+   * @example "기획 방향성 질문"
+   */
+  title?: string;
+  /** 참조 노드 목록 */
+  referencedNodes?: ReferencedNodeResponse[];
+  /**
+   * 생성 시각
+   * @format date-time
+   * @example "2026-04-19T10:00:00"
+   */
+  createdAt?: string;
+}
+
+/** 참조 노드 정보 */
+export interface ReferencedNodeResponse {
+  /**
+   * 노드 ID
+   * @format int64
+   * @example 101
+   */
+  nodeId?: number;
+  /**
+   * 노드 제목
+   * @example "기획 문서 작성"
+   */
+  title?: string;
+}
+
+/** 참조 노드 추가 요청 */
+export interface AddChatNodeRequest {
+  /**
+   * 참조할 노드 ID
+   * @format int64
+   * @example 101
+   */
+  nodeId: number;
+}
+
+/** 참조 노드 추가 응답 */
+export interface AddChatNodeResponse {
+  /**
+   * 채팅 세션 ID
+   * @format int64
+   * @example 301
+   */
+  chatSessionId?: number;
+  /** 추가된 참조 노드 */
+  referencedNode?: ReferencedNodeResponse;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseAddChatNodeResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: AddChatNodeResponse;
+}
+
+/** 메시지 전송 요청 */
+export interface SendMessageRequest {
+  /**
+   * 메시지 내용
+   * @minLength 1
+   * @example "이 노드 내용을 기반으로 일정을 정리해줘"
+   */
+  content: string;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseSendMessageResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: SendMessageResponse;
+}
+
+/** 메시지 전송 응답 */
+export interface SendMessageResponse {
+  /**
+   * 메시지 ID
+   * @format int64
+   * @example 5001
+   */
+  messageId?: number;
+  /** 메시지 내용 */
+  content?: string;
+  /**
+   * 메시지 타입
+   * @example "USER"
+   */
+  messageType?: "USER" | "AI_RESPONSE" | "AI_ACTION";
+  /**
+   * 생성 시각
+   * @format date-time
+   * @example "2026-04-19T10:05:00"
+   */
+  createdAt?: string;
+}
+
 /** 프로젝트 초대 수락 요청 */
 export interface AcceptProjectInvitationRequest {
   /**
@@ -633,35 +806,14 @@ export interface GetNotificationSettingResponse {
   emailEnabled?: boolean;
 }
 
-/** 노드 수정 요청 (변경할 필드만 전달) */
-export interface UpdateNodeRequest {
+/** 노드 제목 수정 요청 */
+export interface UpdateNodeTitleRequest {
   /**
    * 변경할 제목
+   * @minLength 1
    * @example "로그인 화면 기획 (v2)"
    */
-  title?: string;
-  /**
-   * 변경할 설명
-   * @example "OAuth2 로그인 플로우 정리 및 와이어프레임 첨부"
-   */
-  description?: string;
-  /**
-   * 변경할 노트 내용(마크다운)
-   * @example "## 로그인 시나리오
-   * - Google OAuth ..."
-   */
-  noteContent?: string;
-  /**
-   * 변경할 노드 상태
-   * @example "IN_PROGRESS"
-   */
-  status?: "WAITING" | "IN_PROGRESS" | "DONE";
-  /**
-   * 칸반 내 정렬 순서
-   * @format int32
-   * @example 1024
-   */
-  sortOrder?: number;
+  title: string;
 }
 
 /** 노드 상태 변경 요청 */
@@ -671,6 +823,16 @@ export interface UpdateNodeStatusRequest {
    * @example "IN_PROGRESS"
    */
   status: "WAITING" | "IN_PROGRESS" | "DONE";
+}
+
+/** 노드 노트 수정 요청 */
+export interface UpdateNodeNoteRequest {
+  /**
+   * 변경할 노트 내용(마크다운)
+   * @example "## 로그인 시나리오
+   * - Google OAuth ..."
+   */
+  noteContent?: string;
 }
 
 /** 칸반 카드 이동(드래그 앤 드롭) 요청 */
@@ -688,6 +850,15 @@ export interface UpdateNodeKanbanRequest {
   sortOrder: number;
 }
 
+/** 노드 설명 수정 요청 */
+export interface UpdateNodeDescriptionRequest {
+  /**
+   * 변경할 설명
+   * @example "OAuth2 로그인 플로우 정리 및 와이어프레임 첨부"
+   */
+  description?: string;
+}
+
 /** 프로젝트 멤버 권한 변경 요청 */
 export interface UpdateProjectMemberRoleRequest {
   /**
@@ -695,6 +866,53 @@ export interface UpdateProjectMemberRoleRequest {
    * @example "MEMBER"
    */
   role: "VIEWER" | "MEMBER" | "OWNER";
+}
+
+/** 채팅 제목 수정 요청 */
+export interface UpdateChatSessionRequest {
+  /**
+   * 변경할 채팅 제목
+   * @minLength 1
+   * @example "수정된 채팅 제목"
+   */
+  title: string;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseUpdateChatSessionResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: UpdateChatSessionResponse;
+}
+
+/** 채팅 제목 수정 응답 */
+export interface UpdateChatSessionResponse {
+  /**
+   * 채팅 세션 ID
+   * @format int64
+   * @example 301
+   */
+  chatSessionId?: number;
+  /**
+   * 변경된 채팅 제목
+   * @example "수정된 채팅 제목"
+   */
+  title?: string;
 }
 
 /** 공통 응답 형식 */
@@ -1554,6 +1772,170 @@ export interface ProjectMemberInfo {
    * @example "MEMBER"
    */
   role?: "VIEWER" | "MEMBER" | "OWNER";
+}
+
+/** 채팅 세션 요약 응답 */
+export interface ChatSessionSummaryResponse {
+  /**
+   * 채팅 세션 ID
+   * @format int64
+   * @example 301
+   */
+  chatSessionId?: number;
+  /**
+   * 채팅 제목
+   * @example "기획 문서 피드백 요청"
+   */
+  title?: string;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseCursorSliceResponseChatSessionSummaryResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: CursorSliceResponseChatSessionSummaryResponse;
+}
+
+/** 커서 기반 페이지 응답 */
+export interface CursorSliceResponseChatSessionSummaryResponse {
+  /** 조회된 데이터 목록 */
+  content?: ChatSessionSummaryResponse[];
+  /**
+   * 요청한 페이지 크기
+   * @format int32
+   * @example 20
+   */
+  size?: number;
+  /**
+   * 다음 페이지 존재 여부
+   * @example true
+   */
+  hasNext?: boolean;
+  /**
+   * 다음 페이지 조회용 커서 ID
+   * @format int64
+   * @example 42
+   */
+  nextCursorId?: number;
+  /**
+   * 다음 페이지 조회용 커서 값(정렬 기준 값)
+   * @example "2026-04-19T10:00:00"
+   */
+  nextCursorValue?: string;
+}
+
+/** 채팅 메시지 응답 */
+export interface ChatMessageResponse {
+  /**
+   * 메시지 ID
+   * @format int64
+   * @example 5001
+   */
+  messageId?: number;
+  /** 메시지 내용 */
+  content?: string;
+  /**
+   * 메시지 타입
+   * @example "USER"
+   */
+  messageType?: "USER" | "AI_RESPONSE" | "AI_ACTION";
+  /** 액션 데이터 (AI_ACTION 타입만) */
+  actionData?: string;
+  /**
+   * 생성 시각
+   * @format date-time
+   * @example "2026-04-19T10:01:00"
+   */
+  createdAt?: string;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseGetChatSessionResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: GetChatSessionResponse;
+}
+
+/** 채팅 상세 조회 응답 */
+export interface GetChatSessionResponse {
+  /**
+   * 채팅 세션 ID
+   * @format int64
+   * @example 301
+   */
+  chatSessionId?: number;
+  /**
+   * 채팅 제목
+   * @example "기획 문서 피드백 요청"
+   */
+  title?: string;
+  /** 참조 노드 목록 */
+  referencedNodes?: ReferencedNodeResponse[];
+  /** 메시지 목록 */
+  messages?: ChatMessageResponse[];
+  /**
+   * 다음 페이지 존재 여부
+   * @example false
+   */
+  hasNext?: boolean;
+}
+
+/** 공통 응답 형식 */
+export interface CommonResponseGetReferenceNodesResponse {
+  /**
+   * HTTP 상태 코드
+   * @format int32
+   * @example 200
+   */
+  status?: number;
+  /**
+   * 응답 코드
+   * @example "OK"
+   */
+  code?: string;
+  /**
+   * 응답 메시지
+   * @example "요청에 성공했습니다."
+   */
+  message?: string;
+  /** 응답 데이터 */
+  data?: GetReferenceNodesResponse;
+}
+
+/** 참조 가능한 노드 목록 응답 */
+export interface GetReferenceNodesResponse {
+  /** 노드 목록 */
+  nodes?: ReferencedNodeResponse[];
 }
 
 /** 공통 응답 형식 */
@@ -2880,6 +3262,312 @@ export class Api<
       }),
 
     /**
+     * @description 노드의 제목만 수정합니다.
+     *
+     * @tags Node
+     * @name UpdateNodeTitle
+     * @summary 노드 제목 수정
+     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/title
+     * @secure
+     */
+    updateNodeTitle: (
+      projectId: number,
+      nodeId: number,
+      data: UpdateNodeTitleRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_TITLE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 제목을 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/nodes/${nodeId}/title`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 노드의 상태(WAITING/IN_PROGRESS/DONE)만 변경합니다.
+     *
+     * @tags Node
+     * @name UpdateNodeStatus
+     * @summary 노드 상태 변경
+     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/status
+     * @secure
+     */
+    updateNodeStatus: (
+      projectId: number,
+      nodeId: number,
+      data: UpdateNodeStatusRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_STATUS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 상태를 변경했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/nodes/${nodeId}/status`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 노드의 노트(마크다운)만 수정합니다.
+     *
+     * @tags Node
+     * @name UpdateNodeNote
+     * @summary 노드 노트 수정
+     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/note
+     * @secure
+     */
+    updateNodeNote: (
+      projectId: number,
+      nodeId: number,
+      data: UpdateNodeNoteRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_NOTE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 노트를 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/nodes/${nodeId}/note`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 드래그 & 드롭으로 상태와 순서를 동시에 변경합니다.
+     *
+     * @tags Node
+     * @name UpdateNodeKanban
+     * @summary 칸반 카드 이동
+     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/kanban
+     * @secure
+     */
+    updateNodeKanban: (
+      projectId: number,
+      nodeId: number,
+      data: UpdateNodeKanbanRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_KANBAN"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "칸반 카드를 옮겼어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/nodes/${nodeId}/kanban`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 노드의 설명만 수정합니다.
+     *
+     * @tags Node
+     * @name UpdateNodeDescription
+     * @summary 노드 설명 수정
+     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/description
+     * @secure
+     */
+    updateNodeDescription: (
+      projectId: number,
+      nodeId: number,
+      data: UpdateNodeDescriptionRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_NODE_DESCRIPTION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "노드 설명을 수정했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/nodes/${nodeId}/description`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * @description 노드 제목, 키워드로 검색합니다.
+     *
+     * @tags Node
+     * @name Search
+     * @summary 프로젝트 내 검색
+     * @request GET:/v1/projects/{projectId}/search
+     * @secure
+     */
+    search: (
+      projectId: number,
+      query: {
+        query: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "SEARCH"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "검색을 완료했어요."
+           */
+          message?: object;
+          /** 노드 검색 응답 */
+          data?: SearchNodeResponse;
+        },
+        any
+      >({
+        path: `/v1/projects/${projectId}/search`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
      * @description 노드 클릭 시 사이드바 상세 정보를 조회합니다.
      *
      * @tags Node
@@ -2969,208 +3657,6 @@ export class Api<
       >({
         path: `/v1/projects/${projectId}/nodes/${nodeId}`,
         method: "DELETE",
-        secure: true,
-        ...params,
-      }),
-
-    /**
-     * @description 노드 제목, 설명, 노트, 상태, 정렬순서를 수정합니다.
-     *
-     * @tags Node
-     * @name UpdateNode
-     * @summary 노드 수정
-     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}
-     * @secure
-     */
-    updateNode: (
-      projectId: number,
-      nodeId: number,
-      data: UpdateNodeRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<
-        {
-          /**
-           * HTTP 상태 코드
-           * @format int32
-           * @example 200
-           */
-          status?: object;
-          /**
-           * 응답 코드
-           * @example "UPDATE_NODE"
-           */
-          code?: object;
-          /**
-           * 응답 메시지
-           * @example "노드를 수정했어요."
-           */
-          message?: object;
-          /** 응답 데이터 */
-          data?: object;
-        },
-        {
-          /** @format int32 */
-          status?: number;
-          code?: string;
-          message?: string;
-          data?: object;
-        }
-      >({
-        path: `/v1/projects/${projectId}/nodes/${nodeId}`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 노드의 상태(WAITING/IN_PROGRESS/DONE)만 변경합니다.
-     *
-     * @tags Node
-     * @name UpdateNodeStatus
-     * @summary 노드 상태 변경
-     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/status
-     * @secure
-     */
-    updateNodeStatus: (
-      projectId: number,
-      nodeId: number,
-      data: UpdateNodeStatusRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<
-        {
-          /**
-           * HTTP 상태 코드
-           * @format int32
-           * @example 200
-           */
-          status?: object;
-          /**
-           * 응답 코드
-           * @example "UPDATE_NODE_STATUS"
-           */
-          code?: object;
-          /**
-           * 응답 메시지
-           * @example "노드 상태를 변경했어요."
-           */
-          message?: object;
-          /** 응답 데이터 */
-          data?: object;
-        },
-        {
-          /** @format int32 */
-          status?: number;
-          code?: string;
-          message?: string;
-          data?: object;
-        }
-      >({
-        path: `/v1/projects/${projectId}/nodes/${nodeId}/status`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 드래그 & 드롭으로 상태와 순서를 동시에 변경합니다.
-     *
-     * @tags Node
-     * @name UpdateNodeKanban
-     * @summary 칸반 카드 이동
-     * @request PATCH:/v1/projects/{projectId}/nodes/{nodeId}/kanban
-     * @secure
-     */
-    updateNodeKanban: (
-      projectId: number,
-      nodeId: number,
-      data: UpdateNodeKanbanRequest,
-      params: RequestParams = {},
-    ) =>
-      this.request<
-        {
-          /**
-           * HTTP 상태 코드
-           * @format int32
-           * @example 200
-           */
-          status?: object;
-          /**
-           * 응답 코드
-           * @example "UPDATE_NODE_KANBAN"
-           */
-          code?: object;
-          /**
-           * 응답 메시지
-           * @example "칸반 카드를 옮겼어요."
-           */
-          message?: object;
-          /** 응답 데이터 */
-          data?: object;
-        },
-        {
-          /** @format int32 */
-          status?: number;
-          code?: string;
-          message?: string;
-          data?: object;
-        }
-      >({
-        path: `/v1/projects/${projectId}/nodes/${nodeId}/kanban`,
-        method: "PATCH",
-        body: data,
-        secure: true,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * @description 노드 제목, 키워드로 검색합니다.
-     *
-     * @tags Node
-     * @name Search
-     * @summary 프로젝트 내 검색
-     * @request GET:/v1/projects/{projectId}/search
-     * @secure
-     */
-    search: (
-      projectId: number,
-      query: {
-        query: string;
-      },
-      params: RequestParams = {},
-    ) =>
-      this.request<
-        {
-          /**
-           * HTTP 상태 코드
-           * @format int32
-           * @example 200
-           */
-          status?: object;
-          /**
-           * 응답 코드
-           * @example "SEARCH"
-           */
-          code?: object;
-          /**
-           * 응답 메시지
-           * @example "검색을 완료했어요."
-           */
-          message?: object;
-          /** 노드 검색 응답 */
-          data?: SearchNodeResponse;
-        },
-        any
-      >({
-        path: `/v1/projects/${projectId}/search`,
-        method: "GET",
-        query: query,
         secure: true,
         ...params,
       }),
@@ -3459,6 +3945,476 @@ export class Api<
         }
       >({
         path: `/v1/projects/${projectId}/edges/${edgeId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+  };
+  chat = {
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name GetAllChatSessions
+     * @summary 채팅 세션 목록 조회
+     * @request GET:/v1/projects/{projectId}/chats
+     * @secure
+     */
+    getAllChatSessions: (
+      projectId: number,
+      query?: {
+        search?: string;
+        /** @format int64 */
+        cursorId?: number;
+        /**
+         * @format int32
+         * @default 20
+         */
+        size?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_ALL_CHAT_SESSIONS"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "채팅 목록을 조회했어요."
+           */
+          message?: object;
+          /** 커서 기반 페이지 응답 */
+          data?: CursorSliceResponseChatSessionSummaryResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name CreateChatSession
+     * @summary 새 채팅 세션 생성
+     * @request POST:/v1/projects/{projectId}/chats
+     * @secure
+     */
+    createChatSession: (
+      projectId: number,
+      data: CreateChatSessionRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "CREATE_CHAT_SESSION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "새 채팅을 생성했어요."
+           */
+          message?: object;
+          /** 채팅 세션 생성 응답 */
+          data?: CreateChatSessionResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name AddChatNode
+     * @summary 참조 노드 추가
+     * @request POST:/v1/projects/{projectId}/chats/{chatSessionId}/nodes
+     * @secure
+     */
+    addChatNode: (
+      projectId: number,
+      chatSessionId: number,
+      data: AddChatNodeRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "ADD_CHAT_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "참조 노드를 추가했어요."
+           */
+          message?: object;
+          /** 참조 노드 추가 응답 */
+          data?: AddChatNodeResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}/nodes`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name SendMessage
+     * @summary 메시지 전송
+     * @request POST:/v1/projects/{projectId}/chats/{chatSessionId}/messages
+     * @secure
+     */
+    sendMessage: (
+      projectId: number,
+      chatSessionId: number,
+      data: SendMessageRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "SEND_MESSAGE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "메시지를 전송했어요."
+           */
+          message?: object;
+          /** 메시지 전송 응답 */
+          data?: SendMessageResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}/messages`,
+        method: "POST",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name GetChatSessionDetail
+     * @summary 채팅 상세 조회 (메시지 내역)
+     * @request GET:/v1/projects/{projectId}/chats/{chatSessionId}
+     * @secure
+     */
+    getChatSessionDetail: (
+      projectId: number,
+      chatSessionId: number,
+      query?: {
+        /** @format int64 */
+        cursorId?: number;
+        /**
+         * @format int32
+         * @default 30
+         */
+        size?: number;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_CHAT_SESSION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "채팅 상세를 조회했어요."
+           */
+          message?: object;
+          /** 채팅 상세 조회 응답 */
+          data?: GetChatSessionResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}`,
+        method: "GET",
+        query: query,
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name DeleteChatSession
+     * @summary 채팅 삭제
+     * @request DELETE:/v1/projects/{projectId}/chats/{chatSessionId}
+     * @secure
+     */
+    deleteChatSession: (
+      projectId: number,
+      chatSessionId: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "DELETE_CHAT_SESSION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "채팅을 삭제했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}`,
+        method: "DELETE",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name UpdateChatSession
+     * @summary 채팅 제목 수정
+     * @request PATCH:/v1/projects/{projectId}/chats/{chatSessionId}
+     * @secure
+     */
+    updateChatSession: (
+      projectId: number,
+      chatSessionId: number,
+      data: UpdateChatSessionRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "UPDATE_CHAT_SESSION"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "채팅 제목을 수정했어요."
+           */
+          message?: object;
+          /** 채팅 제목 수정 응답 */
+          data?: UpdateChatSessionResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}`,
+        method: "PATCH",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name GetReferenceNodes
+     * @summary 참조 가능한 노드 조회
+     * @request GET:/v1/projects/{projectId}/chats/nodes
+     * @secure
+     */
+    getReferenceNodes: (projectId: number, params: RequestParams = {}) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "GET_REFERENCE_NODES"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "참조 가능한 노드를 조회했어요."
+           */
+          message?: object;
+          /** 참조 가능한 노드 목록 응답 */
+          data?: GetReferenceNodesResponse;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/nodes`,
+        method: "GET",
+        secure: true,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Chat
+     * @name RemoveChatNode
+     * @summary 참조 노드 제거
+     * @request DELETE:/v1/projects/{projectId}/chats/{chatSessionId}/nodes/{nodeId}
+     * @secure
+     */
+    removeChatNode: (
+      projectId: number,
+      chatSessionId: number,
+      nodeId: number,
+      params: RequestParams = {},
+    ) =>
+      this.request<
+        {
+          /**
+           * HTTP 상태 코드
+           * @format int32
+           * @example 200
+           */
+          status?: object;
+          /**
+           * 응답 코드
+           * @example "REMOVE_CHAT_NODE"
+           */
+          code?: object;
+          /**
+           * 응답 메시지
+           * @example "참조 노드를 제거했어요."
+           */
+          message?: object;
+          /** 응답 데이터 */
+          data?: object;
+        },
+        {
+          /** @format int32 */
+          status?: number;
+          code?: string;
+          message?: string;
+          data?: object;
+        }
+      >({
+        path: `/v1/projects/${projectId}/chats/${chatSessionId}/nodes/${nodeId}`,
         method: "DELETE",
         secure: true,
         ...params,
