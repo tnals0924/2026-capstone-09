@@ -108,7 +108,7 @@ public class MeetingFacade {
     }
 
     @Transactional
-    public void createTranscript(
+    public void appendTranscript(
             final Long userId,
             final Long projectId,
             final Long meetingId,

@@ -3,7 +3,7 @@ package kr.flowmeet.api.meeting.controller;
 import jakarta.validation.Valid;
 import kr.flowmeet.api.common.dto.CommonResponse;
 import kr.flowmeet.api.meeting.dto.request.CreateMeetingRequest;
-import kr.flowmeet.api.meeting.dto.request.CreateTranscriptRequest;
+import kr.flowmeet.api.meeting.dto.request.AppendTranscriptRequest;
 import kr.flowmeet.api.meeting.dto.request.UpdateMeetingRequest;
 import kr.flowmeet.api.meeting.dto.response.EndMeetingResponse;
 import kr.flowmeet.api.meeting.facade.MeetingFacade;
@@ -65,15 +65,15 @@ public class MeetingController implements MeetingApi {
 
     @Override
     @PostMapping("/nodes/{nodeId}/meetings/{meetingId}/transcripts")
-    public CommonResponse<?> createTranscript(
+    public CommonResponse<?> appendTranscript(
             @UserId Long userId,
             @PathVariable Long projectId,
             @PathVariable Long nodeId,
             @PathVariable Long meetingId,
-            @Valid @RequestBody CreateTranscriptRequest request
+            @Valid @RequestBody AppendTranscriptRequest request
     ) {
-        meetingFacade.createTranscript(userId, projectId, meetingId, request.content());
-        return CommonResponse.ok(MeetingSuccessCode.CREATE_TRANSCRIPT);
+        meetingFacade.appendTranscript(userId, projectId, meetingId, request.content());
+        return CommonResponse.ok(MeetingSuccessCode.APPEND_TRANSCRIPT);
     }
 
     @Override
