@@ -1,19 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-
 import { ProjectDetailHeader } from '@/components/projects/project-detail/ProjectDetailHeader';
 import { ProjectDetailLinks } from '@/components/projects/project-detail/ProjectDetailLinks';
 import { EXAMPLE_USERS } from '@/constants/exampleConstant';
 import {
   ProjectDetailLayoutContext,
-  type ProjectViewTypes,
   VALID_VIEWS,
+  ProjectViewTypes,
 } from '@/contexts/ProjectDetailLayoutContext';
-
-interface ProjectDetailLayoutProps {
-  children: React.ReactNode;
-}
 
 const STORAGE_KEY = 'project-active-view';
 
@@ -35,7 +30,11 @@ export default function ProjectDetailLayout({ children }: ProjectDetailLayoutPro
   return (
     <ProjectDetailLayoutContext.Provider value={contextValue}>
       <div className="flex h-full w-full flex-1 flex-col overflow-hidden" suppressHydrationWarning>
-        <ProjectDetailHeader activeView={activeView} onlineUsers={EXAMPLE_USERS} onViewChange={setActiveView} />
+        <ProjectDetailHeader
+          activeView={activeView}
+          onlineUsers={EXAMPLE_USERS}
+          onViewChange={setActiveView}
+        />
         <ProjectDetailLinks />
         {children}
       </div>
