@@ -140,6 +140,10 @@ export const useAccountSettingsForm = ({
     [onProfileImageUploaded, showErrorToast],
   );
 
+  const triggerReload = useCallback(() => {
+    setReloadCounter((c) => c + 1);
+  }, []);
+
   return {
     info,
     nickname,
@@ -151,5 +155,6 @@ export const useAccountSettingsForm = ({
     setInfoEmail,
     uploadProfileImage,
     profileImageAcceptAttr: PROFILE_IMAGE_ACCEPT.join(','),
+    triggerReload,
   };
 };

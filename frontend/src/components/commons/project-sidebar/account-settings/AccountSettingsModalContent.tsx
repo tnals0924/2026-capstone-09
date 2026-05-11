@@ -49,6 +49,7 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
     nicknameMaxLength,
     uploadProfileImage,
     profileImageAcceptAttr,
+    triggerReload,
   } = useAccountSettingsForm({
     onNicknameSaved: () => {
       toast({
@@ -80,6 +81,8 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
     nickname,
     onChanged: (nextEmail) => {
       setInfoEmail(nextEmail);
+      // 백엔드 정규화/실제 저장 값을 확인하기 위해 getMe 재조회.
+      triggerReload();
       toast({
         content: '이메일을 변경했어요',
         variant: 'normal',
@@ -234,9 +237,9 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
                       variant="normal"
                       onClick={emailForm.requestVerification}
                       disabled={!emailForm.canRequestVerification}
-                      aria-label="이메일 인증 요청"
+                      aria-label="인증 코드 전송"
                     >
-                      인증하기
+                      전송
                     </TextFieldButton>
                   }
                 />
@@ -271,7 +274,21 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
                     value={emailForm.verificationCode}
                     onChange={(event) => emailForm.setVerificationCode(event.target.value)}
                     width="100%"
-                    placeholder="인증번호 입력"
+                    placeholder="인증번호 6자리 입력"
+                    inputMode="numeric"
+                    maxLength={6}
+                    trailingButton={
+                      emailForm.isVerified ? undefined : (
+                        <TextFieldButton
+                          variant="normal"
+                          onClick={emailForm.verifyCode}
+                          disabled={!emailForm.canVerifyCode}
+                          aria-label="인증 코드 확인"
+                        >
+                          인증하기
+                        </TextFieldButton>
+                      )
+                    }
                     trailingContent={
                       emailForm.isVerified ? (
                         <TextFieldContent variant="icon">
