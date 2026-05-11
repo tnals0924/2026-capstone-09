@@ -62,6 +62,7 @@ export const SearchModalContent = ({ projectId, onResultClick }: SearchModalCont
         <ul className="flex min-h-0 w-full flex-1 flex-col gap-2 overflow-y-auto pr-2">
           {results.map((item) => {
             const updatedAtLabel = formatUpdatedAt(item.updatedAt);
+            const isMainNode = !item.number.includes('.');
             return (
               <li key={item.nodeId}>
                 <Link
@@ -73,9 +74,20 @@ export const SearchModalContent = ({ projectId, onResultClick }: SearchModalCont
                   className="hover:bg-fill-alternative flex w-full items-start gap-2.5 rounded-lg p-4 transition-colors duration-150"
                 >
                   <div className="shrink-0">
-                    <ContentBadge size="medium" variant="outlined" color="neutral">
-                      #{item.number}
-                    </ContentBadge>
+                    {isMainNode ? (
+                      <ContentBadge
+                        size="small"
+                        variant="solid"
+                        color="accent"
+                        className="!bg-primary-40/10 !text-primary-40"
+                      >
+                        #{item.number}
+                      </ContentBadge>
+                    ) : (
+                      <ContentBadge size="small" variant="outlined" color="neutral">
+                        #{item.number}
+                      </ContentBadge>
+                    )}
                   </div>
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <div className="flex items-baseline justify-between gap-3">
