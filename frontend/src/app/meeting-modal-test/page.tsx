@@ -9,7 +9,11 @@ import {
   MeetingCreateModalContent,
   type MeetingCreatePayload,
 } from '@/components/projects/node-flow/MeetingCreateModalContent';
-import { EXAMPLE_MEETING_CREATE_NODE } from '@/constants/exampleConstant';
+import type { ParticipantOption } from '@/components/projects/node-flow/ParticipantsSelect';
+import {
+  EXAMPLE_MEETING_CREATE_NODE,
+  EXAMPLE_MEETING_PARTICIPANTS,
+} from '@/constants/exampleConstant';
 import { useErrorToast } from '@/hooks/useErrorToast';
 
 const TEST_PROJECT_ID = 1;
@@ -33,7 +37,7 @@ export default function MeetingModalTestPage() {
     }
   };
 
-  const handleOpenClick = () => {
+  const openModalWith = (participantOptions: readonly ParticipantOption[]) => {
     openModal({
       variant: 'default',
       closeOnBackdrop: true,
@@ -42,11 +46,32 @@ export default function MeetingModalTestPage() {
         <MeetingCreateModalContent
           nodeBadge={EXAMPLE_MEETING_CREATE_NODE.badge}
           nodeTitle={EXAMPLE_MEETING_CREATE_NODE.title}
+          participantOptions={participantOptions}
           onClose={closeModal}
           onCreate={handleCreate}
         />
       ),
     });
+  };
+
+  const handleOpenWithApi = async () => {
+    try {
+      const res = await privateApi.projectMember.getAllMembers(TEST_PROJECT_ID);
+      const participantOptions: ParticipantOption[] = (res.data.data?.members ?? []).map(
+        (member) => ({
+          id: member.userId ?? 0,
+          name: member.nickname ?? '',
+          email: member.email,
+        }),
+      );
+      openModalWith(participantOptions);
+    } catch (err) {
+      showErrorToast(err, '참여자 목록을 불러오지 못했어요.');
+    }
+  };
+
+  const handleOpenWithMock = () => {
+    openModalWith(EXAMPLE_MEETING_PARTICIPANTS);
   };
 
   return (
@@ -56,9 +81,12 @@ export default function MeetingModalTestPage() {
           <h1 className="text-heading-1 text-label-normal font-medium">회의 생성 모달 테스트</h1>
         </div>
 
-        <div>
-          <Button variant="solid" color="primary" size="medium" onClick={handleOpenClick}>
-            회의 생성 모달 열기
+        <div className="flex flex-col items-start gap-3">
+          <Button variant="solid" color="primary" size="medium" onClick={handleOpenWithApi}>
+            회의 생성 모달 열기 (API 연결)
+          </Button>
+          <Button variant="solid" color="assistive" size="medium" onClick={handleOpenWithMock}>
+            회의 생성 모달 열기 (예시 목 데이터)
           </Button>
         </div>
 

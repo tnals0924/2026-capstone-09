@@ -13,16 +13,16 @@ import { IconClose } from '@wanteddev/wds-icon';
 import { Controller } from 'react-hook-form';
 
 import type { CreateMeetingRequest } from '@/api/Api';
-import { EXAMPLE_MEETING_PARTICIPANTS } from '@/constants/exampleConstant';
 import { useMeetingCreateForm } from '@/hooks/useMeetingCreateForm';
 
-import { ParticipantsSelect } from './ParticipantsSelect';
+import { ParticipantsSelect, type ParticipantOption } from './ParticipantsSelect';
 
 export type MeetingCreatePayload = CreateMeetingRequest;
 
 interface MeetingCreateModalContentProps {
   nodeBadge: string;
   nodeTitle: string;
+  participantOptions: readonly ParticipantOption[];
   onClose: () => void;
   onCreate?: (payload: MeetingCreatePayload) => void;
 }
@@ -30,6 +30,7 @@ interface MeetingCreateModalContentProps {
 export const MeetingCreateModalContent = ({
   nodeBadge,
   nodeTitle,
+  participantOptions,
   onClose,
   onCreate,
 }: MeetingCreateModalContentProps) => {
@@ -143,7 +144,7 @@ export const MeetingCreateModalContent = ({
               rules={{ validate: (participants) => participants.length > 0 }}
               render={({ field }) => (
                 <ParticipantsSelect
-                  options={EXAMPLE_MEETING_PARTICIPANTS}
+                  options={participantOptions}
                   value={field.value}
                   onChange={field.onChange}
                   placeholder="이름 또는 이메일로 검색"
