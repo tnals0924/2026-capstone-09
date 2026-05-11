@@ -10,6 +10,8 @@ import {
   ReferenceNodeModalContent,
   type CreateReferenceNodePathParams,
   type ReferenceNodeCreatePayload,
+  type ReferenceNodeOption,
+  type ReferencedNodeItem,
 } from '@/components/projects/project-detail/reference-node';
 import { EXAMPLE_REFERENCE_NODE_MODAL } from '@/constants/exampleConstant';
 import { useErrorToast } from '@/hooks/useErrorToast';
@@ -36,7 +38,10 @@ export default function ReferenceNodeModalTestPage() {
     }
   };
 
-  const handleOpenModal = () => {
+  const openModalWith = (
+    referencedNodes: readonly ReferencedNodeItem[],
+    nodeOptions: readonly ReferenceNodeOption[],
+  ) => {
     openModal({
       variant: 'default',
       closeOnBackdrop: true,
@@ -44,8 +49,8 @@ export default function ReferenceNodeModalTestPage() {
       content: (
         <ReferenceNodeModalContent
           startNodeId={EXAMPLE_REFERENCE_NODE_MODAL.startNodeId}
-          referencedNodes={EXAMPLE_REFERENCE_NODE_MODAL.referencedNodes}
-          nodeOptions={EXAMPLE_REFERENCE_NODE_MODAL.nodeOptions}
+          referencedNodes={referencedNodes}
+          nodeOptions={nodeOptions}
           onClose={closeModal}
           onCreate={handleCreate}
         />
@@ -53,17 +58,60 @@ export default function ReferenceNodeModalTestPage() {
     });
   };
 
+  const handleOpenWithApi = async () => {
+    try {
+      const [linkedRes, listRes] = await Promise.all([
+        privateApi.node.getLinkedNodes(
+          EXAMPLE_REFERENCE_NODE_MODAL.projectId,
+          EXAMPLE_REFERENCE_NODE_MODAL.startNodeId,
+        ),
+        privateApi.node.getNodeList(EXAMPLE_REFERENCE_NODE_MODAL.projectId),
+      ]);
+
+      const referencedNodes = linkedRes.data.data?.linkedNodes ?? [];
+      const nodeOptions: ReferenceNodeOption[] = (listRes.data.data?.nodes ?? [])
+        .filter((node) => node.nodeId !== EXAMPLE_REFERENCE_NODE_MODAL.startNodeId)
+        .map((node) => ({
+          nodeId: node.nodeId ?? 0,
+          nodeNumber: node.number ?? '',
+          nodeTitle: node.title ?? '',
+        }));
+
+      openModalWith(referencedNodes, nodeOptions);
+    } catch (err) {
+      showErrorToast(err, '참조 노드 정보를 불러오지 못했어요.');
+    }
+  };
+
+  const handleOpenWithMock = () => {
+    openModalWith(
+      EXAMPLE_REFERENCE_NODE_MODAL.referencedNodes,
+      EXAMPLE_REFERENCE_NODE_MODAL.nodeOptions,
+    );
+  };
+
   return (
     <main className="bg-background-normal-alternative flex min-h-screen flex-col items-center justify-center gap-6 p-10">
-      <Button
-        variant="solid"
-        color="primary"
-        size="large"
-        leadingContent={<IconLink />}
-        onClick={handleOpenModal}
-      >
-        참조 노드 모달
-      </Button>
+      <div className="flex flex-col items-center gap-3">
+        <Button
+          variant="solid"
+          color="primary"
+          size="large"
+          leadingContent={<IconLink />}
+          onClick={handleOpenWithApi}
+        >
+          참조 노드 모달 (API 연결)
+        </Button>
+        <Button
+          variant="solid"
+          color="assistive"
+          size="large"
+          leadingContent={<IconLink />}
+          onClick={handleOpenWithMock}
+        >
+          참조 노드 모달 (예시 목 데이터)
+        </Button>
+      </div>
       {submittedRequest && (
         <pre className="border-line-normal-neutral bg-background-normal-normal text-caption-1 text-label-neutral max-w-full overflow-auto rounded-xl border p-4 font-normal">
           {JSON.stringify(submittedRequest, null, 2)}
