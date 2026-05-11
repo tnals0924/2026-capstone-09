@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 
+import { privateApi } from '@/api';
 import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { MeetingDeleteConfirmContent } from '@/components/projects/project-detail/meeting-delete';
 import { EXAMPLE_MEETING_DELETE_TEST } from '@/constants/exampleConstant';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { cn } from '@/utils/cn';
 
 /**
@@ -17,28 +19,37 @@ import { cn } from '@/utils/cn';
  */
 const MeetingDeleteModalTestPage = () => {
   const { openDialog, closeDialog } = useDialog();
+  const showErrorToast = useErrorToast();
   const [lastResult, setLastResult] = useState<{
     projectId: number;
+    nodeId: number;
     meetingId: number;
     title: string;
   } | null>(null);
 
-  const handleOpenDialog = (meeting: { meetingId: number; title: string }) => {
+  const handleOpenDialog = (meeting: { nodeId: number; meetingId: number; title: string }) => {
     openDialog({
       closeOnBackdrop: true,
       closeOnEsc: true,
       content: (
         <MeetingDeleteConfirmContent
-          onConfirm={() => {
-            // 실제 연결 시 호출 예 (메서드는 Swagger 갱신 후 generated 예정):
-            //   privateApi.meeting.deleteMeeting(EXAMPLE_MEETING_DELETE_TEST.projectId, meeting.meetingId)
-            // 본 테스트 페이지에서는 호출 없이 입력만 화면에 표시한다.
-            setLastResult({
-              projectId: EXAMPLE_MEETING_DELETE_TEST.projectId,
-              meetingId: meeting.meetingId,
-              title: meeting.title,
-            });
-            closeDialog();
+          onConfirm={async () => {
+            try {
+              await privateApi.meeting.deleteMeeting(
+                EXAMPLE_MEETING_DELETE_TEST.projectId,
+                meeting.nodeId,
+                meeting.meetingId,
+              );
+              setLastResult({
+                projectId: EXAMPLE_MEETING_DELETE_TEST.projectId,
+                nodeId: meeting.nodeId,
+                meetingId: meeting.meetingId,
+                title: meeting.title,
+              });
+              closeDialog();
+            } catch (err) {
+              showErrorToast(err, '회의 삭제에 실패했어요.');
+            }
           }}
           onCancel={closeDialog}
         />
