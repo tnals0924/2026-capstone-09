@@ -8,7 +8,7 @@ public enum SocialProvider {
 
     public static SocialProvider from(String provider) {
         try {
-            return SocialProvider.valueOf(provider);
+            return SocialProvider.valueOf(provider.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new BusinessException(AuthDomainErrorCode.AUTH_INVALID_PROVIDER);
         }
