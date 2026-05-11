@@ -370,6 +370,7 @@
 /* WDS 내 primary FlowMeet 색상으로 변경 */
 :root {
   --semantic-primary-normal: #03C98F;
+  --semantic-primary-normal-rgb: 3, 201, 143;
 }
 
 body {
