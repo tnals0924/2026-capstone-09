@@ -9,27 +9,33 @@ import {
   EXAMPLE_MULTI_NODE_SUMMARY_NODES,
   EXAMPLE_MULTI_NODE_SUMMARY_RESULT,
 } from '@/constants/exampleConstant';
+import { useErrorToast } from '@/hooks/useErrorToast';
 
 export default function AiSummaryModalTestPage() {
   const { openModal, closeModal } = useModal();
+  const showErrorToast = useErrorToast();
   const { handleSubmit } = useMultiNodeSummaryRequest({
     nodes: EXAMPLE_MULTI_NODE_SUMMARY_NODES,
   });
 
-  const handleOpenClick = () => {
-    handleSubmit();
-    openModal({
-      variant: 'default',
-      closeOnBackdrop: true,
-      closeOnEsc: true,
-      content: (
-        <MultiNodeSummaryModalContent
-          nodes={EXAMPLE_MULTI_NODE_SUMMARY_NODES}
-          result={EXAMPLE_MULTI_NODE_SUMMARY_RESULT}
-          onClose={closeModal}
-        />
-      ),
-    });
+  const handleOpenClick = async () => {
+    try {
+      await handleSubmit();
+      openModal({
+        variant: 'default',
+        closeOnBackdrop: true,
+        closeOnEsc: true,
+        content: (
+          <MultiNodeSummaryModalContent
+            nodes={EXAMPLE_MULTI_NODE_SUMMARY_NODES}
+            result={EXAMPLE_MULTI_NODE_SUMMARY_RESULT}
+            onClose={closeModal}
+          />
+        ),
+      });
+    } catch (err) {
+      showErrorToast(err, 'AI 요약 생성에 실패했어요.');
+    }
   };
 
   return (

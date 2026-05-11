@@ -20,8 +20,8 @@ export const useMultiNodeSummaryRequest = ({
     [nodes],
   );
 
-  const handleSubmit = useCallback(() => {
-    // TODO: privateApi.ai.createMultiNodeSummary(projectId, payload) 생성 후 연결
+  const handleSubmit = useCallback(async () => {
+    // TODO: await privateApi.ai.createMultiNodeSummary(projectId, payload) 생성 후 연결
     onSubmit?.(payload);
   }, [onSubmit, payload]);
 
