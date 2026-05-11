@@ -16,9 +16,8 @@ interface UseLinkEditFormParams {
 /**
  * 링크 추가/수정 다이얼로그가 부모(`onSave`)로 넘기는 페이로드.
  *
- * - `url`  : 백엔드 `ProjectUrlRequest`에 그대로 보낼 정규화된 URL.
- * - `name` : 사용자가 입력한 라벨. 백엔드 스펙상 저장 필드는 없어서 호출부가
- *            클라이언트 측 라벨 캐시에 보관해 표시에만 사용한다 (새로고침 시 hostname으로 폴백).
+ * - `url`  : 백엔드 `ProjectUrlRequest.url`로 보낼 정규화된 URL.
+ * - `name` : 백엔드 `ProjectUrlRequest.name`으로 보낼 사용자 라벨.
  */
 export interface LinkEditPayload {
   url: string;
@@ -58,8 +57,8 @@ const isValidUrl = (raw: string): boolean => {
  *                    edit: URL 유효 + (URL 또는 이름이 변경됨)
  * - `buildPayload` : 부모로 넘길 `{ url, name }` 객체 생성. URL은 정규화 적용.
  *
- * 백엔드 `ProjectUrlRequest`는 `url` 한 필드만 받기 때문에 호출부에서 API 호출 시
- * `payload.url`만 전달하고 `payload.name`은 클라이언트 측 라벨 캐시 용도로 보관한다.
+ * 백엔드 `ProjectUrlRequest`가 `{ name, url }` 두 필드 모두 받으므로 payload를
+ * 그대로 호출부에서 API 바디로 전달하면 된다.
  */
 export const useLinkEditForm = ({
   mode,

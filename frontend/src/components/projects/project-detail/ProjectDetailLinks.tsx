@@ -15,10 +15,13 @@ import {
   type LinkEditPayload,
 } from '@/components/projects/project-detail/link-edit';
 import { ProjectDetailLinkItem } from '@/components/projects/project-detail/ProjectDetailLinkItem';
+import { useErrorToast } from '@/hooks/useErrorToast';
 
 interface LinkItem {
   urlId: number;
   url: string;
+  /** 서버에 저장된 사용자 라벨. 비어있으면 fallback 라벨을 사용한다. */
+  name: string;
   /** 자동 추출된 fallback 라벨(hostname). 사용자 라벨이 없을 때 사용. */
   fallbackLabel: string;
 }
@@ -49,13 +52,10 @@ export const ProjectDetailLinks = () => {
   const isProjectIdValid = projectId !== undefined && !Number.isNaN(projectId);
   const { openDialog, closeDialog } = useDialog();
   const toast = usePositionedToast();
+  const showErrorToast = useErrorToast();
 
   const [links, setLinks] = useState<LinkItem[]>([]);
   const [contextMenu, setContextMenu] = useState<LinkContextMenuState | null>(null);
-  // 사용자가 다이얼로그에서 입력한 라벨(이름) 캐시.
-  // 백엔드 `ProjectUrlRequest`가 `url` 한 필드만 받기 때문에 새로고침 시에는 사라지고
-  // hostname fallback으로 돌아간다. (백엔드에 name 필드 추가는 별도 이슈.)
-  const [customLabels, setCustomLabels] = useState<Record<number, string>>({});
   // 추가/수정/삭제 후 useEffect를 다시 트리거해 목록을 새로 받아오기 위한 카운터.
   // useEffect 안의 inline async 함수 형태를 유지해 `react-hooks/set-state-in-effect` 룰을 회피한다.
   const [reloadCounter, setReloadCounter] = useState(0);
@@ -73,18 +73,19 @@ export const ProjectDetailLinks = () => {
         const urls = response.data.data?.urls ?? [];
         const normalized: LinkItem[] = urls
           .filter(
-            (item): item is { urlId: number; url: string } =>
+            (item): item is { urlId: number; url: string; name?: string } =>
               item.urlId !== undefined && item.url !== undefined,
           )
           .map((item) => ({
             urlId: item.urlId,
             url: item.url,
+            name: item.name ?? '',
             fallbackLabel: extractFallbackLabel(item.url),
           }));
         setLinks(normalized);
       } catch (caught) {
         if (cancelled) return;
-        console.error('프로젝트 URL 목록 조회에 실패했어요.', caught);
+        showErrorToast(caught, '프로젝트 URL 목록 조회에 실패했어요.');
       }
     };
 
@@ -93,7 +94,7 @@ export const ProjectDetailLinks = () => {
     return () => {
       cancelled = true;
     };
-  }, [isProjectIdValid, projectId, reloadCounter]);
+  }, [isProjectIdValid, projectId, reloadCounter, showErrorToast]);
 
   const handleAddClick = () => {
     if (!isProjectIdValid || projectId === undefined) return;
@@ -105,15 +106,14 @@ export const ProjectDetailLinks = () => {
           mode="add"
           onSave={async (payload: LinkEditPayload) => {
             try {
-              const response = await privateApi.projectUrl.addUrl(projectId, { url: payload.url });
-              const newUrlId = response.data.data?.urlId;
-              if (newUrlId !== undefined && payload.name.length > 0) {
-                setCustomLabels((prev) => ({ ...prev, [newUrlId]: payload.name }));
-              }
+              await privateApi.projectUrl.addUrl(projectId, {
+                name: payload.name,
+                url: payload.url,
+              });
               closeDialog();
               triggerReload();
             } catch (caught) {
-              console.error('URL 추가에 실패했어요.', caught);
+              showErrorToast(caught, 'URL 추가에 실패했어요.');
             }
           }}
           onClose={closeDialog}
@@ -131,33 +131,22 @@ export const ProjectDetailLinks = () => {
         <LinkEditDialogContent
           mode="edit"
           initialUrl={link.url}
-          initialName={customLabels[link.urlId] ?? ''}
+          initialName={link.name}
           onSave={async (payload: LinkEditPayload) => {
             try {
-              await privateApi.projectUrl.updateUrl(projectId, link.urlId, { url: payload.url });
-              setCustomLabels((prev) => {
-                const next = { ...prev };
-                if (payload.name.length > 0) {
-                  next[link.urlId] = payload.name;
-                } else {
-                  delete next[link.urlId];
-                }
-                return next;
+              await privateApi.projectUrl.updateUrl(projectId, link.urlId, {
+                name: payload.name,
+                url: payload.url,
               });
               closeDialog();
               triggerReload();
             } catch (caught) {
-              console.error('URL 수정에 실패했어요.', caught);
+              showErrorToast(caught, 'URL 수정에 실패했어요.');
             }
           }}
           onDelete={async () => {
             try {
               await privateApi.projectUrl.deleteUrl(projectId, link.urlId);
-              setCustomLabels((prev) => {
-                const next = { ...prev };
-                delete next[link.urlId];
-                return next;
-              });
               closeDialog();
               triggerReload();
               toast({
@@ -167,7 +156,7 @@ export const ProjectDetailLinks = () => {
                 duration: 'short',
               });
             } catch (caught) {
-              console.error('URL 삭제에 실패했어요.', caught);
+              showErrorToast(caught, 'URL 삭제에 실패했어요.');
             }
           }}
           onClose={closeDialog}
@@ -194,11 +183,6 @@ export const ProjectDetailLinks = () => {
     if (!link || !isProjectIdValid || projectId === undefined) return;
     try {
       await privateApi.projectUrl.deleteUrl(projectId, link.urlId);
-      setCustomLabels((prev) => {
-        const next = { ...prev };
-        delete next[link.urlId];
-        return next;
-      });
       triggerReload();
       toast({
         content: '링크를 삭제했어요',
@@ -207,7 +191,7 @@ export const ProjectDetailLinks = () => {
         duration: 'short',
       });
     } catch (caught) {
-      console.error('URL 삭제에 실패했어요.', caught);
+      showErrorToast(caught, 'URL 삭제에 실패했어요.');
     }
   };
 
@@ -218,7 +202,7 @@ export const ProjectDetailLinks = () => {
           {links.map((link) => (
             <ProjectDetailLinkItem
               key={link.urlId}
-              label={customLabels[link.urlId] ?? link.fallbackLabel}
+              label={link.name.length > 0 ? link.name : link.fallbackLabel}
               href={link.url}
               onContextMenu={handleLinkContextMenu(link)}
             />

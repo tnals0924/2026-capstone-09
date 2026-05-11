@@ -30,9 +30,7 @@ interface LinkEditDialogContentProps {
  *
  * - 백드롭/ESC/외부 클릭 닫힘은 공통 다이얼로그(`useDialog` + `commons/custom-dialog`)에 위임.
  * - 폼 상태·검증·payload 생성은 `useLinkEditForm` 훅에 분리.
- * - 백엔드 `ProjectUrlRequest`가 URL 한 필드만 받기 때문에 이름(name) 입력은
- *   호출부에서 클라이언트 측 라벨 캐시 용도로만 사용되고 서버에는 저장되지 않는다.
- *   (백엔드에 name 필드 추가는 별도 이슈.)
+ * - 백엔드 `ProjectUrlRequest`가 `{ name, url }`을 받으므로 payload의 두 필드 모두 그대로 API에 전달된다.
  * - WDS Button/TextButton의 color prop이 negative 톤을 지원하지 않아, "삭제" / "저장" /
  *   "취소"는 native `<button>` + 디자인 토큰 클래스로 처리한다 (`color-mix`/`!important`로
  *   WDS 내부 스타일을 덮어쓰지 않는 본 프로젝트 컨벤션 준수).
