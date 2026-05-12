@@ -50,6 +50,7 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
     uploadProfileImage,
     profileImageAcceptAttr,
     triggerReload,
+    imageBustKey,
   } = useAccountSettingsForm({
     onNicknameSaved: () => {
       toast({
@@ -183,7 +184,13 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
               <Avatar
                 variant="person"
                 size={84}
-                src={info?.profileImageUrl}
+                src={
+                  info?.profileImageUrl
+                    ? imageBustKey > 0
+                      ? `${info.profileImageUrl}?v=${imageBustKey}`
+                      : info.profileImageUrl
+                    : undefined
+                }
                 alt={info?.nickname ?? '프로필'}
               />
               <span

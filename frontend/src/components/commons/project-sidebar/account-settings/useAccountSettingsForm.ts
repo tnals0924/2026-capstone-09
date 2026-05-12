@@ -18,6 +18,17 @@ const AUTO_SAVE_DEBOUNCE_MS = 1000;
 const PROFILE_IMAGE_MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const PROFILE_IMAGE_ACCEPT = ['image/png', 'image/jpeg', 'image/webp'] as const;
 
+/**
+ * 백엔드가 프로토콜 없이 `static.flowmeet.kr/users/...` 형태로 반환하는 경우 브라우저가
+ * 상대 경로(`/projects/...`)로 해석해 404 가 떨어진다. `http(s)://` 또는 `//` 로 시작하지
+ * 않으면 `https://` 를 보강한다.
+ */
+const normalizeImageUrl = (raw?: string): string | undefined => {
+  if (!raw) return undefined;
+  if (/^(https?:)?\/\//i.test(raw)) return raw;
+  return `https://${raw}`;
+};
+
 interface UseAccountSettingsFormParams {
   /** 닉네임 자동 저장 성공 시 호출. */
   onNicknameSaved?: () => void;
@@ -45,6 +56,9 @@ export const useAccountSettingsForm = ({
   const [info, setInfo] = useState<AccountInfo | null>(null);
   const [nickname, setNickname] = useState('');
   const [reloadCounter, setReloadCounter] = useState(0);
+  // 동일 URL에 새 이미지 덮어썼을 때 브라우저가 캐시된 옛 이미지를 띄우는 문제 우회용.
+  // 업로드 성공 시 timestamp 로 갱신해 Avatar src 에 `?v=...` 쿼리를 붙인다.
+  const [imageBustKey, setImageBustKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,7 +70,7 @@ export const useAccountSettingsForm = ({
         const next: AccountInfo = {
           nickname: data?.nickname ?? '',
           email: data?.email ?? '',
-          profileImageUrl: data?.profileImageUrl,
+          profileImageUrl: normalizeImageUrl(data?.profileImageUrl),
           createdAt: data?.createdAt,
         };
         setInfo(next);
@@ -131,6 +145,7 @@ export const useAccountSettingsForm = ({
 
       try {
         await privateApi.user.updateProfileImage({ profileImage: file });
+        setImageBustKey(Date.now());
         setReloadCounter((c) => c + 1);
         onProfileImageUploaded?.();
       } catch (caught) {
@@ -156,5 +171,6 @@ export const useAccountSettingsForm = ({
     uploadProfileImage,
     profileImageAcceptAttr: PROFILE_IMAGE_ACCEPT.join(','),
     triggerReload,
+    imageBustKey,
   };
 };
