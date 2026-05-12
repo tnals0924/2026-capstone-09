@@ -25,6 +25,12 @@ const SIDEBAR_COLLAPSED_WIDTH = 56;
 const SIDEBAR_TRANSITION_DURATION = 0.24;
 const SIDEBAR_LABEL_TRANSITION_DURATION = 0.16;
 
+const normalizeImageUrl = (raw?: string): string | undefined => {
+  if (!raw) return undefined;
+  if (/^(https?:)?\/\//i.test(raw)) return raw;
+  return `https://${raw}`;
+};
+
 interface ProjectSidebarProps {
   projectName?: string;
   userName?: string;
@@ -56,7 +62,11 @@ export const ProjectSidebar = ({
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState(false);
   // 사이드바가 직접 fetch 한 결과 — props 로 명시 전달된 값이 있으면 그 값을, 없으면 fetch 결과를 사용한다.
   const [fetchedProjectName, setFetchedProjectName] = useState<string | undefined>(undefined);
-  const [me, setMe] = useState<{ nickname?: string; email?: string } | null>(null);
+  const [me, setMe] = useState<{
+    nickname?: string;
+    email?: string;
+    profileImageUrl?: string;
+  } | null>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const isProjectSelectionPage = pathname === '/projects';
 
@@ -92,7 +102,11 @@ export const ProjectSidebar = ({
         const response = await privateApi.user.getMe();
         if (cancelled) return;
         const data = response.data.data;
-        setMe({ nickname: data?.nickname, email: data?.email });
+        setMe({
+          nickname: data?.nickname,
+          email: data?.email,
+          profileImageUrl: normalizeImageUrl(data?.profileImageUrl),
+        });
       } catch (caught) {
         if (cancelled) return;
         showErrorToast(caught, '내 정보 조회에 실패했어요.');
@@ -278,6 +292,7 @@ export const ProjectSidebar = ({
               isCollapsed={isCollapsed}
               userName={userName}
               userEmail={userEmail}
+              profileImageUrl={me?.profileImageUrl}
               onClick={onProfileClick}
             />
           </div>
