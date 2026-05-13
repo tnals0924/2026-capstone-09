@@ -1,33 +1,27 @@
 'use client';
 
-import { useRef, useState } from 'react';
 import { Avatar, Theme, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
+import { useRef, useState } from 'react';
 
 import { AssigneeItem, ProjectMemberInfo } from '@/api/Api';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import { useAddAssigneeMutation, useProjectMembersQuery, useRemoveAssigneeMutation } from '@/queries/member';
+import { useYjsAssignees } from '../hooks/useYjsAssignees';
 
 interface AssigneeFieldProps {
   projectId: number;
   nodeId: number;
-  assignees: AssigneeItem[];
-  onAdd: (assignee: AssigneeItem) => void;
-  onRemove: (userId: number) => void;
+  initialAssignees: AssigneeItem[] | undefined;
 }
 
-export function AssigneeField({
-  projectId,
-  nodeId,
-  assignees,
-  onAdd,
-  onRemove,
-}: AssigneeFieldProps) {
+export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeFieldProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const showErrorToast = useErrorToast();
 
+  const { assignees, yAddAssignee, yRemoveAssignee } = useYjsAssignees(initialAssignees);
   const { data: members = [] } = useProjectMembersQuery(projectId);
   const { mutate: addAssignee } = useAddAssigneeMutation(projectId, nodeId);
   const { mutate: removeAssignee } = useRemoveAssigneeMutation(projectId, nodeId);
@@ -42,10 +36,10 @@ export function AssigneeField({
       email: member.email,
       profileImageUrl: member.profileImageUrl,
     };
-    onAdd(newAssignee);
+    yAddAssignee(newAssignee);
     addAssignee(member.userId, {
       onError: (err) => {
-        onRemove(member.userId!);
+        yRemoveAssignee(member.userId!);
         showErrorToast(err, '담당자 추가에 실패했어요.');
       },
     });
@@ -53,10 +47,10 @@ export function AssigneeField({
 
   const handleRemove = (userId: number) => {
     const removedAssignee = assignees.find((a) => a.userId === userId);
-    onRemove(userId);
+    yRemoveAssignee(userId);
     removeAssignee(userId, {
       onError: (err) => {
-        if (removedAssignee) onAdd(removedAssignee);
+        if (removedAssignee) yAddAssignee(removedAssignee);
         showErrorToast(err, '담당자 제거에 실패했어요.');
       },
     });

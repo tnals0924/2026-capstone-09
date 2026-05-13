@@ -8,23 +8,22 @@ import { TagItem } from '@/api/Api';
 import { ColorType } from '@/constants/badgeColor';
 import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
-import { useAddNodeTagMutation, useRemoveNodeTagMutation } from '@/queries/tag';
-import { useProjectTagsQuery } from '@/queries/tag';
+import { useAddNodeTagMutation, useProjectTagsQuery, useRemoveNodeTagMutation } from '@/queries/tag';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
+import { useYjsTags } from '../hooks/useYjsTags';
 
 interface TagFieldProps {
   projectId: number;
   nodeId: number;
-  tags: TagItem[];
-  onAdd: (tag: TagItem) => void;
-  onRemove: (tagId: number) => void;
+  initialTags: TagItem[] | undefined;
 }
 
-export function TagField({ projectId, nodeId, tags, onAdd, onRemove }: TagFieldProps) {
+export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const showErrorToast = useErrorToast();
 
+  const { tags, yAddTag, yRemoveTag } = useYjsTags(initialTags);
   const { data: allTags = [] } = useProjectTagsQuery(projectId);
   const { mutate: addTag } = useAddNodeTagMutation(projectId, nodeId);
   const { mutate: removeTag } = useRemoveNodeTagMutation(projectId, nodeId);
@@ -33,10 +32,10 @@ export function TagField({ projectId, nodeId, tags, onAdd, onRemove }: TagFieldP
 
   const handleAdd = (tag: TagItem) => {
     if (!tag.tagId) return;
-    onAdd(tag);
+    yAddTag(tag);
     addTag(tag.tagId, {
       onError: (err) => {
-        onRemove(tag.tagId!);
+        yRemoveTag(tag.tagId!);
         showErrorToast(err, '태그 추가에 실패했어요.');
       },
     });
@@ -44,10 +43,10 @@ export function TagField({ projectId, nodeId, tags, onAdd, onRemove }: TagFieldP
 
   const handleRemove = (tagId: number) => {
     const removedTag = tags.find((t) => t.tagId === tagId);
-    onRemove(tagId);
+    yRemoveTag(tagId);
     removeTag(tagId, {
       onError: (err) => {
-        if (removedTag) onAdd(removedTag);
+        if (removedTag) yAddTag(removedTag);
         showErrorToast(err, '태그 제거에 실패했어요.');
       },
     });
