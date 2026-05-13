@@ -57,7 +57,7 @@ function createYjsState(nodeId: number): YjsContextValue | null {
   // const provider = new WebsocketProvider(serverUrl, `node-${nodeId}`, ydoc, {token && {params: {token}}});
   const provider = new WebsocketProvider(serverUrl, `node-${nodeId}`, ydoc);
 
-  // 세션마다 랜덤 색상을 awareness에 설정 (커서·프레즌스 표시용)
+  // 세션 랜덤 색 설정
   const color = AWARENESS_COLORS[Math.floor(Math.random() * AWARENESS_COLORS.length)];
   provider.awareness.setLocalStateField('user', { color });
 
@@ -70,7 +70,7 @@ function YjsInstance({ nodeId, children }: { nodeId: number; children: React.Rea
 
   useEffect(() => {
     const yjsValue = createYjsState(nodeId);
-    // nodeId가 바뀌지 않는 한 effect가 재실행되지 않으므로 cascading render 없음
+    // nodeId가 바뀌지 않는 한 effect가 재실행되지 않으므로 cascading render 없으므로 lint 무시 가능...?
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setValue(yjsValue);
     return () => {
@@ -83,8 +83,8 @@ function YjsInstance({ nodeId, children }: { nodeId: number; children: React.Rea
 }
 
 /**
- * nodeId별로 Yjs 연결을 관리하는 프로바이더.
- * nodeId가 바뀌면 key 교체로 YjsInstance를 리마운트해 WebSocket 연결을 재설정한다.
+ * nodeId별로 Yjs 연결 관리용 프로바이더
+ * nodeId가 바뀌면 key 교체로 YjsInstance를 리마운트해 WebSocket 연결 재설정
  */
 export function YjsProvider({ nodeId, children }: { nodeId: number; children: React.ReactNode }) {
   return (
