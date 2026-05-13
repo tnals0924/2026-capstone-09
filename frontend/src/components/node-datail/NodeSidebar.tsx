@@ -37,6 +37,7 @@ export function NodeSidebar({ nodeId, projectId, onClose }: NodeSidebarProps) {
   }, [nodeId]);
 
   const activeNodeId = nodeId ?? savedNodeId;
+  const numericNodeId = Number(activeNodeId);
   const isOpen = !!activeNodeId;
 
   const handleClose = useCallback(() => {
@@ -44,7 +45,7 @@ export function NodeSidebar({ nodeId, projectId, onClose }: NodeSidebarProps) {
     onClose();
   }, [onClose]);
 
-  if (!isOpen || !activeNodeId) return null;
+  if (!isOpen || !activeNodeId || !Number.isFinite(numericNodeId)) return null;
 
   return (
     <>
@@ -75,7 +76,7 @@ export function NodeSidebar({ nodeId, projectId, onClose }: NodeSidebarProps) {
         </div>
 
         <div className="flex-1 overflow-hidden px-14 pt-14">
-          <YjsProvider nodeId={Number(activeNodeId)}>
+          <YjsProvider nodeId={numericNodeId}>
             <NodeDetailLayout
               nodeId={nodeId}
               projectId={projectId}
