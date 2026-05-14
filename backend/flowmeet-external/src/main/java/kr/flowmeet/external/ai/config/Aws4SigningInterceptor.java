@@ -1,5 +1,6 @@
 package kr.flowmeet.external.ai.config;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpRequest;
@@ -25,22 +26,22 @@ public class Aws4SigningInterceptor implements ClientHttpRequestInterceptor {
     public ClientHttpResponse intercept(final HttpRequest request, final byte[] body,
             final ClientHttpRequestExecution execution) throws IOException {
 
-        SdkHttpFullRequest signedRequest = sign(request);
+        SdkHttpFullRequest signedRequest = sign(request, body);
 
         signedRequest.headers().forEach((key, values) -> {
             if (!"Host".equalsIgnoreCase(key)) {
-                values.forEach(value -> request.getHeaders().add(key, value));
+                values.forEach(value -> request.getHeaders().set(key, value));
             }
         });
 
         return execution.execute(request, body);
     }
 
-    private SdkHttpFullRequest sign(final HttpRequest request) {
+    private SdkHttpFullRequest sign(final HttpRequest request, final byte[] body) {
         SdkHttpFullRequest unsignedRequest = SdkHttpFullRequest.builder()
                 .method(SdkHttpMethod.fromValue(request.getMethod().name()))
                 .uri(request.getURI())
-                .putHeader("x-amz-content-sha256", "UNSIGNED-PAYLOAD")
+                .contentStreamProvider(() -> new ByteArrayInputStream(body))
                 .build();
 
         Aws4SignerParams signerParams = Aws4SignerParams.builder()
