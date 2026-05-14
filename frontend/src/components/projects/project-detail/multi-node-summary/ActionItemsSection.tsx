@@ -3,11 +3,13 @@
 import type { ActionItemsAnalysis } from './types';
 
 interface ActionItemsSectionProps {
-  analysis: ActionItemsAnalysis;
+  analysis: ActionItemsAnalysis | undefined | null;
 }
 
 export const ActionItemsSection = ({ analysis }: ActionItemsSectionProps) => {
-  const personEntries = Object.entries(analysis.by_person);
+  if (!analysis) return null;
+
+  const personEntries = Object.entries(analysis.by_person ?? {});
 
   return (
     <section className="flex w-full flex-col gap-2">

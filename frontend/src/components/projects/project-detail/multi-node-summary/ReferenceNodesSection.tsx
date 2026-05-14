@@ -5,10 +5,12 @@ import { Chip } from '@wanteddev/wds';
 import type { MultiNodeSummaryNode } from './types';
 
 interface ReferenceNodesSectionProps {
-  nodes: readonly MultiNodeSummaryNode[];
+  nodes: readonly MultiNodeSummaryNode[] | undefined | null;
 }
 
 export const ReferenceNodesSection = ({ nodes }: ReferenceNodesSectionProps) => {
+  if (!nodes) return null;
+
   return (
     <section className="flex w-full flex-col gap-2">
       <span className="text-label-1 text-label-neutral font-semibold">참조 노드</span>

@@ -6,12 +6,14 @@ import { IconArrowRight } from '@wanteddev/wds-icon';
 import type { MeetingRelationship } from './types';
 
 interface MeetingRelationshipsSectionProps {
-  relationships: readonly MeetingRelationship[];
+  relationships: readonly MeetingRelationship[] | undefined | null;
 }
 
 export const MeetingRelationshipsSection = ({
   relationships,
 }: MeetingRelationshipsSectionProps) => {
+  if (!relationships) return null;
+
   return (
     <section className="flex w-full flex-col gap-2">
       <span className="text-label-1 text-label-neutral font-semibold">회의 관계</span>

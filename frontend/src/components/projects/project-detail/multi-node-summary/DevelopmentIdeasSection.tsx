@@ -3,10 +3,12 @@
 import type { ParsedIdea } from '@/utils/mermaid';
 
 interface DevelopmentIdeasSectionProps {
-  ideas: readonly ParsedIdea[];
+  ideas: readonly ParsedIdea[] | undefined | null;
 }
 
 export const DevelopmentIdeasSection = ({ ideas }: DevelopmentIdeasSectionProps) => {
+  if (!ideas) return null;
+
   return (
     <section className="flex w-full flex-col gap-2">
       <span className="text-label-1 text-label-neutral font-semibold">개선 아이디어</span>
