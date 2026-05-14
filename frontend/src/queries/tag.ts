@@ -1,8 +1,9 @@
 'use client';
 
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { privateApi } from '@/api';
+import { CreateTagRequest, TagItem } from '@/api/Api';
 import { tagKeys } from './keys/tagKeys';
 
 export function useProjectTagsQuery(projectId: number) {
@@ -24,5 +25,16 @@ export function useAddNodeTagMutation(projectId: number, nodeId: number) {
 export function useRemoveNodeTagMutation(projectId: number, nodeId: number) {
   return useMutation({
     mutationFn: (tagId: number) => privateApi.tag.removeNodeTag(projectId, nodeId, tagId),
+  });
+}
+
+export function useCreateTagMutation(projectId: number) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateTagRequest) =>
+      privateApi.tag.createTag(projectId, data).then((res) => res.data.data as TagItem),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tagKeys.list(projectId) });
+    },
   });
 }
