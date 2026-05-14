@@ -40,6 +40,8 @@ public class NodeAnalysisClient {
         bodyBuilder.part("file", toByteArrayResource(fileContent));
 
         log.info("노드 분석 API 호출 - endpoint: {}", properties.getEndpointUrl());
+        signedRequest.headers().forEach((key, values) ->
+                log.info("서명 헤더 - {}: {}", key, values));
 
         try {
             return nodeAnalysisRestClient.post()
