@@ -2,11 +2,9 @@
 
 import { ContentBadge, ThemeColorsToken, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
-import { useEffect, useRef, useState } from 'react';
 
 import { TagItem } from '@/api/Api';
 import { ColorType } from '@/constants/badgeColor';
-import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
 import {
   useAddNodeTagMutation,
@@ -15,6 +13,7 @@ import {
   useRemoveNodeTagMutation,
 } from '@/queries/tag';
 import { getColorToken } from '@/utils/getBadgeColorInfo';
+import { usePickerState } from '../hooks/usePickerState';
 import { useYjsTags } from '../hooks/useYjsTags';
 
 const TAG_COLORS: ColorType[] = [
@@ -39,34 +38,29 @@ interface TagFieldProps {
 }
 
 export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const showErrorToast = useErrorToast();
+  const {
+    isPickerOpen,
+    setIsPickerOpen,
+    inputValue,
+    selectedIndex,
+    setSelectedIndex,
+    containerRef,
+    inputRef,
+    resetInput,
+    handleInputChange,
+  } = usePickerState();
 
+  const showErrorToast = useErrorToast();
   const { tags, yAddTag, yRemoveTag } = useYjsTags(initialTags);
   const { data: allTags = [] } = useProjectTagsQuery(projectId);
   const { mutate: addTag } = useAddNodeTagMutation(projectId, nodeId);
   const { mutate: removeTag } = useRemoveNodeTagMutation(projectId, nodeId);
   const { mutate: createTag } = useCreateTagMutation(projectId);
 
-  useClickOutside(containerRef, isPickerOpen, () => {
-    setIsPickerOpen(false);
-    setInputValue('');
-    setSelectedIndex(-1);
-  });
-
-  useEffect(() => {
-    if (isPickerOpen) inputRef.current?.focus();
-  }, [isPickerOpen]);
-
   const handleAdd = (tag: TagItem) => {
     if (!tag.tagId) return;
     yAddTag(tag);
-    setInputValue('');
-    setSelectedIndex(-1);
+    resetInput();
     addTag(tag.tagId, {
       onError: (err) => {
         yRemoveTag(tag.tagId!);
@@ -101,7 +95,6 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
     if (!trimmed) return;
 
     const exactMatch = allTags.find((t) => t.name?.toLowerCase() === trimmed.toLowerCase());
-
     if (exactMatch) {
       if (!assignedTagIds.has(exactMatch.tagId)) handleAdd(exactMatch);
       return;
@@ -119,8 +112,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
               showErrorToast(err, '태그 추가에 실패했어요.');
             },
           });
-          setInputValue('');
-          setSelectedIndex(-1);
+          resetInput();
         },
         onError: (err) => showErrorToast(err, '태그 생성에 실패했어요.'),
       },
@@ -183,10 +175,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
           <input
             ref={inputRef}
             value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setSelectedIndex(-1);
-            }}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             className="text-label-normal min-w-20 flex-1 border-0 bg-transparent text-sm outline-none"
             onClick={(e) => e.stopPropagation()}

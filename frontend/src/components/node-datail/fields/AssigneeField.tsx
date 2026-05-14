@@ -2,12 +2,15 @@
 
 import { Avatar, Theme, Typography } from '@wanteddev/wds';
 import { IconClose } from '@wanteddev/wds-icon';
-import { useRef, useState } from 'react';
 
 import { AssigneeItem, ProjectMemberInfo } from '@/api/Api';
-import { useClickOutside } from '@/hooks/useClickOutside';
 import { useErrorToast } from '@/hooks/useErrorToast';
-import { useAddAssigneeMutation, useProjectMembersQuery, useRemoveAssigneeMutation } from '@/queries/member';
+import {
+  useAddAssigneeMutation,
+  useProjectMembersQuery,
+  useRemoveAssigneeMutation,
+} from '@/queries/member';
+import { usePickerState } from '../hooks/usePickerState';
 import { useYjsAssignees } from '../hooks/useYjsAssignees';
 
 interface AssigneeFieldProps {
@@ -17,16 +20,23 @@ interface AssigneeFieldProps {
 }
 
 export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeFieldProps) {
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const showErrorToast = useErrorToast();
+  const {
+    isPickerOpen,
+    setIsPickerOpen,
+    inputValue,
+    selectedIndex,
+    setSelectedIndex,
+    containerRef,
+    inputRef,
+    resetInput,
+    handleInputChange,
+  } = usePickerState();
 
+  const showErrorToast = useErrorToast();
   const { assignees, yAddAssignee, yRemoveAssignee } = useYjsAssignees(initialAssignees);
   const { data: members = [] } = useProjectMembersQuery(projectId);
   const { mutate: addAssignee } = useAddAssigneeMutation(projectId, nodeId);
   const { mutate: removeAssignee } = useRemoveAssigneeMutation(projectId, nodeId);
-
-  useClickOutside(containerRef, isPickerOpen, () => setIsPickerOpen(false));
 
   const handleAdd = (member: ProjectMemberInfo) => {
     if (!member.userId) return;
@@ -37,6 +47,7 @@ export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeF
       profileImageUrl: member.profileImageUrl,
     };
     yAddAssignee(newAssignee);
+    resetInput();
     addAssignee(member.userId, {
       onError: (err) => {
         yRemoveAssignee(member.userId!);
@@ -58,6 +69,28 @@ export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeF
 
   const assignedUserIds = new Set(assignees.map((a) => a.userId));
   const availableMembers = members.filter((m) => !assignedUserIds.has(m.userId));
+  const filteredMembers = inputValue
+    ? availableMembers.filter(
+        (m) =>
+          m.nickname?.toLowerCase().includes(inputValue.toLowerCase()) ||
+          m.email?.toLowerCase().includes(inputValue.toLowerCase()),
+      )
+    : availableMembers;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, filteredMembers.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, -1));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (selectedIndex >= 0 && selectedIndex < filteredMembers.length) {
+        handleAdd(filteredMembers[selectedIndex]);
+      }
+    }
+  };
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -67,7 +100,7 @@ export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeF
         }}
         className={`flex w-full cursor-text flex-wrap items-center gap-2.5 rounded-t-sm ${isPickerOpen ? 'bg-line-normal-alternative border-line-solid-normal border border-b-0 p-2.5' : ''}`}
       >
-        {assignees.length === 0 && (
+        {assignees.length === 0 && !isPickerOpen && (
           <div className="text-label-alternative items-center">
             <Typography variant="caption1">선택된 담당자가 없어요</Typography>
           </div>
@@ -90,24 +123,37 @@ export function AssigneeField({ projectId, nodeId, initialAssignees }: AssigneeF
             />
           </div>
         ))}
-        {isPickerOpen && <span className="h-4 w-px self-center" />}
+        {isPickerOpen && (
+          <input
+            ref={inputRef}
+            value={inputValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            className="text-label-normal min-w-20 flex-1 border-0 bg-transparent text-sm outline-none"
+            onClick={(e) => e.stopPropagation()}
+          />
+        )}
       </div>
 
       {isPickerOpen && (
         <div className="border-line-solid-normal absolute top-full left-0 z-50 w-full rounded-b-sm border bg-white py-2 shadow-md">
-          {availableMembers.length === 0 ? (
+          {filteredMembers.length === 0 ? (
             <p className="text-label-alternative px-3 py-2">
               <Typography variant="caption1">
-                {members.length === 0 ? '멤버가 없어요' : '모든 멤버가 추가되었어요'}
+                {members.length === 0
+                  ? '멤버가 없어요'
+                  : availableMembers.length === 0
+                    ? '모든 멤버가 추가되었어요'
+                    : '검색 결과가 없어요'}
               </Typography>
             </p>
           ) : (
-            availableMembers.map((member) => (
+            filteredMembers.map((member, i) => (
               <button
                 key={member.userId}
                 type="button"
                 onClick={() => handleAdd(member)}
-                className="flex w-full items-center justify-between gap-2 bg-white px-3 py-2 hover:bg-gray-50"
+                className={`flex w-full items-center justify-between gap-2 px-3 py-2 ${selectedIndex === i ? 'bg-gray-100' : 'bg-white hover:bg-gray-50'}`}
               >
                 <div className="flex items-center gap-3">
                   <Avatar
