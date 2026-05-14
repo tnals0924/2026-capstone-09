@@ -46,9 +46,11 @@ public class NodeAnalysisClient {
         try {
             return nodeAnalysisRestClient.post()
                     .uri(uri)
-                    .headers(headers -> signedRequest.headers().forEach((key, values) ->
-                            values.forEach(value -> headers.add(key, value))
-                    ))
+                    .headers(headers -> signedRequest.headers().forEach((key, values) -> {
+                            if (!"Host".equalsIgnoreCase(key)) {
+                                values.forEach(value -> headers.add(key, value));
+                            }
+                    }))
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .body(bodyBuilder.build())
                     .retrieve()
