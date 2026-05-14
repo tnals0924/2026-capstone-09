@@ -76,18 +76,13 @@ export function useRefreshMutation() {
   });
 }
 
-// 이메일 인증 코드 발송
+// 회원가입 이메일 인증 코드 발송 
 export function useSendEmailVerificationMutation() {
   return useMutation({
-    mutationFn: async ({ email, accessToken }: { email: string; accessToken?: string }): Promise<AuthResponse> => {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
-
-      const res = await fetch(`${API_BASE_URL}/v1/users/me/email-verifications`, {
+    mutationFn: async ({ email }: { email: string }): Promise<AuthResponse> => {
+      const res = await fetch(`${API_BASE_URL}/v1/auth/signup/email-verifications`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       return res.json();
@@ -95,18 +90,13 @@ export function useSendEmailVerificationMutation() {
   });
 }
 
-// 이메일 인증 코드 검증
+// 회원가입 이메일 인증 코드 검증
 export function useVerifyEmailCodeMutation() {
   return useMutation({
-    mutationFn: async ({ email, code, accessToken }: { email: string; code: string; accessToken?: string }): Promise<AuthResponse> => {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
-
-      const res = await fetch(`${API_BASE_URL}/v1/users/me/email-verifications/verify`, {
+    mutationFn: async ({ email, code }: { email: string; code: string }): Promise<AuthResponse> => {
+      const res = await fetch(`${API_BASE_URL}/v1/auth/signup/email-verifications/verify`, {
         method: 'POST',
-        headers,
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code }),
       });
       return res.json();

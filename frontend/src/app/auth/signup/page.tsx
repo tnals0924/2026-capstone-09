@@ -3,7 +3,7 @@
 import { FormField, FormLabel, FormControl, TextField, TextFieldContent, TextFieldButton, Button } from '@wanteddev/wds';
 import type { Theme } from '@wanteddev/wds-engine';
 import { useRouter } from 'next/navigation';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { authStorage } from '@/api/authStorage';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { useCountdown } from '@/hooks/useCountdown';
@@ -20,6 +20,16 @@ interface SignupPending {
   email: string;
 }
 
+const getSignupPending = (): SignupPending | null => {
+  try {
+    const data = sessionStorage.getItem('signup_pending');
+    return data ? JSON.parse(data) : null;
+  } catch {
+    sessionStorage.removeItem('signup_pending');
+    return null;
+  }
+};
+
 export default function SignupPage() {
   const router = useRouter();
   const toast = usePositionedToast();
@@ -27,37 +37,35 @@ export default function SignupPage() {
   const sendEmailMutation = useSendEmailVerificationMutation();
   const verifyEmailMutation = useVerifyEmailCodeMutation();
 
-  const [pending, setPending] = useState<SignupPending | null>(null);
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const pending = useMemo<SignupPending | null>(() => getSignupPending(), []);
+  const [name, setName] = useState(pending?.name || '');
+  const [email, setEmail] = useState(pending?.email || '');
   const [verificationCode, setVerificationCode] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState('');
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [verificationError, setVerificationError] = useState(false);
   const { timeLeft, start: startTimer, reset: resetTimer, formatTime } = useCountdown();
 
   useEffect(() => {
-    const data = sessionStorage.getItem('signup_pending');
-    if (!data) {
+    if (!pending) {
       router.replace('/auth/login');
-      return;
     }
-
-    const parsed: SignupPending = JSON.parse(data);
-    setPending(parsed);
-    setName(parsed.name || '');
-    setEmail(parsed.email || '');
-  }, [router]);
+  }, [router, pending]);
 
   const handleSendVerification = () => {
     if (!pending) return;
 
     sendEmailMutation.mutate(
-      { email: email.trim(), accessToken: pending.socialAccessToken },
+      { email: email.trim() },
       {
         onSuccess: (data) => {
           if (data.code === 'SEND_EMAIL_VERIFICATION') {
             setIsCodeSent(true);
+            setIsEmailVerified(false);
+            setVerifiedEmail('');
+            setVerificationError(false);
+            setVerificationCode('');
             startTimer(300);
             toast({
               content: data.message,
@@ -79,49 +87,54 @@ export default function SignupPage() {
     );
   };
 
-  const handleVerifyCode = useCallback((code: string) => {
-    if (!pending || code.length !== 6 || isEmailVerified || verifyEmailMutation.isPending) {
-      return;
-    }
+  const { mutate: verifyEmail, isPending: isVerifying } = verifyEmailMutation;
 
-    verifyEmailMutation.mutate(
-      {
-        email: email.trim(),
-        code: code.trim(),
-        accessToken: pending.socialAccessToken
-      },
-      {
-        onSuccess: (data) => {
-          if (data.code === 'VERIFY_EMAIL') {
-            setIsEmailVerified(true);
-            setVerificationError(false);
-            toast({
-              content: data.message,
-              variant: 'positive',
-              placement: 'top-center',
-            });
-          } else {
+  const handleVerifyCode = useCallback(
+    (code: string) => {
+      if (!pending || code.length !== 6 || isEmailVerified || isVerifying || !isCodeSent || timeLeft === 0) {
+        return;
+      }
+
+      verifyEmail(
+        {
+          email: email.trim(),
+          code: code.trim(),
+        },
+        {
+          onSuccess: (data) => {
+            if (data.code === 'VERIFY_EMAIL') {
+              setIsEmailVerified(true);
+              setVerifiedEmail(email.trim());
+              setVerificationError(false);
+              toast({
+                content: data.message,
+                variant: 'positive',
+                placement: 'top-center',
+              });
+            } else {
+              setVerificationError(true);
+              setIsEmailVerified(false);
+              toast({
+                content: data.message,
+                variant: 'negative',
+                placement: 'top-center',
+              });
+            }
+          },
+          onError: (error) => {
+            console.error('Code verification error:', error);
             setVerificationError(true);
             setIsEmailVerified(false);
-            toast({
-              content: data.message,
-              variant: 'negative',
-              placement: 'top-center',
-            });
-          }
+          },
         },
-        onError: (error) => {
-          console.error('Code verification error:', error);
-          setVerificationError(true);
-          setIsEmailVerified(false);
-        },
-      },
-    );
-  }, [email, pending, verifyEmailMutation, toast, isEmailVerified]);
+      );
+    },
+    [email, pending, verifyEmail, toast, isEmailVerified, isVerifying, isCodeSent, timeLeft],
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!pending) return;
+    if (!pending || email.trim() !== verifiedEmail) return;
 
     signupMutation.mutate(
       {
@@ -214,7 +227,7 @@ export default function SignupPage() {
                 <FormLabel
                   htmlFor="email"
                   variant="label1"
-                    sx={(theme: Theme) => ({
+                  sx={(theme: Theme) => ({
                     color: theme.semantic.label.neutral,
                   })}
                 >
@@ -227,6 +240,7 @@ export default function SignupPage() {
                     onChange={(e) => {
                       setEmail(e.target.value);
                       setIsEmailVerified(false);
+                      setVerifiedEmail('');
                       setIsCodeSent(false);
                       setVerificationCode('');
                       setVerificationError(false);
@@ -253,7 +267,7 @@ export default function SignupPage() {
                   <TextField
                     value={verificationCode}
                     onChange={(e) => {
-                      const newValue = e.target.value;
+                      const newValue = e.target.value.replace(/\D/g, '').slice(0, 6);
                       setVerificationCode(newValue);
                       setVerificationError(false);
                       handleVerifyCode(newValue);
@@ -291,7 +305,13 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              disabled={signupMutation.isPending || !name.trim() || !email.trim() || !isEmailVerified}
+              disabled={
+                signupMutation.isPending ||
+                !name.trim() ||
+                !email.trim() ||
+                !isEmailVerified ||
+                email.trim() !== verifiedEmail
+              }
               variant="solid"
               color="primary"
               size="large"
