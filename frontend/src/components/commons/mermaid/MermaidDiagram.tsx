@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useId, useRef } from 'react';
 import mermaid from 'mermaid';
 
 interface MermaidDiagramProps {
@@ -9,13 +9,13 @@ interface MermaidDiagramProps {
 
 export function MermaidDiagram({ code }: MermaidDiagramProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const hasInitialized = useRef(false);
+  const rawId = useId();
+  const diagramId = `mermaid-${rawId.replace(/:/g, '')}`;
 
   useEffect(() => {
-    const render = async () => {
-      if (hasInitialized.current) return;
-      hasInitialized.current = true;
+    let cancelled = false;
 
+    const render = async () => {
       try {
         mermaid.initialize({ startOnLoad: false });
 
@@ -36,7 +36,19 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
           requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
         });
 
-        if (!containerRef.current) return;
+        if (cancelled || !containerRef.current) return;
+
+        const { svg, bindFunctions } = await mermaid.render(diagramId, code);
+
+        if (cancelled || !containerRef.current) return;
+
+        containerRef.current.innerHTML = svg;
+        bindFunctions?.(containerRef.current);
+
+        const svgEl = containerRef.current.querySelector('svg');
+        if (!svgEl) return;
+
+        svgEl.classList.add('mermaidDiagram');
 
         const styleEl = document.createElement('style');
         styleEl.textContent = `
@@ -44,21 +56,14 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
           .mermaidDiagram .nodeLabel { color: ${textColor}; font-family: ${fontFamily}; }
           .mermaidDiagram .node rect { fill: ${bgColor}; stroke: ${secondaryColor}; }
         `;
-        containerRef.current.appendChild(styleEl);
+        svgEl.appendChild(styleEl);
 
-        await mermaid.render('mermaid', code, containerRef.current);
-
-        const svg = containerRef.current.querySelector('svg');
-        if (!svg) return;
-
-        svg.classList.add('mermaidDiagram');
-
-        svg.querySelectorAll('g[id^="node"] rect').forEach((rect) => {
+        svgEl.querySelectorAll('g[id^="node"] rect').forEach((rect) => {
           rect.setAttribute('rx', '12');
           rect.setAttribute('ry', '12');
         });
 
-        svg.querySelectorAll('.edgeLabel').forEach((label) => {
+        svgEl.querySelectorAll('.edgeLabel').forEach((label) => {
           const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
           bg.setAttribute('x', '-10');
           bg.setAttribute('y', '-10');
@@ -70,17 +75,21 @@ export function MermaidDiagram({ code }: MermaidDiagramProps) {
           label.insertBefore(bg, label.firstChild);
         });
 
-        svg.style.maxHeight = '400px';
-        svg.style.overflow = 'auto';
+        svgEl.style.maxHeight = '400px';
+        svgEl.style.overflow = 'auto';
       } catch {
-        if (containerRef.current) {
+        if (!cancelled && containerRef.current) {
           containerRef.current.innerHTML = '<p>Error rendering diagram</p>';
         }
       }
     };
 
     render();
-  }, [code]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [code, diagramId]);
 
   return <div ref={containerRef} />;
 }
