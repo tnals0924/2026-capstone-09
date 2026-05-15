@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { asset } from '@/lib/asset';
 import { SectionHeader } from '../ui/SectionHeader';
 
 interface Member {
@@ -134,7 +135,7 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
     >
       <div className={`relative aspect-[4/3] w-full bg-gradient-to-br ${member.accent}`}>
         <img
-          src={member.photo}
+          src={asset(member.photo)}
           alt={member.name}
           className="absolute inset-0 h-full w-full object-cover"
           style={member.photoPosition ? { objectPosition: member.photoPosition } : undefined}

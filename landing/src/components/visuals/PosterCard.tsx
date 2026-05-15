@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { asset } from '@/lib/asset';
 
 export function PosterCard() {
   return (
@@ -36,7 +37,7 @@ export function PosterCard() {
           className="relative aspect-[930/1000] w-full max-w-[300px] overflow-hidden rounded-xl bg-[#050608] shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
         >
           <img
-            src="/docs/poster-preview.png"
+            src={asset('/docs/poster-preview.png')}
             alt="flowMeet 포스터 미리보기"
             className="block h-full w-full object-cover"
             loading="lazy"
@@ -51,7 +52,7 @@ export function PosterCard() {
           <p className="text-[10.5px] text-[var(--color-text-dim)]">49.2 MB · A1 (594 × 841 mm)</p>
         </div>
         <a
-          href="/docs/flowMeet-poster.png"
+          href={asset('/docs/flowMeet-poster.png')}
           download="flowMeet-poster.png"
           className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary-50)] px-4 py-2 text-[12.5px] font-semibold text-black transition-colors hover:bg-[var(--color-primary-50)]/90"
         >

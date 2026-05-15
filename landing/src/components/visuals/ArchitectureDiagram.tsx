@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { asset } from '@/lib/asset';
 
 /**
  * Architecture diagram — displays the source PNG inside the shared dark themed
@@ -25,7 +26,7 @@ export function ArchitectureDiagram() {
       </div>
 
       <motion.img
-        src="/docs/architecture.png"
+        src={asset('/docs/architecture.png')}
         alt="flowMeet system architecture"
         initial={{ opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
