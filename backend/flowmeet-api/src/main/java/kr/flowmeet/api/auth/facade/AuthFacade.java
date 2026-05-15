@@ -36,6 +36,7 @@ public class AuthFacade {
     private final JwtProvider jwtProvider;
     private final SocialOAuthGateway oauthGateway;
 
+    @Transactional
     public LoginResult login(final SocialProvider provider, final SocialLoginRequest request) {
         SocialTokens tokens = oauthGateway.exchangeCode(provider, request.code(), request.redirectUri());
         SocialUserInfo userInfo = oauthGateway.fetchUserInfo(provider, tokens.accessToken());
