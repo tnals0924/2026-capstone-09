@@ -1,20 +1,26 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
+import { Loading } from '@wanteddev/wds';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { authStorage } from '@/api/authStorage';
 
 export default function Home() {
-  const [version, setVersion] = useState('')
+  const router = useRouter();
 
-  const onClick = async () => {
-    const v = await window.desktop.getVersion()
-    setVersion(v)
-  }
+  useEffect(() => {
+    const token = authStorage.getAccess();
+
+    if (token) {
+      router.replace('/projects');
+    } else {
+      router.replace('/auth/login');
+    }
+  }, [router]);
 
   return (
-    <main style={{ padding: 24 }}>
-      <h1>Web + Electron</h1>
-      <button onClick={onClick}>앱 버전 확인</button>
-      <p>{version}</p>
+    <main className="mx-auto flex min-h-screen max-w-3xl flex-1 items-center justify-center">
+      <Loading />
     </main>
-  )
+  );
 }
