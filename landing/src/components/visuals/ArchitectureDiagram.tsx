@@ -17,7 +17,8 @@ export function ArchitectureDiagram() {
         <div className="flex items-center gap-3">
           <span className="inline-flex h-2 w-2 rounded-full bg-[var(--color-primary-50)] shadow-[0_0_12px_rgba(4,230,162,0.8)]" />
           <p className="text-[12px] uppercase tracking-[0.22em] text-[var(--color-primary-50)]">
-            Architecture · System Structure
+            <span className="sm:hidden">Architecture</span>
+            <span className="hidden sm:inline">Architecture · System Structure</span>
           </p>
         </div>
         <span className="rounded-full border border-[var(--color-primary-50)]/25 bg-[var(--color-primary-50)]/[0.06] px-2.5 py-1 text-[10.5px] tracking-[0.18em] text-[var(--color-primary-50)]">
