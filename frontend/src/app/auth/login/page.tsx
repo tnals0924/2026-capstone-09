@@ -20,8 +20,19 @@ export default function LoginPage() {
 
   return (
     <main className="flex min-h-screen">
-      {/* 왼쪽 1/3 빈 공간 */}
-      <div className="w-1/3" />
+      {/* 왼쪽 1/3 */}
+      <div className="w-1/3">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-screen object-cover"
+        >
+          <source src="/videos/login.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
       <div className="flex w-2/3 items-start justify-center pt-[35vh]">
         <div className="flex flex-col gap-8">

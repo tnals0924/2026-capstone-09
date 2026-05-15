@@ -202,8 +202,19 @@ export default function SignupPage() {
           box-shadow: inset 0 0 0 2px #04E6A2 !important;
         }
       `}</style>
-      {/* 왼쪽 1/3 빈 공간 */}
-      <div className="w-1/3" />
+      {/* 왼쪽 1/3 */}
+      <div className="w-1/3">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-screen object-cover"
+        >
+          <source src="/videos/login.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
 
       <div className="flex w-2/3 items-center justify-center">
         <div className="flex flex-col gap-8">
