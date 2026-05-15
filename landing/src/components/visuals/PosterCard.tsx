@@ -21,7 +21,7 @@ export function PosterCard() {
           </div>
         </div>
         <span className="rounded-full border border-white/[0.08] bg-black/40 px-2 py-0.5 text-[10px] text-[var(--color-text-dim)]">
-          A1 · PDF
+          A1 · PNG
         </span>
       </div>
 
@@ -33,20 +33,26 @@ export function PosterCard() {
         <motion.div
           whileHover={{ y: -2 }}
           transition={{ duration: 0.3 }}
-          className="relative aspect-[707/1000] w-full max-w-[260px] overflow-hidden rounded-xl bg-[#050608] shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
+          className="relative aspect-[930/1000] w-full max-w-[300px] overflow-hidden rounded-xl bg-[#050608] shadow-[0_30px_60px_rgba(0,0,0,0.5)]"
         >
-          <PosterMock />
+          <img
+            src="/docs/poster-preview.png"
+            alt="flowMeet 포스터 미리보기"
+            className="block h-full w-full object-cover"
+            loading="lazy"
+            draggable={false}
+          />
         </motion.div>
       </div>
 
       <div className="flex items-center gap-3 border-t border-white/[0.06] bg-black/30 px-5 py-3.5">
         <div className="flex-1">
-          <p className="text-[12px] font-medium text-white">flowMeet_poster_v1.pdf</p>
-          <p className="text-[10.5px] text-[var(--color-text-dim)]">2.4 MB · A1 (594 × 841 mm)</p>
+          <p className="text-[12px] font-medium text-white">flowMeet-poster.png</p>
+          <p className="text-[10.5px] text-[var(--color-text-dim)]">49.2 MB · A1 (594 × 841 mm)</p>
         </div>
         <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
+          href="/docs/flowMeet-poster.png"
+          download="flowMeet-poster.png"
           className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-primary-50)] px-4 py-2 text-[12.5px] font-semibold text-black transition-colors hover:bg-[var(--color-primary-50)]/90"
         >
           <DownloadIcon />

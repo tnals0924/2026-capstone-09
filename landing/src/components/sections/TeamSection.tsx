@@ -13,13 +13,14 @@ interface Member {
   initials: string;
   accent: string;
   isLead?: boolean;
+  photoPosition?: string;
 }
 
 const TEAM: Member[] = [
   {
     name: '황수민',
     role: 'Team Lead · Backend',
-    area: '서비스 백본 · 회의 / Meet 연동',
+    area: '아키텍처 설계 · CI/CD 파이프라인 · API 구현 · MCP 서버',
     email: 'thals655@kookmin.ac.kr',
     photo: '/team/hwangsumin.jpg',
     initials: 'HSM',
@@ -29,7 +30,7 @@ const TEAM: Member[] = [
   {
     name: '윤성욱',
     role: 'Backend',
-    area: 'CRDT · 실시간 동기화',
+    area: 'SQS 비동기 파이프라인 · MCP 서버 · SSE 알림',
     email: 'seonguk3553@kookmin.ac.kr',
     photo: '/team/yunseonguk.jpg',
     initials: 'YSU',
@@ -38,8 +39,8 @@ const TEAM: Member[] = [
   {
     name: '박정은',
     role: 'AI',
-    area: '에이전트 · RAG · MCP',
-    email: 'ovepje2004@gmail.com',
+    area: '에이전트 · LLM · MCP',
+    email: 'ovepje2004@kookmin.ac.kr',
     photo: '/team/parkjeongeun.jpg',
     initials: 'PJE',
     accent: 'from-[#FF8FA3]/35 to-[#FF8FA3]/5',
@@ -47,29 +48,30 @@ const TEAM: Member[] = [
   {
     name: '박건민',
     role: 'Frontend',
-    area: '노드 플로우 · 노드 디테일',
+    area: '디자인 · 랜딩페이지 · 모달 · 사이드바 · 헤더',
     email: 'pkm021118@kookmin.ac.kr',
     photo: '/team/parkgunmin.jpg',
     initials: 'PGM',
     accent: 'from-[#7BD3FF]/35 to-[#7BD3FF]/5',
   },
   {
-    name: '백채린',
-    role: 'Frontend',
-    area: '랜딩 · 디자인 시스템',
-    email: 'cofls00@kookmin.ac.kr',
-    photo: '/team/baekchaerin.jpg',
-    initials: 'BCR',
-    accent: 'from-[#FFB78A]/35 to-[#FFB78A]/5',
-  },
-  {
     name: '윤신지',
     role: 'Frontend',
-    area: '실시간 협업 · 회의 UI',
+    area: '동시성 처리(CRDT) · Chrome Extension',
     email: 'sinji1012@kookmin.ac.kr',
     photo: '/team/yunsinji.jpg',
     initials: 'YSJ',
     accent: 'from-[#C7B8FF]/35 to-[#C7B8FF]/5',
+  },
+  {
+    name: '백채린',
+    role: 'Frontend',
+    area: '로그인/회원가입 · 노드 플로우 · AI 채팅 플로팅',
+    email: 'cofls00@kookmin.ac.kr',
+    photo: '/team/baekchaerin.jpg',
+    initials: 'BCR',
+    accent: 'from-[#FFB78A]/35 to-[#FFB78A]/5',
+    photoPosition: '50% 65%',
   },
 ];
 
@@ -135,15 +137,11 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
           src={member.photo}
           alt={member.name}
           className="absolute inset-0 h-full w-full object-cover"
+          style={member.photoPosition ? { objectPosition: member.photoPosition } : undefined}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = 'none';
           }}
         />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-medium text-[36px] font-semibold tracking-[0.05em] text-white/30">
-            {member.initials}
-          </span>
-        </div>
         {member.isLead && (
           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-[var(--color-primary-50)]/45 bg-black/60 px-2 py-0.5 text-[10.5px] font-medium text-[var(--color-primary-50)] backdrop-blur">
             ★ Team Lead

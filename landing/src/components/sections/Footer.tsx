@@ -31,8 +31,14 @@ export function Footer() {
             <FooterCol
               title="Legal"
               items={[
-                { label: '서비스 이용약관', href: '#' },
-                { label: '개인정보처리방침', href: '#' },
+                {
+                  label: '서비스 이용약관',
+                  href: 'https://aerial-mule-b93.notion.site/flowMeet-361733adb1cf809dbe54c089d11702e1',
+                },
+                {
+                  label: '개인정보처리방침',
+                  href: 'https://aerial-mule-b93.notion.site/flowMeet-361733adb1cf809dbe54c089d11702e1?source=copy_link',
+                },
               ]}
             />
           </div>
@@ -60,6 +66,8 @@ function FooterCol({
           <li key={it.label}>
             <a
               href={it.href}
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-[var(--color-text-muted)] transition-colors hover:text-white"
             >
               {it.label}

@@ -3,11 +3,21 @@
 import { motion } from 'framer-motion';
 import { Eyebrow } from '../ui/Eyebrow';
 import { SectionHeader } from '../ui/SectionHeader';
+import { ArchitectureDiagram } from '../visuals/ArchitectureDiagram';
+import { CRDTDiagram } from '../visuals/CRDTDiagram';
 import { DocSkeleton } from '../visuals/DocSkeleton';
+import { MCPDiagram } from '../visuals/MCPDiagram';
 import { PPTCarousel } from '../visuals/PPTCarousel';
 import { PosterCard } from '../visuals/PosterCard';
 
-const ITEMS = [
+interface DocItem {
+  id: string;
+  eyebrow: string;
+  title: string;
+  image?: string;
+}
+
+const ITEMS: DocItem[] = [
   { id: 'arch', eyebrow: 'Doc 01', title: 'Architecture' },
   { id: 'mcp', eyebrow: 'Doc 02', title: 'MCP' },
   { id: 'crdt', eyebrow: 'Doc 03', title: 'CRDT' },
@@ -49,7 +59,25 @@ export function DocsSection() {
   );
 }
 
-function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number }) {
+function DocVisual({ item }: { item: DocItem }) {
+  if (item.id === 'arch') return <ArchitectureDiagram />;
+  if (item.id === 'mcp') return <MCPDiagram />;
+  if (item.id === 'crdt') return <CRDTDiagram />;
+  if (item.image) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-2">
+        <img
+          src={item.image}
+          alt={`${item.title} diagram`}
+          className="block h-auto w-full rounded-xl"
+        />
+      </div>
+    );
+  }
+  return <DocSkeleton />;
+}
+
+function DocBlock({ item, index }: { item: DocItem; index: number }) {
   // Doc 01 (Architecture) — centered text + skeleton below (was special-cased earlier)
   if (index === 0) {
     return (
@@ -66,8 +94,8 @@ function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number
             {item.title}
           </h3>
         </div>
-        <div className="w-full max-w-[860px]">
-          <DocSkeleton />
+        <div className="w-full max-w-[1100px]">
+          <DocVisual item={item} />
         </div>
       </motion.div>
     );
@@ -101,7 +129,7 @@ function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number
         </h3>
       </div>
       <div className={['w-full max-w-[900px]', reverse ? 'lg:order-1' : ''].join(' ')}>
-        <DocSkeleton />
+        <DocVisual item={item} />
       </div>
     </motion.div>
   );
