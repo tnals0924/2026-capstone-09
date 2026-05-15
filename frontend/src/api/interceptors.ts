@@ -73,7 +73,6 @@ export function createAuthFetch() {
             refreshing = doRefresh(refreshToken);
           }
           const newAccessToken = await refreshing;
-          refreshing = null;
 
           // 새 access token으로 요청 재시도
           const retryHeaders = new Headers(init?.headers);
@@ -83,10 +82,11 @@ export function createAuthFetch() {
             ...init,
             headers: retryHeaders,
           });
-        } catch (error) {
-          refreshing = null;
+        } catch {
           handleLogout();
           return response;
+        } finally {
+          refreshing = null;
         }
       }
 
