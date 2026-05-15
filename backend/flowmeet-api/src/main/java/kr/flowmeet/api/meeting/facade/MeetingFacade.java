@@ -18,6 +18,8 @@ import kr.flowmeet.domain.project.entity.ProjectMember;
 import kr.flowmeet.domain.project.entity.ProjectMemberRole;
 import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
+import kr.flowmeet.domain.user.entity.User;
+import kr.flowmeet.domain.user.service.UserService;
 import kr.flowmeet.api.meeting.event.MeetingEndedEvent;
 import kr.flowmeet.domain.transcript.service.MeetingTranscriptService;
 import kr.flowmeet.external.meeting.MeetingRoomProvider;
@@ -39,6 +41,7 @@ public class MeetingFacade {
     private final NodeValidator nodeValidator;
     private final ProjectPermissionValidator projectPermissionValidator;
     private final ProjectMemberService projectMemberService;
+    private final UserService userService;
     private final MeetingRoomProvider meetingRoomProvider;
     private final MeetingTranscriptService meetingTranscriptService;
     private final AiTaskService aiTaskService;
@@ -55,8 +58,9 @@ public class MeetingFacade {
         projectPermissionValidator.validateAllAreMembers(projectId, request.participantUserIds());
         meetingService.validateCreatable(nodeId, request.startedAt());
 
+        User host = userService.findById(userId);
         Node node = nodeService.findByIdAndProjectId(nodeId, projectId);
-        MeetingRoom room = meetingRoomProvider.create(toCreateRoomCommand(node, request.startedAt(), null));
+        MeetingRoom room = meetingRoomProvider.create(toCreateRoomCommand(node, request.startedAt(), host.getGoogleRefreshToken()));
 
         //Meeting 생성 실패 시, 외부로 호출해서 생성한 회의실 삭제
         try {
@@ -99,11 +103,13 @@ public class MeetingFacade {
 
         ProjectMember projectMember = projectMemberService.findByProjectIdAndUserId(projectId, userId);
         String externalEventId = meeting.getExternalEventId();
+        Long hostId = meeting.getCreatedById();
 
         meetingService.delete(projectMember, meeting);
 
         if (externalEventId != null && !externalEventId.isBlank()) {
-            meetingRoomProvider.delete(externalEventId, null);
+            User host = userService.findById(hostId);
+            meetingRoomProvider.delete(externalEventId, host.getGoogleRefreshToken());
         }
     }
 
