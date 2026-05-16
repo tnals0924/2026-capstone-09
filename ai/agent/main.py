@@ -1,20 +1,22 @@
 import asyncio
+import os
 from client import MCPClient
 from agent import Agent
 import sys
- 
- 
+
+
 async def main():
+    token = os.environ["FLOWMEET_JWT"]
     mcp_client = MCPClient()
- 
+
     try:
-        await mcp_client.connect_sse("http://localhost:8082/sse")
+        await mcp_client.connect("http://localhost:8082/mcp", token)
  
         agent = Agent(mcp_client=mcp_client)
  
         while True:
-            user_input = await asyncio.get_running_loop().run_in_executor(None, sys.stdin.readline)
-            user_input = user_input.strip()
+            raw = await asyncio.get_running_loop().run_in_executor(None, sys.stdin.buffer.readline)
+            user_input = raw.decode("utf-8", errors="replace").strip()
 
             if user_input.lower() in ("exit", "quit"):
                 break
