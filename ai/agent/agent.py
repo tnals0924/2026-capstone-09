@@ -33,7 +33,7 @@ class Agent:
  
         return [types.Tool(function_declarations=function_declarations)]
  
-    async def run(self, user_message: str) -> str:
+    async def run(self, user_message: str, project_id: int | None = None) -> str:
 
         self.conversation_history = self.conversation_history[-MAX_HISTORY:]
         # tool_call/response 쌍 중간에서 잘리면 Gemini 오류 발생 — 텍스트 user 메시지부터 시작
@@ -59,6 +59,7 @@ class Agent:
                 contents=self.conversation_history,
                 config=types.GenerateContentConfig(
                     tools=self._tools,
+                    system_instruction=f"당신은 프로젝트 {project_id}의 AI 어시스턴트입니다." if project_id else None,
                     thinking_config=types.ThinkingConfig(
                         thinking_budget=512 # 응답 너무 느리면 0으로 변경 가능
                     ),

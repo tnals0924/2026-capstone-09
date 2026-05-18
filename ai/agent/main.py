@@ -48,6 +48,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 class ChatRequest(BaseModel):
     message: str
     session_id: str | None = None
+    project_id: int | None = None
 
 
 class ChatResponse(BaseModel):
@@ -72,6 +73,6 @@ async def chat(body: ChatRequest, authorization: str = Header(None)):
     session = await get_or_create_session(session_id, token)
 
     async with session["lock"]:
-        response = await session["agent"].run(body.message)
+        response = await session["agent"].run(body.message, body.project_id)
 
     return ChatResponse(response=response, session_id=session_id)
