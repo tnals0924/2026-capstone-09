@@ -182,6 +182,18 @@ export const EXAMPLE_USERS = [
   { userId: 6, nickname: '박정은', email: 'jeongeun@kookmin.ac.kr' },
 ] as const;
 
+export const EXAMPLE_MEETING_CREATE_NODE = {
+  id: 101,
+  badge: '#1.1',
+  title: '로그인 화면 기획',
+} as const;
+
+export const EXAMPLE_MEETING_PARTICIPANTS = EXAMPLE_USERS.map((user) => ({
+  id: user.userId,
+  name: user.nickname,
+  email: user.email,
+}));
+
 export const EXAMPLE_NODE_DETAIL = {
   nodeId: 101,
   projectId: 17,
@@ -459,3 +471,15 @@ export const EXAMPLE_FLOWCHART_DATA = {
     },
   ],
 };
+
+// 노드 삭제 컨펌 모달 테스트 페이지 전용 더미 데이터
+// 실제 API(`privateApi.node.deleteNode(projectId: number, nodeId: number)`)에 맞춰
+// id는 number 형태로 둔다.
+export const EXAMPLE_NODE_DELETE_TEST = {
+  projectId: 1,
+  candidates: [
+    { id: 1, name: '디자인 회의일걸요?' },
+    { id: 2, name: '메인 노드 제목입니다' },
+    { id: 3, name: '프로토타입 사용자 테스트' },
+  ],
+} as const;
