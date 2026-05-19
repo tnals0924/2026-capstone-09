@@ -183,10 +183,8 @@ export const EXAMPLE_USERS = [
 ] as const;
 
 export const EXAMPLE_MULTI_NODE_SUMMARY_NODES = [
-  { id: 1, label: '비즈니스 모델 전략 회의' },
-  { id: 2, label: 'MVP기능 회의' },
-  { id: 3, label: 'MVP 개발 일정 조정 회의' },
-  { id: 5, label: 'PPT 제작 회의' },
+  { id: 8, label: 'AI 답변 출처 표시' },
+  { id: 13, label: 'RAG 인덱싱 범위 확정' },
 ] as const;
 
 export const EXAMPLE_MULTI_NODE_SUMMARY_RESULT = {
