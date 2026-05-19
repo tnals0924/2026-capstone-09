@@ -1,32 +1,30 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
-import type { CreateMultiNodeSummaryRequest, MultiNodeSummaryNode } from './types';
+import { useAnalyzeDraggedNodesMutation } from '@/queries/nodeAnalysis';
+
+import type { MultiNodeSummaryNode, MultiNodeSummaryResult } from './types';
 
 interface UseMultiNodeSummaryRequestParams {
+  projectId: number;
   nodes: readonly MultiNodeSummaryNode[];
-  onSubmit?: (payload: CreateMultiNodeSummaryRequest) => void;
 }
 
 export const useMultiNodeSummaryRequest = ({
+  projectId,
   nodes,
-  onSubmit,
 }: UseMultiNodeSummaryRequestParams) => {
-  const payload = useMemo<CreateMultiNodeSummaryRequest>(
-    () => ({
-      nodeIds: nodes.map((node) => node.id),
-    }),
-    [nodes],
-  );
+  const { mutateAsync, isPending } = useAnalyzeDraggedNodesMutation(projectId);
 
-  const handleSubmit = useCallback(async () => {
-    // TODO: await privateApi.ai.createMultiNodeSummary(projectId, payload) 생성 후 연결
-    onSubmit?.(payload);
-  }, [onSubmit, payload]);
+  const handleSubmit = useCallback(async (): Promise<MultiNodeSummaryResult> => {
+    const nodeIds = nodes.map((node) => node.id);
+    const result = await mutateAsync(nodeIds);
+    return result ?? {};
+  }, [mutateAsync, nodes]);
 
   return {
-    payload,
     handleSubmit,
+    isPending,
   };
 };
