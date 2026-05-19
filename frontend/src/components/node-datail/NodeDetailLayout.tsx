@@ -75,6 +75,7 @@ export function NodeDetailLayout({
   const menuActions = useNodeMenuActions({
     nodeId: nodeId ?? 0,
     projectId,
+    meetingId: nodeDetail?.meeting?.meetingId,
     nodeTitle: nodeDetail?.title,
     nodeNumber: nodeDetail?.number,
   });
