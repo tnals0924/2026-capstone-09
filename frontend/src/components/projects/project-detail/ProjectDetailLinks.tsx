@@ -4,9 +4,8 @@ import { Menu, MenuContent, MenuList, MenuTrigger } from '@wanteddev/wds';
 import type { Theme } from '@wanteddev/wds-engine';
 import { IconPencil, IconPlus, IconTrash } from '@wanteddev/wds-icon';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { privateApi } from '@/api';
 import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { CustomMenuItem } from '@/components/commons/custom-menu/CustomMemuItem';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
@@ -16,6 +15,8 @@ import {
 } from '@/components/projects/project-detail/link-edit';
 import { ProjectDetailLinkItem } from '@/components/projects/project-detail/ProjectDetailLinkItem';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useProjectQuery } from '@/queries/project';
+import { useAddUrlMutation, useDeleteUrlMutation, useUpdateUrlMutation } from '@/queries/projectUrl';
 
 interface LinkItem {
   urlId: number;
@@ -53,48 +54,28 @@ export const ProjectDetailLinks = () => {
   const { openDialog, closeDialog } = useDialog();
   const toast = usePositionedToast();
   const showErrorToast = useErrorToast();
-
-  const [links, setLinks] = useState<LinkItem[]>([]);
   const [contextMenu, setContextMenu] = useState<LinkContextMenuState | null>(null);
-  // 추가/수정/삭제 후 useEffect를 다시 트리거해 목록을 새로 받아오기 위한 카운터.
-  // useEffect 안의 inline async 함수 형태를 유지해 `react-hooks/set-state-in-effect` 룰을 회피한다.
-  const [reloadCounter, setReloadCounter] = useState(0);
-  const triggerReload = () => setReloadCounter((c) => c + 1);
 
-  useEffect(() => {
-    if (!isProjectIdValid || projectId === undefined) return;
+  const { data: project } = useProjectQuery(isProjectIdValid ? (projectId as number) : 0);
+  const { mutateAsync: addUrl } = useAddUrlMutation(isProjectIdValid ? (projectId as number) : 0);
+  const { mutateAsync: updateUrl } = useUpdateUrlMutation(
+    isProjectIdValid ? (projectId as number) : 0,
+  );
+  const { mutateAsync: deleteUrl } = useDeleteUrlMutation(
+    isProjectIdValid ? (projectId as number) : 0,
+  );
 
-    let cancelled = false;
-
-    const fetchLinks = async () => {
-      try {
-        const response = await privateApi.project.getProject(projectId);
-        if (cancelled) return;
-        const urls = response.data.data?.urls ?? [];
-        const normalized: LinkItem[] = urls
-          .filter(
-            (item): item is { urlId: number; url: string; name?: string } =>
-              item.urlId !== undefined && item.url !== undefined,
-          )
-          .map((item) => ({
-            urlId: item.urlId,
-            url: item.url,
-            name: item.name ?? '',
-            fallbackLabel: extractFallbackLabel(item.url),
-          }));
-        setLinks(normalized);
-      } catch (caught) {
-        if (cancelled) return;
-        showErrorToast(caught, '프로젝트 URL 목록 조회에 실패했어요.');
-      }
-    };
-
-    void fetchLinks();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [isProjectIdValid, projectId, reloadCounter, showErrorToast]);
+  const links: LinkItem[] = (project?.urls ?? [])
+    .filter(
+      (item): item is { urlId: number; url: string; name?: string } =>
+        item.urlId !== undefined && item.url !== undefined,
+    )
+    .map((item) => ({
+      urlId: item.urlId,
+      url: item.url,
+      name: item.name ?? '',
+      fallbackLabel: extractFallbackLabel(item.url),
+    }));
 
   const handleAddClick = () => {
     if (!isProjectIdValid || projectId === undefined) return;
@@ -106,12 +87,8 @@ export const ProjectDetailLinks = () => {
           mode="add"
           onSave={async (payload: LinkEditPayload) => {
             try {
-              await privateApi.projectUrl.addUrl(projectId, {
-                name: payload.name,
-                url: payload.url,
-              });
+              await addUrl({ name: payload.name, url: payload.url });
               closeDialog();
-              triggerReload();
             } catch (caught) {
               showErrorToast(caught, 'URL 추가에 실패했어요.');
             }
@@ -134,21 +111,16 @@ export const ProjectDetailLinks = () => {
           initialName={link.name}
           onSave={async (payload: LinkEditPayload) => {
             try {
-              await privateApi.projectUrl.updateUrl(projectId, link.urlId, {
-                name: payload.name,
-                url: payload.url,
-              });
+              await updateUrl({ urlId: link.urlId, data: { name: payload.name, url: payload.url } });
               closeDialog();
-              triggerReload();
             } catch (caught) {
               showErrorToast(caught, 'URL 수정에 실패했어요.');
             }
           }}
           onDelete={async () => {
             try {
-              await privateApi.projectUrl.deleteUrl(projectId, link.urlId);
+              await deleteUrl(link.urlId);
               closeDialog();
-              triggerReload();
               toast({
                 content: '링크를 삭제했어요',
                 variant: 'normal',
@@ -182,8 +154,7 @@ export const ProjectDetailLinks = () => {
     setContextMenu(null);
     if (!link || !isProjectIdValid || projectId === undefined) return;
     try {
-      await privateApi.projectUrl.deleteUrl(projectId, link.urlId);
-      triggerReload();
+      await deleteUrl(link.urlId);
       toast({
         content: '링크를 삭제했어요',
         variant: 'normal',
