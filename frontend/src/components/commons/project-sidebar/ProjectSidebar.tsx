@@ -19,6 +19,7 @@ import {
 } from '@/constants/exampleConstant';
 import { cn } from '@/utils/cn';
 
+import { AccountSettingsModalContent } from './account-settings';
 import { SearchModalContent } from './SearchModalContent';
 import { SettingsModalContent } from './setting-modal';
 import { SidebarAlarmModal } from './SidebarAlarmModal';
@@ -120,6 +121,16 @@ export const ProjectSidebar = ({
       closeOnBackdrop: true,
       closeOnEsc: true,
       content: <SettingsModalContent projectId={projectId} onClose={closeModal} />,
+    });
+  };
+
+  const handleProfileClick = () => {
+    onProfileClick?.();
+    openModal({
+      variant: 'default',
+      closeOnBackdrop: true,
+      closeOnEsc: true,
+      content: <AccountSettingsModalContent onClose={closeModal} />,
     });
   };
 
@@ -235,7 +246,7 @@ export const ProjectSidebar = ({
               isCollapsed={isCollapsed}
               userName={userName}
               userEmail={userEmail}
-              onClick={onProfileClick}
+              onClick={handleProfileClick}
             />
           </div>
         </div>
