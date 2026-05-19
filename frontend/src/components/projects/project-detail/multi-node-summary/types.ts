@@ -15,6 +15,10 @@ export interface ActionItemsAnalysis {
   byPerson?: Record<string, { count?: number; rate?: number }>;
 }
 
+export interface CreateMultiNodeSummaryRequest {
+  nodeIds: number[];
+}
+
 export interface MultiNodeSummaryResult {
   meetingRelationships?: readonly MeetingRelationship[];
   actionItemsAnalysis?: ActionItemsAnalysis;

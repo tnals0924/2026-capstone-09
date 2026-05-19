@@ -11,11 +11,11 @@ export const buildMermaidCode = (relationships: readonly MeetingRelationship[] |
   const escape = (value: string) => value.replace(/"/g, '\\"');
 
   const lines: string[] = ['graph TD'];
-  names.forEach((name) => lines.push(`    ${idOf.get(name)!}["${escape(name)}"]`));
+  names.forEach((name) => lines.push(`    ${idOf.get(name)!}["${escape(name ?? '')}"]`));
   relationships.forEach((rel) => {
     const from = idOf.get(rel.from);
     const to = idOf.get(rel.to);
-    if (from && to) lines.push(`    ${from} -->|${escape(rel.relation)}| ${to}`);
+    if (from && to) lines.push(`    ${from} -->|${escape(rel.relation ?? '')}| ${to}`);
   });
   return lines.join('\n');
 };

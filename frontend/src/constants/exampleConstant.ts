@@ -65,6 +65,113 @@ export const EXAMPLE_PROJECT_DETAIL_LINKS = [
   { id: 'link-4', label: 'Vercel', href: 'https://vercel.com/dashboard' },
 ] as const;
 
+export const EXAMPLE_REFERENCE_NODE_MODAL = {
+  projectId: 1,
+  startNodeId: 101,
+  referencedNodes: [
+    {
+      edgeId: 9001,
+      linkType: 'END',
+      linkedNodeId: 1,
+      number: '1',
+      title: '메인 노드 제목입니다.',
+      description:
+        '노드 노트 요약 내용입니다. 대충 이런 느낌의 내용이 들어가있을 거에요. 몇 자까지 할까요? 맞춰보세요ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ',
+      createdBy: { userId: 91, nickname: '윤신지' },
+    },
+    {
+      edgeId: 9002,
+      linkType: 'END',
+      linkedNodeId: 2,
+      number: '2',
+      title: '메인 노드 제목입니다.',
+      description:
+        '노드 노트 요약 내용입니다. 대충 이런 느낌의 내용이 들어가있을 거에요. 몇 자까지 할까요? 맞춰보세요...',
+      createdBy: { userId: 91, nickname: '윤신지' },
+    },
+    {
+      edgeId: 9003,
+      linkType: 'END',
+      linkedNodeId: 3,
+      number: '3',
+      title: '메인 노드 제목입니다.',
+      description:
+        '노드 노트 요약 내용입니다. 대충 이런 느낌의 내용이 들어가있을 거에요. 몇 자까지 할까요? 맞춰보세요...',
+      createdBy: { userId: 91, nickname: '윤신지' },
+    },
+    {
+      edgeId: 9004,
+      linkType: 'END',
+      linkedNodeId: 4,
+      number: '4',
+      title: '메인 노드 제목입니다.',
+      description:
+        '노드 노트 요약 내용입니다. 대충 이런 느낌의 내용이 들어가있을 거에요. 몇 자까지 할까요? 맞춰보세요...',
+      createdBy: { userId: 91, nickname: '윤신지' },
+    },
+    {
+      edgeId: 9005,
+      linkType: 'END',
+      linkedNodeId: 5,
+      number: '5',
+      title: '대시보드 진입 화면',
+      description:
+        '대시보드 첫 진입 시 보여줄 위젯 구성과 기본 필터 상태를 정리한 노드입니다. 권한별 노출 규칙도 함께 다룹니다.',
+      createdBy: { userId: 92, nickname: '황수민' },
+    },
+    {
+      edgeId: 9006,
+      linkType: 'END',
+      linkedNodeId: 6,
+      number: '6',
+      title: '사용자 세션 저장',
+      description:
+        '리프레시 토큰 만료 처리와 세션 무효화 시 라우트 가드 동작을 어떻게 묶을지에 대한 결정 노드.',
+      createdBy: { userId: 93, nickname: '박건민' },
+    },
+    {
+      edgeId: 9007,
+      linkType: 'END',
+      linkedNodeId: 7,
+      number: '7',
+      title: '권한별 접근 제어',
+      description:
+        '워크스페이스 멤버 권한별로 노출되는 메뉴와 가능한 액션을 표 형태로 정리해 둔 노드입니다.',
+      createdBy: { userId: 94, nickname: '백채린' },
+    },
+    {
+      edgeId: 9008,
+      linkType: 'END',
+      linkedNodeId: 8,
+      number: '8',
+      title: '온보딩 체크리스트',
+      description:
+        '신규 사용자가 처음 30분 안에 도달해야 하는 핵심 액션을 단계별로 정리한 온보딩 노드.',
+      createdBy: { userId: 95, nickname: '윤성욱' },
+    },
+  ],
+  nodeOptions: [
+    { nodeId: 102, nodeNumber: '5', nodeTitle: '대시보드 진입 화면', kind: 'main' },
+    { nodeId: 1021, nodeNumber: '5.1', nodeTitle: '대시보드 위젯 분류', kind: 'sub' },
+    { nodeId: 1022, nodeNumber: '5.2', nodeTitle: '권한별 위젯 노출', kind: 'sub' },
+    { nodeId: 1023, nodeNumber: '5.3', nodeTitle: '대시보드 진입 시 로딩', kind: 'sub' },
+    { nodeId: 201, nodeNumber: '6', nodeTitle: '사용자 세션 저장', kind: 'main' },
+    { nodeId: 2011, nodeNumber: '6.1', nodeTitle: '리프레시 토큰 정책', kind: 'sub' },
+    { nodeId: 2012, nodeNumber: '6.2', nodeTitle: '세션 만료 라우트 가드', kind: 'sub' },
+    { nodeId: 301, nodeNumber: '7', nodeTitle: '권한별 접근 제어', kind: 'main' },
+    { nodeId: 3011, nodeNumber: '7.1', nodeTitle: '워크스페이스 권한 매트릭스', kind: 'sub' },
+    { nodeId: 3012, nodeNumber: '7.2', nodeTitle: '게스트 초대 흐름', kind: 'sub' },
+    { nodeId: 401, nodeNumber: '8', nodeTitle: '온보딩 체크리스트', kind: 'main' },
+    { nodeId: 4011, nodeNumber: '8.1', nodeTitle: '튜토리얼 카드 노출', kind: 'sub' },
+    { nodeId: 4012, nodeNumber: '8.2', nodeTitle: '온보딩 완료 트래킹', kind: 'sub' },
+    { nodeId: 501, nodeNumber: '9', nodeTitle: '결제 모듈 통합', kind: 'main' },
+    { nodeId: 5011, nodeNumber: '9.1', nodeTitle: '플랜 변경 시 안내 모달', kind: 'sub' },
+    { nodeId: 601, nodeNumber: '10', nodeTitle: '알림 센터 개편', kind: 'main' },
+    { nodeId: 6011, nodeNumber: '10.1', nodeTitle: '실시간 알림 큐', kind: 'sub' },
+    { nodeId: 6012, nodeNumber: '10.2', nodeTitle: '읽음 상태 동기화', kind: 'sub' },
+  ],
+} as const;
+
 // TODO : 프로필 이미지 url 추가 + User 컴포넌트에 이미지 들어도록 수정 필요
 export const EXAMPLE_USERS = [
   { userId: 1, nickname: '황수민', email: 'tnals655@kookmin.ac.kr' },
@@ -165,6 +272,18 @@ export const EXAMPLE_MULTI_NODE_SUMMARY_RESULT = {
   mermaidCode:
     'graph TD\\n    YjsCRDT통합설계[\\"Yjs CRDT 통합 설계\\"] ---|\\"시너지\\"| 프레즌스표시UX설계[\\"프레즌스 표시 UX 설계\\"]\\n    AI답변출처표시[\\"AI 답변 출처 표시\\"] ---|\\"선행조건\\"| RAG인덱싱범위확정[\\"RAG 인덱싱 범위 확정\\"]',
 } as const;
+
+export const EXAMPLE_MEETING_CREATE_NODE = {
+  id: 101,
+  badge: '#1.1',
+  title: '로그인 화면 기획',
+} as const;
+
+export const EXAMPLE_MEETING_PARTICIPANTS = EXAMPLE_USERS.map((user) => ({
+  id: user.userId,
+  name: user.nickname,
+  email: user.email,
+}));
 
 export const EXAMPLE_NODE_DETAIL = {
   nodeId: 101,
@@ -443,3 +562,15 @@ export const EXAMPLE_FLOWCHART_DATA = {
     },
   ],
 };
+
+// 노드 삭제 컨펌 모달 테스트 페이지 전용 더미 데이터
+// 실제 API(`privateApi.node.deleteNode(projectId: number, nodeId: number)`)에 맞춰
+// id는 number 형태로 둔다.
+export const EXAMPLE_NODE_DELETE_TEST = {
+  projectId: 1,
+  candidates: [
+    { id: 1, name: '디자인 회의일걸요?' },
+    { id: 2, name: '메인 노드 제목입니다' },
+    { id: 3, name: '프로토타입 사용자 테스트' },
+  ],
+} as const;
