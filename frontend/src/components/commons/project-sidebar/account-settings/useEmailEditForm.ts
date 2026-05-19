@@ -15,6 +15,8 @@ interface UseEmailEditFormParams {
   onChanged: (nextEmail: string) => void;
   /** 인증 코드 발송 성공 시 호출. */
   onCodeSent?: () => void;
+  /** 인증번호 검증 성공 시 호출. */
+  onVerified?: () => void;
 }
 
 /**
@@ -29,19 +31,25 @@ interface UseEmailEditFormParams {
  * - 변경 적용: `applyChange` → `updateMe({ nickname, email })`.
  *   응답의 email 을 우선 반영해 백엔드 정규화 값과 동기화한다.
  */
-export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEditFormParams) => {
+export const useEmailEditForm = ({
+  nickname,
+  onChanged,
+  onCodeSent,
+  onVerified,
+}: UseEmailEditFormParams) => {
   const showErrorToast = useErrorToast();
   const [isEditing, setIsEditing] = useState(false);
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCodeState] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const trimmedEmail = email.trim();
   const trimmedCode = verificationCode.trim();
   const isEmailValid = EMAIL_PATTERN.test(trimmedEmail);
   const isEmailInvalid = trimmedEmail.length > 0 && !isEmailValid;
-  const canRequestVerification = isEmailValid && !isVerified && !isVerifying;
+  const canRequestVerification = isEmailValid && !isVerified && !isVerifying && !isSending;
   const canVerifyCode =
     isEmailValid &&
     trimmedCode.length === VERIFICATION_CODE_LENGTH &&
@@ -61,6 +69,7 @@ export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEd
     setVerificationCodeState('');
     setIsVerified(false);
     setIsVerifying(false);
+    setIsSending(false);
   }, []);
 
   const startEdit = useCallback((initialEmail: string) => {
@@ -77,6 +86,7 @@ export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEd
 
   const requestVerification = useCallback(async () => {
     if (!canRequestVerification) return;
+    setIsSending(true);
     try {
       await privateApi.user.sendEmailVerification({ email: trimmedEmail });
       setVerificationCodeState('');
@@ -84,6 +94,8 @@ export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEd
       onCodeSent?.();
     } catch (caught) {
       showErrorToast(caught, '인증 코드 발송에 실패했어요.');
+    } finally {
+      setIsSending(false);
     }
   }, [canRequestVerification, trimmedEmail, onCodeSent, showErrorToast]);
 
@@ -93,13 +105,14 @@ export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEd
     try {
       await privateApi.user.verifyEmail({ email: trimmedEmail, code: trimmedCode });
       setIsVerified(true);
+      onVerified?.();
     } catch (caught) {
       setIsVerified(false);
       showErrorToast(caught, '인증 코드가 올바르지 않아요.');
     } finally {
       setIsVerifying(false);
     }
-  }, [canVerifyCode, trimmedEmail, trimmedCode, showErrorToast]);
+  }, [canVerifyCode, trimmedEmail, trimmedCode, onVerified, showErrorToast]);
 
   const applyChange = useCallback(async () => {
     if (!canApplyChange) return;
@@ -119,6 +132,7 @@ export const useEmailEditForm = ({ nickname, onChanged, onCodeSent }: UseEmailEd
     email,
     setEmail,
     isEmailInvalid,
+    isSending,
     canRequestVerification,
     verificationCode,
     setVerificationCode,

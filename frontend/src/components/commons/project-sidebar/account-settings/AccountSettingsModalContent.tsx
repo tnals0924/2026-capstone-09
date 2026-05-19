@@ -99,6 +99,7 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
         duration: 'short',
       });
     },
+    onVerified: triggerReload,
   });
 
   const handleLogoutClick = () => {
@@ -330,19 +331,23 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
         {/* 하단 링크 row */}
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
-            <button
-              type="button"
+            <a
+              href="https://aerial-mule-b93.notion.site/flowMeet-361733adb1cf809dbe54c089d11702e1?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-label-2 text-label-alternative hover:text-label-neutral focus-visible:ring-primary-40 rounded-md bg-transparent font-normal outline-none transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               서비스 이용 약관
-            </button>
+            </a>
             <div className="bg-label-alternative h-3 w-px" aria-hidden="true" />
-            <button
-              type="button"
+            <a
+              href="https://aerial-mule-b93.notion.site/flowMeet-361733adb1cf809dbe54c089d11702e1?source=copy_link"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-label-2 text-label-alternative hover:text-label-neutral focus-visible:ring-primary-40 rounded-md bg-transparent font-normal outline-none transition-colors focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               개인정보처리방침
-            </button>
+            </a>
           </div>
           <div className="flex items-center gap-2">
             <button
