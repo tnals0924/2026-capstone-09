@@ -49,7 +49,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource(CorsProperties corsProperties) {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(Arrays.asList(corsProperties.allowedOrigins()));
+        corsConfiguration.setAllowedOriginPatterns(Arrays.asList(corsProperties.allowedOrigins()));
         corsConfiguration.setAllowedMethods(ALLOWED_METHODS);
         corsConfiguration.setAllowedHeaders(ALLOWED_HEADERS);
 
