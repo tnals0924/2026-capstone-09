@@ -49,10 +49,13 @@ chrome.runtime.onMessage.addListener(
 async function handleMessage(message: Message): Promise<unknown> {
   switch (message.type) {
     case 'CAPTIONS_CAPTURED': {
-      const { pendingCaptions = [], captionCount = 0 } = await storage.get([
+      const { pendingCaptions = [], captionCount = 0, isCapturing } = await storage.get([
         'pendingCaptions',
         'captionCount',
+        'isCapturing',
       ]);
+      // 수집 중지 후 도착한 자막은 무시 (MEETING_ENDED 직후 race condition 방지)
+      if (!isCapturing) return { ok: true };
       await storage.set({
         pendingCaptions: [...pendingCaptions, ...message.captions],
         captionCount: captionCount + message.captions.length,
@@ -97,10 +100,17 @@ async function handleMessage(message: Message): Promise<unknown> {
       return { ok: true };
     }
 
+    case 'ABORT_CAPTURE': {
+      // 자막 전송 없이 즉시 중단 — pendingCaptions 버림
+      await storage.set({ isCapturing: false, pendingCaptions: [], captionCount: 0 });
+      return { ok: true };
+    }
+
     case 'GET_STATUS': {
       const data = await storage.get([
         'isCapturing',
         'captionCount',
+        'pendingCaptions',
         'lastSentAt',
         'meetingContext',
         'user',
@@ -108,6 +118,7 @@ async function handleMessage(message: Message): Promise<unknown> {
       const status: StatusResponse = {
         isCapturing: data.isCapturing ?? false,
         captionCount: data.captionCount ?? 0,
+        pendingCount: data.pendingCaptions?.length ?? 0,
         lastSentAt: data.lastSentAt ?? null,
         meetingContext: data.meetingContext ?? null,
         user: data.user ?? null,

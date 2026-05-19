@@ -30,6 +30,21 @@ export const CC_BUTTON_SELECTORS = [
   '[aria-label*="Turn on captions"]',
 ];
 
+// 자막 언어 선택 버튼 셀렉터 (자막 활성화 후 나타나는 언어 선택 UI)
+export const CAPTION_LANG_BUTTON_SELECTORS = [
+  '[aria-label*="자막 언어"]',
+  '[aria-label*="Caption language"]',
+  '[data-tooltip*="자막 언어"]',
+  '[data-tooltip*="Caption language"]',
+];
+
+// 한국어 옵션 셀렉터 (언어 선택 메뉴 내부)
+export const KOREAN_LANG_OPTION_SELECTORS = [
+  '[data-value="ko-KR"]',
+  '[data-value="ko"]',
+  'li[role="option"]:has(*[lang="ko"])',
+];
+
 // 회의 종료 감지 셀렉터
 export const MEETING_END_SELECTORS = [
   '[jsname="r4nke"]',

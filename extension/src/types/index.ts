@@ -28,6 +28,7 @@ export interface StorageData {
 export interface StatusResponse {
   isCapturing: boolean;
   captionCount: number;
+  pendingCount: number;
   lastSentAt: number | null;
   meetingContext: MeetingContext | null;
   user: UserData | null;
@@ -66,5 +67,6 @@ export type Message =
   | { type: 'SET_MEETING_CONTEXT'; context: MeetingContext }
   | { type: 'START_CAPTURE' }
   | { type: 'STOP_CAPTURE' }
+  | { type: 'ABORT_CAPTURE' }
   | { type: 'SYNC_TOKENS'; accessToken: string | null; refreshToken: string | null }
   | { type: 'LOGOUT' };
