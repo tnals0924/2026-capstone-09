@@ -5,7 +5,9 @@ import { MeetingCreateModalContent } from '@/components/projects/node-flow/Meeti
 import { MeetingDeleteConfirmContent } from '@/components/projects/project-detail/meeting-delete/MeetingDeleteConfirmContent';
 import { NodeDeleteConfirmContent } from '@/components/projects/project-detail/node-delete/NodeDeleteConfirmContent';
 import { ReferenceNodeModalContent } from '@/components/projects/project-detail/reference-node/ReferenceNodeModalContent';
+import { useCreateMeetingMutation } from '@/queries/meeting';
 import { useDeleteMeetingMutation } from '@/queries/meetingDelete';
+import { useProjectMembersQuery } from '@/queries/member';
 import { useDeleteNodeMutation } from '@/queries/nodeDelete';
 import { useErrorToast } from './useErrorToast';
 
@@ -27,9 +29,17 @@ export function useNodeMenuActions({
   onBeforeAction,
 }: NodeMenuActionsOptions) {
   const { openModal, closeModal } = useModal();
+  const { mutate: createMeeting } = useCreateMeetingMutation(projectId, nodeId);
   const { mutate: deleteNode } = useDeleteNodeMutation(projectId);
   const { mutate: deleteMeeting } = useDeleteMeetingMutation(projectId);
+  const { data: members = [] } = useProjectMembersQuery(projectId);
   const showErrorToast = useErrorToast();
+
+  const participantOptions = members.map((m) => ({
+    id: m.userId ?? 0,
+    name: m.nickname ?? '',
+    email: m.email,
+  }));
 
   const before = () => onBeforeAction?.();
   const badge = `#${nodeNumber ?? nodeId}`;
@@ -47,8 +57,14 @@ export function useNodeMenuActions({
           <MeetingCreateModalContent
             nodeBadge={badge}
             nodeTitle={nodeTitle}
-            participantOptions={[]}
+            participantOptions={participantOptions}
             onClose={closeModal}
+            onCreate={(payload) => {
+              createMeeting(payload, {
+                onSuccess: closeModal,
+                onError: (err) => showErrorToast(err, '회의 생성에 실패했어요.'),
+              });
+            }}
           />
         ),
       });
