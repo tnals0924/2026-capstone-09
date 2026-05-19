@@ -20,10 +20,8 @@ public class MeetingStatusScheduler {
     @Scheduled(cron = "0 * * * * *", zone = "Asia/Seoul")
     @Transactional
     public void startScheduledMeetings() {
-        log.info("[startScheduledMeetings] 회의 상태 전환 시작");
         List<Meeting> meetings = meetingService.findScheduledToStart(LocalDateTime.now());
         if (meetings.isEmpty()) {
-            log.info("[startScheduledMeetings] 전환할 회의 없음. -> 종료");
             return;
         }
 
