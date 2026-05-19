@@ -1,7 +1,7 @@
 'use client';
 
 import { IconButton } from '@wanteddev/wds';
-import { IconChevronDoubleLeftSmall, IconChevronLeft } from '@wanteddev/wds-icon';
+import { IconChevronLeft } from '@wanteddev/wds-icon';
 import { usePathname, useRouter } from 'next/navigation';
 
 import NodeMeetingTab from '@/components/node-datail/meeting/NodeMeetingTab';
