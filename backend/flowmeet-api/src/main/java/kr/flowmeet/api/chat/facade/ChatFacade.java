@@ -8,6 +8,7 @@ import kr.flowmeet.api.chat.dto.response.ChatSessionSummaryResponse;
 import kr.flowmeet.api.chat.dto.response.CreateChatSessionResponse;
 import kr.flowmeet.api.chat.dto.response.GetChatSessionResponse;
 import kr.flowmeet.api.chat.dto.response.GetReferenceNodesResponse;
+import kr.flowmeet.api.chat.dto.response.GetReferenceUsersResponse;
 import kr.flowmeet.api.chat.dto.response.SendMessageResponse;
 import kr.flowmeet.api.chat.dto.response.UpdateChatSessionResponse;
 import kr.flowmeet.api.common.dto.CursorSliceResponse;
@@ -18,6 +19,8 @@ import kr.flowmeet.domain.chat.service.ChatSessionNodeService;
 import kr.flowmeet.domain.chat.service.ChatSessionService;
 import kr.flowmeet.domain.node.entity.Node;
 import kr.flowmeet.domain.node.service.NodeService;
+import kr.flowmeet.domain.project.entity.ProjectMember;
+import kr.flowmeet.domain.project.service.ProjectMemberService;
 import kr.flowmeet.domain.project.service.ProjectPermissionValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +35,7 @@ public class ChatFacade {
     private final ChatMessageService chatMessageService;
     private final ChatSessionNodeService chatSessionNodeService;
     private final NodeService nodeService;
+    private final ProjectMemberService projectMemberService;
     private final ProjectPermissionValidator projectPermissionValidator;
 
     public CursorSliceResponse<ChatSessionSummaryResponse> getAllChatSessions(
@@ -148,6 +152,14 @@ public class ChatFacade {
         List<Node> nodes = nodeService.findAllByProjectId(projectId);
 
         return GetReferenceNodesResponse.from(nodes);
+    }
+
+    public GetReferenceUsersResponse getReferenceUsers(final Long userId, final Long projectId) {
+        projectPermissionValidator.validate(projectId, userId);
+
+        List<ProjectMember> members = projectMemberService.findAllByProjectIdOrderByRole(projectId);
+
+        return GetReferenceUsersResponse.from(members);
     }
 
     @Transactional
