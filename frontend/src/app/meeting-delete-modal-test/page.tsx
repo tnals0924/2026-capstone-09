@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 
-import { privateApi } from '@/api';
 import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { MeetingDeleteConfirmContent } from '@/components/projects/project-detail/meeting-delete';
 import { EXAMPLE_MEETING_DELETE_TEST } from '@/constants/exampleConstant';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useDeleteMeetingMutation } from '@/queries/meetingDelete';
 import { cn } from '@/utils/cn';
 
 /**
@@ -27,6 +27,10 @@ const MeetingDeleteModalTestPage = () => {
     title: string;
   } | null>(null);
 
+  const { mutateAsync: deleteMeeting } = useDeleteMeetingMutation(
+    EXAMPLE_MEETING_DELETE_TEST.projectId,
+  );
+
   const handleOpenDialog = (meeting: { nodeId: number; meetingId: number; title: string }) => {
     openDialog({
       closeOnBackdrop: true,
@@ -35,11 +39,7 @@ const MeetingDeleteModalTestPage = () => {
         <MeetingDeleteConfirmContent
           onConfirm={async () => {
             try {
-              await privateApi.meeting.deleteMeeting(
-                EXAMPLE_MEETING_DELETE_TEST.projectId,
-                meeting.nodeId,
-                meeting.meetingId,
-              );
+              await deleteMeeting({ nodeId: meeting.nodeId, meetingId: meeting.meetingId });
               setLastResult({
                 projectId: EXAMPLE_MEETING_DELETE_TEST.projectId,
                 nodeId: meeting.nodeId,
