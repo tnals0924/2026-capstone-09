@@ -4,11 +4,11 @@ import { Avatar, Button, IconButton, TextField, TextFieldButton, TextFieldConten
 import { IconCircleCheckFill, IconClose, IconPencil } from '@wanteddev/wds-icon';
 import { useRouter } from 'next/navigation';
 
-import { privateApi } from '@/api';
 import { authStorage } from '@/api/authStorage';
 import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useDeleteMeMutation } from '@/queries/user';
 
 import { AccountLogoutConfirmContent } from './AccountLogoutConfirmContent';
 import { AccountWithdrawConfirmContent } from './AccountWithdrawConfirmContent';
@@ -40,6 +40,7 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
   const { openDialog, closeDialog } = useDialog();
   const toast = usePositionedToast();
   const showErrorToast = useErrorToast();
+  const { mutateAsync: deleteMe } = useDeleteMeMutation();
 
   const {
     info,
@@ -136,7 +137,7 @@ export const AccountSettingsModalContent = ({ onClose }: AccountSettingsModalCon
           nickname={info.nickname}
           onConfirm={async () => {
             try {
-              await privateApi.user.deleteMe();
+              await deleteMe();
               authStorage.clear();
               closeDialog();
               onClose();

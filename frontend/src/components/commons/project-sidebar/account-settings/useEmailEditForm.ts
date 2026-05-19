@@ -2,8 +2,8 @@
 
 import { useCallback, useState } from 'react';
 
-import { privateApi } from '@/api';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useSendEmailVerificationMutation, useUpdateMeMutation, useVerifyEmailMutation } from '@/queries/user';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_CODE_LENGTH = 6;
@@ -38,6 +38,9 @@ export const useEmailEditForm = ({
   onVerified,
 }: UseEmailEditFormParams) => {
   const showErrorToast = useErrorToast();
+  const { mutateAsync: sendVerification } = useSendEmailVerificationMutation();
+  const { mutateAsync: verifyEmailMutation } = useVerifyEmailMutation();
+  const { mutateAsync: updateMe } = useUpdateMeMutation();
   const [isEditing, setIsEditing] = useState(false);
   const [email, setEmail] = useState('');
   const [verificationCode, setVerificationCodeState] = useState('');
@@ -88,7 +91,7 @@ export const useEmailEditForm = ({
     if (!canRequestVerification) return;
     setIsSending(true);
     try {
-      await privateApi.user.sendEmailVerification({ email: trimmedEmail });
+      await sendVerification(trimmedEmail);
       setVerificationCodeState('');
       setIsVerified(false);
       onCodeSent?.();
@@ -97,13 +100,13 @@ export const useEmailEditForm = ({
     } finally {
       setIsSending(false);
     }
-  }, [canRequestVerification, trimmedEmail, onCodeSent, showErrorToast]);
+  }, [canRequestVerification, trimmedEmail, onCodeSent, showErrorToast, sendVerification]);
 
   const verifyCode = useCallback(async () => {
     if (!canVerifyCode) return;
     setIsVerifying(true);
     try {
-      await privateApi.user.verifyEmail({ email: trimmedEmail, code: trimmedCode });
+      await verifyEmailMutation({ email: trimmedEmail, code: trimmedCode });
       setIsVerified(true);
       onVerified?.();
     } catch (caught) {
@@ -112,20 +115,19 @@ export const useEmailEditForm = ({
     } finally {
       setIsVerifying(false);
     }
-  }, [canVerifyCode, trimmedEmail, trimmedCode, onVerified, showErrorToast]);
+  }, [canVerifyCode, trimmedEmail, trimmedCode, onVerified, showErrorToast, verifyEmailMutation]);
 
   const applyChange = useCallback(async () => {
     if (!canApplyChange) return;
     try {
-      const response = await privateApi.user.updateMe({ nickname, email: trimmedEmail });
-      // 백엔드가 정규화/소문자 변환 등 가공한 값이 있으면 그것을 우선.
+      const response = await updateMe({ nickname, email: trimmedEmail });
       const updatedEmail = response.data.data?.email ?? trimmedEmail;
       onChanged(updatedEmail);
       resetEditState();
     } catch (caught) {
       showErrorToast(caught, '이메일 변경에 실패했어요.');
     }
-  }, [canApplyChange, nickname, trimmedEmail, onChanged, resetEditState, showErrorToast]);
+  }, [canApplyChange, nickname, trimmedEmail, onChanged, resetEditState, showErrorToast, updateMe]);
 
   return {
     isEditing,

@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { privateApi } from '@/api';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useCurrentUserQuery, useUpdateMeMutation, useUpdateProfileImageMutation } from '@/queries/user';
 
 interface AccountInfo {
   nickname: string;
@@ -53,38 +53,26 @@ export const useAccountSettingsForm = ({
   onProfileImageUploaded,
 }: UseAccountSettingsFormParams = {}) => {
   const showErrorToast = useErrorToast();
-  const [info, setInfo] = useState<AccountInfo | null>(null);
   const [nickname, setNickname] = useState('');
-  const [reloadCounter, setReloadCounter] = useState(0);
   // 동일 URL에 새 이미지 덮어썼을 때 브라우저가 캐시된 옛 이미지를 띄우는 문제 우회용.
-  // 업로드 성공 시 timestamp 로 갱신해 Avatar src 에 `?v=...` 쿼리를 붙인다.
   const [imageBustKey, setImageBustKey] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchMe = async () => {
-      try {
-        const response = await privateApi.user.getMe();
-        if (cancelled) return;
-        const data = response.data.data;
-        const next: AccountInfo = {
-          nickname: data?.nickname ?? '',
-          email: data?.email ?? '',
-          profileImageUrl: normalizeImageUrl(data?.profileImageUrl),
-          createdAt: data?.createdAt,
-        };
-        setInfo(next);
-        setNickname(next.nickname);
-      } catch (caught) {
-        if (cancelled) return;
-        showErrorToast(caught, '내 정보 조회에 실패했어요.');
+  const { data: userData } = useCurrentUserQuery();
+  const { mutateAsync: updateMe } = useUpdateMeMutation();
+  const { mutateAsync: updateProfileImage } = useUpdateProfileImageMutation();
+
+  const info: AccountInfo | null = userData
+    ? {
+        nickname: userData.nickname ?? '',
+        email: userData.email ?? '',
+        profileImageUrl: normalizeImageUrl(userData.profileImageUrl),
+        createdAt: userData.createdAt,
       }
-    };
-    void fetchMe();
-    return () => {
-      cancelled = true;
-    };
-  }, [reloadCounter, showErrorToast]);
+    : null;
+
+  useEffect(() => {
+    if (userData) setNickname(userData.nickname ?? '');
+  }, [userData]);
 
   const trimmed = nickname.trim();
   const isValidNickname = trimmed.length > 0 && trimmed.length <= NICKNAME_MAX_LENGTH;
@@ -99,9 +87,8 @@ export const useAccountSettingsForm = ({
     const timer = setTimeout(() => {
       const saveNickname = async () => {
         try {
-          await privateApi.user.updateMe({ nickname: trimmed });
+          await updateMe({ nickname: trimmed });
           if (cancelled) return;
-          setInfo((prev) => (prev ? { ...prev, nickname: trimmed } : prev));
           onNicknameSaved?.();
         } catch (caught) {
           if (cancelled) return;
@@ -115,21 +102,17 @@ export const useAccountSettingsForm = ({
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [trimmed, canSave, onNicknameSaved, showErrorToast]);
+  }, [trimmed, canSave, onNicknameSaved, showErrorToast, updateMe]);
 
   const reset = useCallback(() => {
     setNickname(info?.nickname ?? '');
   }, [info]);
 
-  /** 이메일이 외부(useEmailEditForm)에서 갱신됐을 때 `info.email` 만 동기화. */
-  const setInfoEmail = useCallback((nextEmail: string) => {
-    setInfo((prev) => (prev ? { ...prev, email: nextEmail } : prev));
-  }, []);
+  const setInfoEmail = useCallback((_nextEmail: string) => {}, []);
 
-  /** 프로필 이미지 업로드. 클라이언트 사전 검증 → multipart 호출 → getMe 재로드. */
+  /** 프로필 이미지 업로드. 클라이언트 사전 검증 → multipart 호출 → 캐시 무효화. */
   const uploadProfileImage = useCallback(
     async (file: File) => {
-      // 1) MIME 사전 검증
       const isAllowedType = PROFILE_IMAGE_ACCEPT.includes(
         file.type as (typeof PROFILE_IMAGE_ACCEPT)[number],
       );
@@ -137,27 +120,23 @@ export const useAccountSettingsForm = ({
         showErrorToast(null, 'PNG·JPEG·WEBP 파일만 업로드할 수 있어요.');
         return;
       }
-      // 2) 크기 사전 검증
       if (file.size > PROFILE_IMAGE_MAX_BYTES) {
         showErrorToast(null, '파일 크기는 5MB 이하여야 해요.');
         return;
       }
 
       try {
-        await privateApi.user.updateProfileImage({ profileImage: file });
+        await updateProfileImage(file);
         setImageBustKey(Date.now());
-        setReloadCounter((c) => c + 1);
         onProfileImageUploaded?.();
       } catch (caught) {
         showErrorToast(caught, '프로필 이미지 업로드에 실패했어요.');
       }
     },
-    [onProfileImageUploaded, showErrorToast],
+    [onProfileImageUploaded, showErrorToast, updateProfileImage],
   );
 
-  const triggerReload = useCallback(() => {
-    setReloadCounter((c) => c + 1);
-  }, []);
+  const triggerReload = useCallback(() => {}, []);
 
   return {
     info,
