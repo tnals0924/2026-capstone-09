@@ -97,7 +97,7 @@ export function NodeDetailLayout({
 
   return (
     <div className="flex h-full flex-col overflow-y-scroll [&::-webkit-scrollbar]:hidden">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pt-1">
         {nodeDetail?.parentId ? (
           <ContentBadge color="neutral" size="xsmall" variant="outlined">
             #{nodeDetail?.number}
