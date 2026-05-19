@@ -1,77 +1,176 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/Lvs6kcL8)
-# Welcome to GitHub
+# Flowmeet <img src="https://github.com/user-attachments/assets/82677f50-3ff8-4407-8b39-9d6bdb4f1bc0" width="100" align="left" />
 
-캡스톤 팀 생성을 축하합니다.
+기획이 흐름을 만나는 순간,
 
-## 팀소개 및 페이지를 꾸며주세요.
+<img src="https://github.com/user-attachments/assets/eee5321e-0206-404a-9058-4964b80f8c99" />
 
-- 프로젝트 소개
-  - 프로젝트 설치방법 및 데모, 사용방법, 프리뷰등을 readme.md에 작성.
-  - Api나 사용방법등 내용이 많을경우 wiki에 꾸미고 링크 추가.
+</br>
 
-- 팀페이지 꾸미기
-  - 프로젝트 소개 및 팀원 소개
-  - index.md 예시보고 수정.
+<div align="center">
+  <a href="https://kookmin-sw.github.io/2026-capstone-09/">
+    <img src="https://github.com/user-attachments/assets/ad3e9aff-e667-416a-83e6-98c4ec2785bc" width="500" />
+  </a>
+    <br>
+    <br>
+    <p>로고 클릭 시 소개 페이지로 이동합니다.</p>
+    <!-- <img src="" width="700" alt="서비스 포스터 /> -->
+</div>
 
-- GitHub Pages 리파지토리 Settings > Options > GitHub Pages 
-  - Source를 marster branch
-  - Theme Chooser에서 태마선택
-  - 수정후 팀페이지 확인하여 점검.
+</br>
 
-**팀페이지 주소** -> https://kookmin-sw.github.io/ '{{자신의 리파지토리 아이디}}'
+## ✏️ 서비스 소개
 
-**예시)** 2023년 0조  https://kookmin-sw.github.io/capstone-2023-00/
+플로밋은 흩어진 아이디어와 회의 내용, 자료를 노드 기반으로 연결해
+</br>
+프로젝트 기획 흐름을 시각화하는 AI 기반 기획 협업 플랫폼입니다.
 
+사용자는 복잡한 기획 구조를 한눈에 확인하고,
+</br>
+AI 회의 요약과 AI 에이전트를 통해 핵심 내용을 빠르게 정리할 수 있습니다.
 
-## 내용에 아래와 같은 내용들을 추가하세요.
+또한 팀원들과 기획 내용을 공유 및 관리하며,
+</br>
+프로젝트의 흐름과 맥락을 놓치지 않고 협업할 수 있도록 돕습니다.
 
-### 1. 프로잭트 소개
+### 기능 소개
 
-프로젝트
+기능 소개 예정
 
-### 2. 소개 영상
+### 구현 스크린샷
 
-프로젝트 소개하는 영상을 추가하세요
+스크린샷 추가 예정
 
-### 3. 팀 소개
+## 🫂 팀원 소개
 
-팀을 소개하세요.
+<table align="center">
+    <tr align="center">
+      <td style="min-width: 150px;">
+            <a href="https://github.com/tnals0924">
+              <img src="https://github.com/tnals0924.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🦊 황수민</b>
+            </a>
+        </td>
+      <td style="min-width: 150px;">
+            <a href="https://github.com/wngktjd13">
+              <img src="https://github.com/wngktjd13.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🐯 윤성욱</b>
+            </a>
+        </td>
+      <td style="min-width: 150px;">
+            <a href="https://github.com/ovepje2004">
+              <img src="https://github.com/ovepje2004.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🐟 박정은</b>
+            </a>
+        </td>
+      <td style="min-width: 150px;">
+            <a href="https://github.com/sinji2102">
+              <img src="https://github.com/sinji2102.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🐣 윤신지</b>
+            </a>
+        </td>
+        <td style="min-width: 150px;">
+            <a href="https://github.com/chael-in">
+              <img src="https://github.com/chael-in.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🐹 백채린</b>
+            </a>
+        </td>
+        <td style="min-width: 150px;">
+            <a href="https://github.com/pkm021118">
+              <img src="https://github.com/pkm021118.png" width="200" alt="깃허브계정-프로필사진">
+              <br />
+              <b>🦄 박건민</b>
+            </a>
+        </td>
+    </tr>
+    <tr align="center">
+       <td>
+            팀장, Backend <br/>
+      </td>
+       <td>
+            Backend <br/>
+      </td>
+       <td>
+            AI <br/>
+      </td>
+      <td>
+            Frontend <br/>
+      </td>
+      <td>
+            Frontend <br/>
+      </td>
+      <td>
+            Frontend <br/>
+      </td>
+    </tr>
+</table>
 
-팀원정보 및 담당이나 사진 및 SNS를 이용하여 소개하세요.
+## 🖥️ Tech
 
-### 4. 사용법
+### 🕹️ 기술 스택
 
-소스코드제출시 설치법이나 사용법을 작성하세요.
+### 🌐 Frontend
 
-### 5. 기타
+#### Language & Framework
 
-추가적인 내용은 자유롭게 작성하세요.
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript badge"> <img src="https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=next.js&logoColor=white" alt="Next.js badge"> <img src="https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black" alt="React badge">
 
+#### Styling
 
-## Markdown을 사용하여 내용꾸미기
+<img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS badge">
 
-Markdown은 작문을 스타일링하기위한 가볍고 사용하기 쉬운 구문입니다. 여기에는 다음을위한 규칙이 포함됩니다.
+#### Desktop
 
-```markdown
-Syntax highlighted code block
+<img src="https://img.shields.io/badge/Electron-47848F?style=flat-square&logo=electron&logoColor=white" alt="Electron badge">
 
-# Header 1
-## Header 2
-### Header 3
+#### Collaboration
 
-- Bulleted
-- List
+<img src="https://img.shields.io/badge/Yjs-000000?style=flat-square&logo=y-combinator&logoColor=white" alt="Yjs badge"> <img src="https://img.shields.io/badge/Tiptap-000000?style=flat-square&logo=tiptap&logoColor=white" alt="Tiptap badge">
 
-1. Numbered
-2. List
+### 📊 Backend
 
-**Bold** and _Italic_ and `Code` text
+#### Language & Framework
 
-[Link](url) and ![Image](src)
-```
+<img src="https://img.shields.io/badge/Java_21-ED8B00?style=flat-square&logo=openjdk&logoColor=white" alt="Java 21 badge"> <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=springboot&logoColor=white" alt="Spring Boot badge"> <img src="https://img.shields.io/badge/Gradle-02303A?style=flat-square&logo=gradle&logoColor=white" alt="Gradle badge">
 
-자세한 내용은 [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+#### ORM & Migration
 
-### Support or Contact
+<img src="https://img.shields.io/badge/Spring_Data_JPA-6DB33F?style=flat-square&logo=databricks&logoColor=white" alt="Spring Data JPA badge"> <img src="https://img.shields.io/badge/Flyway-CC0200?style=flat-square&logo=flyway&logoColor=white" alt="Flyway badge">
 
-readme 파일 생성에 추가적인 도움이 필요하면 [도움말](https://help.github.com/articles/about-readmes/) 이나 [contact support](https://github.com/contact) 을 이용하세요.
+#### Authorization
+
+<img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=flat-square&logo=springsecurity&logoColor=white" alt="Spring Security badge"> <img src="https://img.shields.io/badge/JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white" alt="JWT badge">
+
+#### Database
+
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat-square&logo=postgresql&logoColor=white" alt="PostgreSQL badge">
+
+#### WebSocket
+
+<img src="https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white" alt="Node.js badge"> <img src="https://img.shields.io/badge/Yjs-000000?style=flat-square&logo=y-combinator&logoColor=white" alt="Yjs badge">
+
+#### Other
+
+<img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat-square&logo=swagger&logoColor=black" alt="Swagger badge">
+
+### 🤖 AI
+
+#### Language & Framework
+
+<img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python badge"> <img src="https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white" alt="FastAPI badge">
+
+#### AI Model
+
+<img src="https://img.shields.io/badge/Google_Gemini-8E75B2?style=flat-square&logo=google&logoColor=white" alt="Google Gemini badge">
+
+#### Cloud
+
+<img src="https://img.shields.io/badge/AWS_Lambda-FF9900?style=flat-square&logo=awslambda&logoColor=white" alt="AWS Lambda badge"> <img src="https://img.shields.io/badge/AWS_SQS-FF9900?style=flat-square&logo=amazonsqs&logoColor=white" alt="AWS SQS badge">
+
+### ⚒️ 서비스 아키텍처
+
+<img src="https://github.com/user-attachments/assets/951f9b2d-21b2-4694-9de5-08ac70b6880f" alt="FlowMeet 서비스 아키텍처"/>
