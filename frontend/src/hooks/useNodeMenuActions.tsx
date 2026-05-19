@@ -5,11 +5,85 @@ import { MeetingCreateModalContent } from '@/components/projects/node-flow/Meeti
 import { MeetingDeleteConfirmContent } from '@/components/projects/project-detail/meeting-delete/MeetingDeleteConfirmContent';
 import { NodeDeleteConfirmContent } from '@/components/projects/project-detail/node-delete/NodeDeleteConfirmContent';
 import { ReferenceNodeModalContent } from '@/components/projects/project-detail/reference-node/ReferenceNodeModalContent';
+import { useCreateEdgeMutation, useLinkedNodesQuery, useNodeListQuery } from '@/queries/edge';
 import { useCreateMeetingMutation } from '@/queries/meeting';
 import { useDeleteMeetingMutation } from '@/queries/meetingDelete';
 import { useProjectMembersQuery } from '@/queries/member';
 import { useDeleteNodeMutation } from '@/queries/nodeDelete';
 import { useErrorToast } from './useErrorToast';
+
+// 모달이 열릴 때만 마운트되어 쿼리를 실행하는 래퍼 컴포넌트들
+
+function ConnectedMeetingCreateModal({
+  projectId,
+  nodeId,
+  badge,
+  nodeTitle,
+  onClose,
+}: {
+  projectId: number;
+  nodeId: number;
+  badge: string;
+  nodeTitle: string;
+  onClose: () => void;
+}) {
+  const { data: members = [] } = useProjectMembersQuery(projectId);
+  const { mutate: createMeeting } = useCreateMeetingMutation(projectId, nodeId);
+  const showErrorToast = useErrorToast();
+
+  return (
+    <MeetingCreateModalContent
+      nodeBadge={badge}
+      nodeTitle={nodeTitle}
+      participantOptions={members.map((m) => ({
+        id: m.userId ?? 0,
+        name: m.nickname ?? '',
+        email: m.email,
+      }))}
+      onClose={onClose}
+      onCreate={(payload) => {
+        createMeeting(payload, {
+          onSuccess: onClose,
+          onError: (err) => showErrorToast(err, '회의 생성에 실패했어요.'),
+        });
+      }}
+    />
+  );
+}
+
+function ConnectedReferenceNodeModal({
+  projectId,
+  nodeId,
+  onClose,
+}: {
+  projectId: number;
+  nodeId: number;
+  onClose: () => void;
+}) {
+  const { data: linkedNodes = [] } = useLinkedNodesQuery(projectId, nodeId);
+  const { data: nodeList = [] } = useNodeListQuery(projectId);
+  const { mutate: createEdge } = useCreateEdgeMutation(projectId);
+  const showErrorToast = useErrorToast();
+
+  const nodeOptions = nodeList
+    .filter((n) => n.nodeId !== nodeId)
+    .map((n) => ({ nodeId: n.nodeId ?? 0, nodeNumber: n.number ?? '', nodeTitle: n.title ?? '' }));
+
+  return (
+    <ReferenceNodeModalContent
+      startNodeId={nodeId}
+      referencedNodes={linkedNodes}
+      nodeOptions={nodeOptions}
+      onClose={onClose}
+      onCreate={(payload) => {
+        createEdge(payload, {
+          onSuccess: onClose,
+          onError: (err) => showErrorToast(err, '참조 노드 연결에 실패했어요.'),
+        });
+      }}
+    />
+  );
+}
 
 interface NodeMenuActionsOptions {
   nodeId: number;
@@ -29,17 +103,9 @@ export function useNodeMenuActions({
   onBeforeAction,
 }: NodeMenuActionsOptions) {
   const { openModal, closeModal } = useModal();
-  const { mutate: createMeeting } = useCreateMeetingMutation(projectId, nodeId);
   const { mutate: deleteNode } = useDeleteNodeMutation(projectId);
   const { mutate: deleteMeeting } = useDeleteMeetingMutation(projectId);
-  const { data: members = [] } = useProjectMembersQuery(projectId);
   const showErrorToast = useErrorToast();
-
-  const participantOptions = members.map((m) => ({
-    id: m.userId ?? 0,
-    name: m.nickname ?? '',
-    email: m.email,
-  }));
 
   const before = () => onBeforeAction?.();
   const badge = `#${nodeNumber ?? nodeId}`;
@@ -54,17 +120,12 @@ export function useNodeMenuActions({
       openModal({
         closeOnBackdrop: true,
         content: (
-          <MeetingCreateModalContent
-            nodeBadge={badge}
+          <ConnectedMeetingCreateModal
+            projectId={projectId}
+            nodeId={nodeId}
+            badge={badge}
             nodeTitle={nodeTitle}
-            participantOptions={participantOptions}
             onClose={closeModal}
-            onCreate={(payload) => {
-              createMeeting(payload, {
-                onSuccess: closeModal,
-                onError: (err) => showErrorToast(err, '회의 생성에 실패했어요.'),
-              });
-            }}
           />
         ),
       });
@@ -99,10 +160,9 @@ export function useNodeMenuActions({
       openModal({
         closeOnBackdrop: true,
         content: (
-          <ReferenceNodeModalContent
-            startNodeId={nodeId}
-            referencedNodes={[]}
-            nodeOptions={[]}
+          <ConnectedReferenceNodeModal
+            projectId={projectId}
+            nodeId={nodeId}
             onClose={closeModal}
           />
         ),
