@@ -3,12 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { EditorContent } from '@tiptap/react';
 import { ContentBadge, Tab, TabList, TabListItem, TabPanel, Typography } from '@wanteddev/wds';
-import {
-  IconDocumentText,
-  IconFire,
-  IconPersons,
-  IconTag,
-} from '@wanteddev/wds-icon';
+import { IconDocumentText, IconFire, IconPersons, IconTag } from '@wanteddev/wds-icon';
 import { useEffect } from 'react';
 
 import { GetNodeResponse } from '@/api/Api';
@@ -172,8 +167,12 @@ export function NodeDetailLayout({
 
       <Tab value={value} onValueChange={onValueChange} defaultValue="note">
         <TabList size="medium" resize="fill">
-          <TabListItem value="note">노트</TabListItem>
-          {nodeDetail?.parentId && <TabListItem value="meeting">회의</TabListItem>}
+          {nodeDetail?.parentId && (
+            <>
+              <TabListItem value="note">노트</TabListItem>
+              <TabListItem value="meeting">회의</TabListItem>
+            </>
+          )}
         </TabList>
         <TabPanel value="note">{noteContent}</TabPanel>
         <TabPanel value="meeting" sx={{ flex: 1 }}>
