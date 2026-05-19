@@ -12,8 +12,7 @@ import { useProjectMembersQuery } from '@/queries/member';
 import { useDeleteNodeMutation } from '@/queries/nodeDelete';
 import { useErrorToast } from './useErrorToast';
 
-// 모달이 열릴 때만 마운트되어 쿼리를 실행하는 래퍼 컴포넌트들
-
+// 리스트를 받아야 하기 때문에 모달이 열릴 때만 마운트되어 쿼리를 실행
 function ConnectedMeetingCreateModal({
   projectId,
   nodeId,
@@ -92,6 +91,7 @@ interface NodeMenuActionsOptions {
   nodeTitle?: string;
   nodeNumber?: number | string;
   onBeforeAction?: () => void;
+  onDeleteSuccess?: () => void;
 }
 
 export function useNodeMenuActions({
@@ -101,6 +101,7 @@ export function useNodeMenuActions({
   nodeTitle = '',
   nodeNumber,
   onBeforeAction,
+  onDeleteSuccess,
 }: NodeMenuActionsOptions) {
   const { openModal, closeModal } = useModal();
   const { mutate: deleteNode } = useDeleteNodeMutation(projectId);
@@ -132,7 +133,7 @@ export function useNodeMenuActions({
     },
     onEditMeeting: () => {
       before();
-      // TODO: 회의 수정 모달
+      // 회의 수정 모달 -> 훅 외부에서 주입
     },
     onDeleteMeeting: () => {
       before();
@@ -160,11 +161,7 @@ export function useNodeMenuActions({
       openModal({
         closeOnBackdrop: true,
         content: (
-          <ConnectedReferenceNodeModal
-            projectId={projectId}
-            nodeId={nodeId}
-            onClose={closeModal}
-          />
+          <ConnectedReferenceNodeModal projectId={projectId} nodeId={nodeId} onClose={closeModal} />
         ),
       });
     },
@@ -177,7 +174,10 @@ export function useNodeMenuActions({
             nodeName={nodeTitle}
             onConfirm={() => {
               deleteNode(nodeId, {
-                onSuccess: closeModal,
+                onSuccess: () => {
+                  closeModal();
+                  onDeleteSuccess?.();
+                },
                 onError: (err) => showErrorToast(err, '노드 삭제에 실패했어요.'),
               });
             }}

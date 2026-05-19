@@ -7,6 +7,17 @@ import { GetNodeResponse } from '@/api/Api';
 import { NodeStatusType } from '@/constants/nodeStatus';
 import { nodeKeys } from './keys/nodeKeys';
 
+export function useFlowchartQuery(projectId: number) {
+  return useQuery({
+    queryKey: nodeKeys.flowchart(projectId),
+    queryFn: async () => {
+      const response = await privateApi.node.getFlowchart(projectId);
+      return response.data.data ?? null;
+    },
+    enabled: !!projectId,
+  });
+}
+
 export function useNodeListQuery(projectId: number, sort: 'LATEST' | 'NAME' = 'LATEST') {
   return useQuery({
     queryKey: nodeKeys.list(projectId, sort),

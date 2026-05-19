@@ -31,6 +31,7 @@ interface NodeDetailLayoutProps {
   meetingContent: React.ReactNode;
   value?: string;
   onValueChange?: (tab: string) => void;
+  onDeleteSuccess?: () => void;
 }
 
 export function NodeDetailLayout({
@@ -40,6 +41,7 @@ export function NodeDetailLayout({
   meetingContent,
   value,
   onValueChange,
+  onDeleteSuccess,
 }: NodeDetailLayoutProps) {
   const queryClient = useQueryClient();
   const { data: nodeDetail, error, isLoading } = useNodeDetailQuery(projectId, nodeId);
@@ -78,6 +80,7 @@ export function NodeDetailLayout({
     meetingId: nodeDetail?.meeting?.meetingId,
     nodeTitle: nodeDetail?.title,
     nodeNumber: nodeDetail?.number,
+    onDeleteSuccess,
   });
 
   if (isLoading) return <Loading />;
