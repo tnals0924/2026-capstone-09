@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useYjsContext, YJS_FIELDS } from '@/contexts/YjsContext';
+import { useErrorToast } from '@/hooks/useErrorToast';
+import { useNodeDetailQuery, useUpdateNodeNoteMutation } from '@/queries/node';
 import Editor from '../../commons/editor/editor';
-import { privateApi } from '@/api';
 
 interface NodeNoteTabProps {
   nodeId: number | null;
@@ -10,25 +11,32 @@ interface NodeNoteTabProps {
 }
 
 export default function NodeNoteTab({ nodeId, projectId }: NodeNoteTabProps) {
-  const [content, setContent] = useState<string | undefined>('테스트');
+  const { data: nodeDetail } = useNodeDetailQuery(projectId, nodeId);
+  const showErrorToast = useErrorToast();
+  const { mutate: updateNote } = useUpdateNodeNoteMutation(projectId, nodeId ?? 0);
+  const yjsCtx = useYjsContext();
+  const fragment = yjsCtx?.ydoc.getXmlFragment(YJS_FIELDS.note) ?? null;
 
-  useEffect(() => {
-    const fetchNodeDetail = async () => {
-      try {
-        if (!projectId || !nodeId) return;
+  const isMainNode = !nodeDetail?.parentId;
 
-        const data = await privateApi.node.getNode(projectId, nodeId);
-        setContent(data.data.data?.noteContent);
-      } catch (error) {
-        console.error('Failed to load flowchart:', error);
-      }
-    };
-    void fetchNodeDetail();
-  }, [nodeId]);
+  const handleUpdate = (markdown: string) => {
+    if (!nodeId) return;
+    updateNote(markdown, {
+      onError: (err) => showErrorToast(err, '노트 저장에 실패했어요.'),
+    });
+  };
 
   return (
     <main className="flex">
-      <Editor content={content} />
+      {isMainNode ? (
+        <Editor content={nodeDetail?.mainSummary} editable={false} />
+      ) : (
+        <Editor
+          content={nodeDetail?.noteContent}
+          fragment={fragment}
+          onUpdate={handleUpdate}
+        />
+      )}
     </main>
   );
 }
