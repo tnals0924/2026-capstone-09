@@ -1,9 +1,9 @@
 'use client';
 
 import { IconClose } from '@wanteddev/wds-icon';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { privateApi } from '@/api';
+import { useProjectQuery } from '@/queries/project';
 
 import { MembersSettingsPanel } from './MembersSettingsPanel';
 import { NotificationsSettingsPanel } from './NotificationsSettingsPanel';
@@ -22,34 +22,16 @@ interface SettingsModalContentProps {
  * 프로젝트 설정 모달의 레이아웃 셸 (탭 사이드바 + 본문).
  *
  * - 자식 패널들에서 권한 분기 UI(소유자만 삭제·다른 권한은 나가기 등)가 필요해
- *   여기서 `getProject` 한 번 호출해 `myRole` 만 추출해 자식에게 prop으로 내려준다.
- * - 패널 내부에서 별도로 `getProject` 를 호출해야 하는 경우(이름·구성원 수 등 비교적
- *   변동이 잦은 메타데이터)는 자체 fetch 를 유지한다.
+ *   여기서 `useProjectQuery` 로 `myRole` 만 추출해 자식에게 prop으로 내려준다.
+ * - 동일 queryKey 를 쓰는 `ProjectSettingsPanel` 과 캐시를 공유하므로 중복 요청 없음.
  */
 export const SettingsModalContent = ({ projectId, onClose }: SettingsModalContentProps) => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('project');
-  const [myRole, setMyRole] = useState<ProjectMemberRole | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    const fetchMyRole = async () => {
-      try {
-        const response = await privateApi.project.getProject(projectId);
-        if (cancelled) return;
-        const role = response.data.data?.myRole;
-        if (role === 'OWNER' || role === 'MEMBER' || role === 'VIEWER') {
-          setMyRole(role);
-        }
-      } catch (caught) {
-        if (cancelled) return;
-        console.error('내 권한 조회에 실패했어요.', caught);
-      }
-    };
-    void fetchMyRole();
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
+  const { data: projectData } = useProjectQuery(projectId);
+  const role = projectData?.myRole;
+  const myRole: ProjectMemberRole | null =
+    role === 'OWNER' || role === 'MEMBER' || role === 'VIEWER' ? role : null;
 
   return (
     <div className="-m-12 flex h-144 items-stretch gap-8 pr-12">

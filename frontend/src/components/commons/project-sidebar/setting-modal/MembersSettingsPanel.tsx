@@ -11,12 +11,18 @@ import {
   TextFieldButton,
 } from '@wanteddev/wds';
 import { IconChevronDownSmall, IconClose } from '@wanteddev/wds-icon';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { privateApi } from '@/api';
 import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { CustomMenuItem } from '@/components/commons/custom-menu/CustomMemuItem';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
+import { useErrorToast } from '@/hooks/useErrorToast';
+import {
+  useDeleteMemberMutation,
+  useInviteMemberMutation,
+  useProjectMembersQuery,
+  useUpdateMemberRoleMutation,
+} from '@/queries/member';
 import { cn } from '@/utils/cn';
 
 import { ProjectDeleteConfirmContent } from './ProjectDeleteConfirmContent';
@@ -32,40 +38,22 @@ interface MemberRow {
 }
 
 const ROLE_LABEL_MAP: Record<ProjectMemberRole, string> = {
-  // OWNER 는 표시 라벨만 "관리자" 로 사용. 백엔드 enum 값은 그대로 OWNER 유지.
   OWNER: '관리자',
   MEMBER: '멤버',
   VIEWER: '뷰어',
 };
 
-/** 일반 멤버에게 변경 가능한 권한 옵션. OWNER 양도는 정책 미정으로 본 PR 범위 밖. */
 const ASSIGNABLE_ROLES: readonly ProjectMemberRole[] = ['MEMBER', 'VIEWER'];
 
 interface MembersSettingsPanelProps {
   projectId: number;
-  /** 부모(`SettingsModalContent`)에서 한 번 받아 내려주는 현재 사용자의 권한. */
   myRole: ProjectMemberRole | null;
 }
 
-/**
- * 설정 모달 - 구성원 탭.
- *
- * 권한 분기:
- * - OWNER  : 모든 멤버 행에 권한 드롭다운 + 삭제 버튼 (해당 행이 OWNER 면 둘 다 X).
- * - MEMBER : 권한 드롭다운만 표시(권한 변경은 가능), 삭제 버튼 미노출.
- * - VIEWER : 권한 드롭다운/삭제 모두 미노출. 라벨만 표시.
- *
- * 그 외:
- * - 멤버 목록: `getAllMembers(projectId)` → `MemberRow` 정규화.
- * - 멤버 초대: `useMemberInviteForm` + `inviteMember(projectId, { email })`.
- * - 권한 변경: WDS Menu + CustomMenuItem → `updateMemberRole(projectId, memberId, { role })`.
- *   드롭다운이 모달(z-9999) 뒤로 빠지지 않도록 `MenuContent.sx.zIndex` 명시.
- * - 멤버 삭제: 컨펌 다이얼로그 → `deleteMember(projectId, memberId)`.
- * - 멤버 목록 스크롤바: `globals.css` 의 `.custom-scrollbar` 유틸 사용.
- */
 export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanelProps) => {
   const { openDialog, closeDialog } = useDialog();
   const toast = usePositionedToast();
+  const showErrorToast = useErrorToast();
   const {
     email,
     setEmail,
@@ -78,44 +66,28 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
     reset,
   } = useMemberInviteForm();
 
-  const [members, setMembers] = useState<MemberRow[]>([]);
   const [openRoleMenuFor, setOpenRoleMenuFor] = useState<number | null>(null);
-  const [reloadCounter, setReloadCounter] = useState(0);
-  const triggerReload = () => setReloadCounter((c) => c + 1);
+
+  const { data: rawMembers = [] } = useProjectMembersQuery(projectId);
+  const inviteMemberMutation = useInviteMemberMutation(projectId);
+  const updateMemberRoleMutation = useUpdateMemberRoleMutation(projectId);
+  const deleteMemberMutation = useDeleteMemberMutation(projectId);
+
+  const members: MemberRow[] = rawMembers
+    .filter(
+      (m): m is { memberId: number; role: ProjectMemberRole } & typeof m =>
+        m.memberId !== undefined && m.role !== undefined,
+    )
+    .map((m) => ({
+      memberId: m.memberId,
+      nickname: m.nickname ?? '',
+      email: m.email ?? '',
+      profileImageUrl: m.profileImageUrl,
+      role: m.role as ProjectMemberRole,
+    }));
 
   const isViewer = myRole === 'VIEWER';
   const isOwner = myRole === 'OWNER';
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchMembers = async () => {
-      try {
-        const response = await privateApi.projectMember.getAllMembers(projectId);
-        if (cancelled) return;
-        const list = response.data.data?.members ?? [];
-        const normalized: MemberRow[] = list
-          .filter(
-            (m): m is { memberId: number; role: ProjectMemberRole } & typeof m =>
-              m.memberId !== undefined && m.role !== undefined,
-          )
-          .map((m) => ({
-            memberId: m.memberId,
-            nickname: m.nickname ?? '',
-            email: m.email ?? '',
-            profileImageUrl: m.profileImageUrl,
-            role: m.role,
-          }));
-        setMembers(normalized);
-      } catch (caught) {
-        if (cancelled) return;
-        console.error('멤버 목록 조회에 실패했어요.', caught);
-      }
-    };
-    void fetchMembers();
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId, reloadCounter]);
 
   const handleEmailKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key !== 'Enter') return;
@@ -127,11 +99,11 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
     if (!canSendAll) return;
     const payloads = buildPayloads();
     if (payloads.length === 0) return;
-    // 백엔드 `inviteMember` 가 단일 이메일만 받아 일괄 호출은 클라이언트에서 Promise.all 로 처리.
     const results = await Promise.allSettled(
-      payloads.map((payload) => privateApi.project.inviteMember(projectId, payload)),
+      payloads.map((payload) => inviteMemberMutation.mutateAsync(payload.email)),
     );
     const failures = results.filter((r) => r.status === 'rejected');
+    const successCount = payloads.length - failures.length;
     reset();
     if (failures.length === 0) {
       toast({
@@ -141,15 +113,8 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
         duration: 'short',
       });
     } else {
-      failures.forEach((failure) => {
-        console.error('멤버 초대 일부 실패', (failure as PromiseRejectedResult).reason);
-      });
-      toast({
-        content: `${payloads.length - failures.length}명 전송 완료, ${failures.length}명 실패`,
-        variant: 'cautionary',
-        placement: 'bottom-left',
-        duration: 'short',
-      });
+      const firstReason = (failures[0] as PromiseRejectedResult).reason;
+      showErrorToast(firstReason, `${successCount}명 전송 완료, ${failures.length}명 실패`);
     }
   };
 
@@ -157,10 +122,7 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
     setOpenRoleMenuFor(null);
     if (member.role === nextRole) return;
     try {
-      await privateApi.projectMember.updateMemberRole(projectId, member.memberId, {
-        role: nextRole,
-      });
-      triggerReload();
+      await updateMemberRoleMutation.mutateAsync({ memberId: member.memberId, role: nextRole });
       toast({
         content: '멤버 권한을 변경했어요',
         variant: 'normal',
@@ -168,7 +130,7 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
         duration: 'short',
       });
     } catch (caught) {
-      console.error('멤버 권한 변경에 실패했어요.', caught);
+      showErrorToast(caught, '멤버 권한 변경에 실패했어요.');
     }
   };
 
@@ -181,9 +143,8 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
           projectName={member.nickname || member.email}
           onConfirm={async () => {
             try {
-              await privateApi.projectMember.deleteMember(projectId, member.memberId);
+              await deleteMemberMutation.mutateAsync(member.memberId);
               closeDialog();
-              triggerReload();
               toast({
                 content: '멤버를 삭제했어요',
                 variant: 'normal',
@@ -191,7 +152,7 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
                 duration: 'short',
               });
             } catch (caught) {
-              console.error('멤버 삭제에 실패했어요.', caught);
+              showErrorToast(caught, '멤버 삭제에 실패했어요.');
             }
           }}
           onClose={closeDialog}
@@ -226,7 +187,6 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
           }
         />
 
-        {/* 추가된 초대 대기 이메일 Chip 목록 */}
         {pendingEmails.length > 0 && (
           <div className="flex flex-wrap items-center gap-3 pt-2">
             {pendingEmails.map((mail) => (
@@ -300,15 +260,13 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
                   {showRoleDropdown ? (
                     <Menu
                       open={openRoleMenuFor === member.memberId}
-                      onOpenChange={(isOpen) =>
-                        setOpenRoleMenuFor(isOpen ? member.memberId : null)
-                      }
+                      onOpenChange={(isOpen) => setOpenRoleMenuFor(isOpen ? member.memberId : null)}
                     >
                       <MenuTrigger>
                         <button
                           type="button"
                           className={cn(
-                            'text-caption-1 text-label-neutral hover:bg-fill-normal active:bg-fill-strong inline-flex items-center gap-1 rounded-md bg-transparent px-2 py-1 font-medium outline-none transition-colors',
+                            'text-caption-1 text-label-neutral hover:bg-fill-normal active:bg-fill-strong inline-flex items-center gap-1 rounded-md bg-transparent px-2 py-1 font-medium transition-colors outline-none',
                             'focus-visible:ring-primary-40 focus-visible:ring-2 focus-visible:ring-offset-2',
                           )}
                         >
@@ -316,7 +274,6 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
                           <IconChevronDownSmall className="h-4 w-4" aria-hidden="true" />
                         </button>
                       </MenuTrigger>
-                      {/* WDS Menu 기본 z-index(11) < 공통 모달(9999). 모달 뒤로 빠지지 않도록 명시. */}
                       <MenuContent
                         offset={4}
                         position="bottom-end"
@@ -345,7 +302,7 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
                       type="button"
                       onClick={() => handleMemberDelete(member)}
                       className={cn(
-                        'text-caption-1 text-status-negative hover:bg-fill-normal active:bg-fill-strong rounded-md bg-transparent px-2 py-1 font-semibold outline-none transition-colors',
+                        'text-caption-1 text-status-negative hover:bg-fill-normal active:bg-fill-strong rounded-md bg-transparent px-2 py-1 font-semibold transition-colors outline-none',
                         'focus-visible:ring-primary-40 focus-visible:ring-2 focus-visible:ring-offset-2',
                       )}
                     >
