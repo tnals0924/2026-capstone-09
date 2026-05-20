@@ -9,6 +9,8 @@ import kr.flowmeet.domain.project.repository.projection.ProjectWithMemberCountPr
 public record ProjectSummaryResponse(
         @Schema(description = "프로젝트 ID", example = "17")
         Long projectId,
+        @Schema(description = "프로젝트 프로필 이미지 URL", example = "https://static.flowmeet.kr/projects/1.png")
+        String profileImageUrl,
         @Schema(description = "프로젝트 이름", example = "FlowMeet 리뉴얼")
         String name,
         @Schema(description = "프로젝트 멤버 수", example = "8")
@@ -20,6 +22,7 @@ public record ProjectSummaryResponse(
         Project project = projection.project();
         return new ProjectSummaryResponse(
                 project.getId(),
+                project.getProfileImageUrl(),
                 project.getName(),
                 projection.memberCount().intValue(),
                 project.getUpdatedAt()
