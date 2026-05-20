@@ -10,8 +10,8 @@ import org.springframework.web.client.RestClient;
 public class AiAgentConfig {
 
     @Bean
-    public RestClient aiAgentRestClient(final AiAgentProperties properties) {
-        return RestClient.builder()
+    public RestClient aiAgentRestClient(final RestClient.Builder builder, final AiAgentProperties properties) {
+        return builder
                 .baseUrl(properties.getUrl())
                 .build();
     }
