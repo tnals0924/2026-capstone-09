@@ -1,4 +1,4 @@
-import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge, Position } from 'reactflow';
+import { EdgeProps, getBezierPath, EdgeLabelRenderer, BaseEdge, Position, useNodes } from 'reactflow';
 import type { Edge as FlowChartEdge } from '@/types/FlowChartTypes';
 import { DashedComment } from './DashedComment';
 
@@ -12,34 +12,75 @@ export function ReferenceEdge({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   data,
 }: EdgeProps) {
   const edgeData = data?.edgeData as FlowChartEdge | undefined;
+  const nodes = useNodes();
 
   const midX = (sourceX + targetX) / 2;
   const midY = (sourceY + targetY) / 2;
-  const referenceNodeOffsetY = 100;
-  const referenceNodeX = midX;
-  const referenceNodeY = midY + referenceNodeOffsetY;
+
+  // 노드들과 겹치지 않는 위치 찾기
+  const NODE_WIDTH = 280;
+  const NODE_HEIGHT = 100;
+  const COMMENT_WIDTH = 250;
+  const COMMENT_HEIGHT = 80;
+  const MIN_OFFSET = 120;
+  const OFFSET_STEP = 80;
+
+  function isOverlapping(x: number, y: number): boolean {
+    return nodes.some((node) => {
+      const nodeX = node.position.x;
+      const nodeY = node.position.y;
+
+      // 코멘트 박스와 노드가 겹치는지 확인
+      return (
+        x - COMMENT_WIDTH / 2 < nodeX + NODE_WIDTH &&
+        x + COMMENT_WIDTH / 2 > nodeX &&
+        y - COMMENT_HEIGHT / 2 < nodeY + NODE_HEIGHT &&
+        y + COMMENT_HEIGHT / 2 > nodeY
+      );
+    });
+  }
+
+  // 여러 위치를 시도 (아래 → 위 → 더 아래 → 더 위)
+  let referenceNodeX = midX;
+  let referenceNodeY = midY + MIN_OFFSET;
+
+  const positions = [
+    { x: midX, y: midY + MIN_OFFSET },           // 아래
+    { x: midX, y: midY - MIN_OFFSET },           // 위
+    { x: midX, y: midY + MIN_OFFSET + OFFSET_STEP }, // 더 아래
+    { x: midX, y: midY - MIN_OFFSET - OFFSET_STEP }, // 더 위
+    { x: midX, y: midY + MIN_OFFSET + OFFSET_STEP * 2 }, // 훨씬 아래
+  ];
+
+  for (const pos of positions) {
+    if (!isOverlapping(pos.x, pos.y)) {
+      referenceNodeX = pos.x;
+      referenceNodeY = pos.y;
+      break;
+    }
+  }
 
   const [path1] = getBezierPath({
     sourceX,
     sourceY,
-    sourcePosition,
+    sourcePosition: Position.Right,
     targetX: referenceNodeX,
     targetY: referenceNodeY,
-    targetPosition: Position.Left, // 참조노드의 왼쪽으로 연결
+    targetPosition: Position.Left,
+    curvature: 0.25,
   });
 
   const [path2] = getBezierPath({
     sourceX: referenceNodeX,
     sourceY: referenceNodeY,
-    sourcePosition: Position.Right, // 참조노드의 오른쪽에서 시작
+    sourcePosition: Position.Right,
     targetX,
     targetY,
-    targetPosition,
+    targetPosition: Position.Left,
+    curvature: 0.25,
   });
 
   return (
