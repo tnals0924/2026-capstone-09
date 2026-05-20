@@ -6,17 +6,17 @@ interface ChatMessageProps {
   role: 'user' | 'assistant';
   content: string;
   timestamp?: string;
-  isStreaming?: boolean;
+  shouldAnimate?: boolean;
 }
 
 // 타이핑 효과 전용 컴포넌트
-function StreamingText({ content, isStreaming }: { content: string; isStreaming: boolean }) {
-  const [displayedContent, setDisplayedContent] = useState(isStreaming ? '' : content);
+function StreamingText({ content, shouldAnimate }: { content: string; shouldAnimate: boolean }) {
+  const [displayedContent, setDisplayedContent] = useState(shouldAnimate ? '' : content);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // 타이핑 애니메이션
   useEffect(() => {
-    if (isStreaming && currentIndex < content.length) {
+    if (shouldAnimate && currentIndex < content.length) {
       const timeout = setTimeout(() => {
         setDisplayedContent(content.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
@@ -24,19 +24,19 @@ function StreamingText({ content, isStreaming }: { content: string; isStreaming:
 
       return () => clearTimeout(timeout);
     }
-  }, [content, currentIndex, isStreaming]);
+  }, [content, currentIndex, shouldAnimate]);
 
   return (
     <>
       {displayedContent}
-      {isStreaming && currentIndex < content.length && (
+      {shouldAnimate && currentIndex < content.length && (
         <span className="inline-block w-1 h-4 ml-1 bg-label-normal animate-pulse" />
       )}
     </>
   );
 }
 
-export function ChatMessage({ role, content, isStreaming = false }: ChatMessageProps) {
+export function ChatMessage({ role, content, shouldAnimate = false }: ChatMessageProps) {
   const isUser = role === 'user';
 
   return (
@@ -50,7 +50,7 @@ export function ChatMessage({ role, content, isStreaming = false }: ChatMessageP
       ) : (
         <div className="w-full">
           <p className="text-body-2 text-label-normal whitespace-pre-wrap break-words">
-            <StreamingText key={content} content={content} isStreaming={isStreaming} />
+            <StreamingText key={content} content={content} shouldAnimate={shouldAnimate} />
           </p>
         </div>
       )}
