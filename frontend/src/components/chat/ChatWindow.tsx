@@ -4,7 +4,7 @@ import { useQueryClient, useQuery } from '@tanstack/react-query';
 import { IconButton, List, ListCell, ScrollArea } from '@wanteddev/wds';
 import { IconTemplate, IconChat, IconSearch } from '@wanteddev/wds-icon';
 import { useParams } from 'next/navigation';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { privateApi } from '@/api';
 import { MultiSelectInput, type MultiSelectInputValue, type NodeOption, type UserOption } from '@/components/commons/custom-input/MultiSelectInput';
 import { useCreateChatSession, useSendMessage, useGetAllChatSessions, useGetChatSessionDetail, useGetReferenceNodes, useAddChatNode, useRemoveChatNode } from '@/queries/chat';
@@ -84,7 +84,6 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   const { data: referenceNodesData } = useGetReferenceNodes(projectId);
 
   // 프로젝트 멤버 조회
-  // TODO: 수정해야 함
   const { data: membersData } = useQuery({
     queryKey: ['projectMembers', projectId],
     queryFn: async () => {
@@ -95,25 +94,21 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   });
 
   // 노드 옵션 생성
-  const nodeOptions: NodeOption[] = useMemo(() => {
-    const nodes = referenceNodesData?.data?.nodes || [];
-    return nodes.map((node) => ({
-      id: node.nodeId?.toString() || '',
-      label: node.title || '',
-      nodeId: node.nodeId || 0,
-      number: node.number || '',
-    }));
-  }, [referenceNodesData]);
+  const nodes = referenceNodesData?.data?.nodes || [];
+  const nodeOptions: NodeOption[] = nodes.map((node) => ({
+    id: node.nodeId?.toString() || '',
+    label: node.title || '',
+    nodeId: node.nodeId || 0,
+    number: node.number || '',
+  }));
 
   // 사용자 옵션 생성
-  const userOptions: UserOption[] = useMemo(() => {
-    const members = membersData?.data?.members || [];
-    return members.map((member) => ({
-      id: member.userId?.toString() || '',
-      label: member.nickname || member.email || '',
-      profileImageUrl: member.profileImageUrl,
-    }));
-  }, [membersData]);
+  const members = membersData?.data?.members || [];
+  const userOptions: UserOption[] = members.map((member) => ({
+    id: member.userId?.toString() || '',
+    label: member.nickname || member.email || '',
+    profileImageUrl: member.profileImageUrl,
+  }));
 
   const addChatNodeMutation = useAddChatNode();
   const removeChatNodeMutation = useRemoveChatNode();
@@ -123,16 +118,14 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   };
 
   // 서버에서 로드된 채팅 메시지 (이전 채팅 조회용)
-  const serverMessages = useMemo<Message[]>(() => {
-    if (!chatDetail?.data?.messages) return [];
-
-    return chatDetail.data.messages.map((msg) => ({
-      id: msg.messageId?.toString() || '',
-      role: msg.messageType === 'USER' ? 'user' : 'assistant',
-      content: msg.content || '',
-      timestamp: msg.createdAt || new Date().toISOString(),
-    }));
-  }, [chatDetail?.data?.messages]);
+  const serverMessages: Message[] = !chatDetail?.data?.messages
+    ? []
+    : chatDetail.data.messages.map((msg) => ({
+        id: msg.messageId?.toString() || '',
+        role: msg.messageType === 'USER' ? 'user' : 'assistant',
+        content: msg.content || '',
+        timestamp: msg.createdAt || new Date().toISOString(),
+      }));
 
   // 현재 세션 ID
   const currentChatSessionId = selectedChatId ?? chatSessionId;
@@ -238,7 +231,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
             setInputValue({ text: '', mentions: [] });
 
             // 채팅 목록 새로고침
-            queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
+            void queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
           }
         },
         onError: () => {},

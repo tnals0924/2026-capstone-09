@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ChatMessageProps {
   role: 'user' | 'assistant';
@@ -9,37 +9,35 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
-export function ChatMessage({ role, content, isStreaming = false }: ChatMessageProps) {
-  const isUser = role === 'user';
-  const [displayedContent, setDisplayedContent] = useState(isUser ? content : '');
+// 타이핑 효과 전용 컴포넌트
+function StreamingText({ content, isStreaming }: { content: string; isStreaming: boolean }) {
+  const [displayedContent, setDisplayedContent] = useState(isStreaming ? '' : content);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const prevContentRef = useRef(content);
 
-  /* eslint-disable react-hooks/set-state-in-effect */
+  // 타이핑 애니메이션
   useEffect(() => {
-    if (!isUser && prevContentRef.current !== content) {
-      prevContentRef.current = content;
-      if (isStreaming) {
-        setDisplayedContent('');
-        setCurrentIndex(0);
-      } else {
-        setDisplayedContent(content);
-      }
-    }
-  }, [content, isUser, isStreaming]);
-  /* eslint-enable react-hooks/set-state-in-effect */
-
-  // AI 메시지 타이핑 애니메이션
-  useEffect(() => {
-    if (!isUser && isStreaming && currentIndex < content.length) {
+    if (isStreaming && currentIndex < content.length) {
       const timeout = setTimeout(() => {
         setDisplayedContent(content.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
-      }, 20); // 20ms 간격으로 한 글자씩 표시
+      }, 20);
 
       return () => clearTimeout(timeout);
     }
-  }, [content, currentIndex, isUser, isStreaming]);
+  }, [content, currentIndex, isStreaming]);
+
+  return (
+    <>
+      {displayedContent}
+      {isStreaming && currentIndex < content.length && (
+        <span className="inline-block w-1 h-4 ml-1 bg-label-normal animate-pulse" />
+      )}
+    </>
+  );
+}
+
+export function ChatMessage({ role, content, isStreaming = false }: ChatMessageProps) {
+  const isUser = role === 'user';
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
@@ -52,10 +50,7 @@ export function ChatMessage({ role, content, isStreaming = false }: ChatMessageP
       ) : (
         <div className="w-full">
           <p className="text-body-2 text-label-normal whitespace-pre-wrap break-words">
-            {displayedContent}
-            {isStreaming && currentIndex < content.length && (
-              <span className="inline-block w-1 h-4 ml-1 bg-label-normal animate-pulse" />
-            )}
+            <StreamingText key={content} content={content} isStreaming={isStreaming} />
           </p>
         </div>
       )}
