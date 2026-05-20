@@ -7,7 +7,7 @@ tool_schema = [
             "properties": {
                 "projectId": {"type": "integer", "description": "조회할 프로젝트의 ID"}
             },
-            "required": ["projectId"],
+            "required": [],
             "additionalProperties": False
         }
     },
@@ -19,7 +19,7 @@ tool_schema = [
             "properties": {
                 "projectId": {"type": "integer", "description": "조회할 프로젝트의 ID"}
             },
-            "required": ["projectId"],
+            "required": [],
             "additionalProperties": False
         }
     },
@@ -31,7 +31,7 @@ tool_schema = [
             "properties": {
                 "projectId": {"type": "integer", "description": "조회할 프로젝트의 ID"}
             },
-            "required": ["projectId"],
+            "required": [],
             "additionalProperties": False
         }
     }
