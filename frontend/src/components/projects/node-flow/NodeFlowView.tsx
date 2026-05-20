@@ -24,7 +24,7 @@ import { Loading } from '@/components/commons/loading/Loading';
 import { useModal } from '@/components/commons/modal/ModalContext';
 import { NodeSidebar } from '@/components/node-datail/NodeSidebar';
 import { MultiNodeSummaryModalContent } from '@/components/projects/project-detail/multi-node-summary/MultiNodeSummaryModalContent';
-import type { MultiNodeSummaryNode } from '@/components/projects/project-detail/multi-node-summary/types';
+import type { MultiNodeSummaryNode, MultiNodeSummaryResult } from '@/components/projects/project-detail/multi-node-summary/types';
 import { useMultiNodeSummaryRequest } from '@/components/projects/project-detail/multi-node-summary/useMultiNodeSummaryRequest';
 import { nodeKeys } from '@/queries/keys/nodeKeys';
 import { useFlowchartQuery } from '@/queries/node';
@@ -57,7 +57,7 @@ function ConnectedMultiNodeSummary({
   onClose: () => void;
 }) {
   const { handleSubmit, isPending } = useMultiNodeSummaryRequest({ projectId, nodes });
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<MultiNodeSummaryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
