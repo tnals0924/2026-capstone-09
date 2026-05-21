@@ -9,7 +9,7 @@ import { chatKeys } from '@/queries/keys/chatKeys';
 import { ChatHeader } from './ChatHeader';
 import { ChatInputArea } from './ChatInputArea';
 import { ChatMessageList } from './ChatMessageList';
-import { ChatSidebar } from './ChatSidebar';
+import { ChatSidebar } from './sidebar/ChatSidebar';
 
 interface Message {
   id: string;

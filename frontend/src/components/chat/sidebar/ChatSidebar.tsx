@@ -4,7 +4,7 @@ import { List, ListCell, ScrollArea } from '@wanteddev/wds';
 import { IconTemplate, IconChat, IconSearch } from '@wanteddev/wds-icon';
 import { useModal } from '@/components/commons/modal/ModalContext';
 import { ChatListItem } from './ChatListItem';
-import { ChatSearchModalContent } from './ChatSearchModalContent';
+import { ChatSearchModalContent } from '../search/ChatSearchModalContent';
 
 interface ChatSession {
   chatSessionId?: number | null;
