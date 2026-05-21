@@ -3,7 +3,7 @@ const path = require('node:path')
 const { autoUpdater } = require('electron-updater')
 
 const isDev = process.env.NODE_ENV === 'development'
-const PROD_URL = process.env.ELECTRON_APP_URL || 'https://flowmeet.kr'
+const PROD_URL = process.env.ELECTRON_APP_URL || 'https://app.flowmeet.kr'
 
 autoUpdater.autoDownload = false
 
