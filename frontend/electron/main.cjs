@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, shell } = require('electron')
 const path = require('node:path')
 
 const isDev = process.env.NODE_ENV === 'development'
+const PROD_URL = process.env.ELECTRON_APP_URL || 'https://flowmeet.kr'
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -14,9 +15,7 @@ function createWindow() {
     },
   })
 
-  if (isDev) {
-    win.loadURL('http://localhost:3000')
-  }
+  win.loadURL(isDev ? 'http://localhost:3000' : PROD_URL)
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
