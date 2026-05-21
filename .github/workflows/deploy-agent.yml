@@ -2,7 +2,7 @@ name: AI CI/CD
 
 on:
   push:
-    branches: [ai/develop]
+    branches: [ai/develop, backend/develop]
     paths:
       - 'mcp-server/**'
       - 'ai/agent/**'
