@@ -1,6 +1,10 @@
 'use client';
 
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 import { IconSparkleFill } from '@wanteddev/wds-icon';
+import { useEffect } from 'react';
+import { Markdown } from 'tiptap-markdown';
 
 import { MermaidDiagram } from '@/components/commons/mermaid/MermaidDiagram';
 import { Users } from '@/components/commons/user/UserAvatarGroup';
@@ -18,6 +22,19 @@ interface MeetingSummaryProps {
 }
 
 export function MeetingSummary({ summary, mermaidCode, participants }: MeetingSummaryProps) {
+  const editor = useEditor({
+    extensions: [StarterKit.configure({ undoRedo: false }), Markdown],
+    editable: false,
+    content: summary,
+    immediatelyRender: false,
+  });
+
+  useEffect(() => {
+    if (editor && !editor.isDestroyed) {
+      editor.commands.setContent(summary);
+    }
+  }, [editor, summary]);
+
   return (
     <div className="flex flex-col gap-6 p-4">
       {participants !== undefined && (
@@ -36,9 +53,11 @@ export function MeetingSummary({ summary, mermaidCode, participants }: MeetingSu
           <IconSparkleFill className="text-primary-40 h-4 w-4 shrink-0" />
           <span className="text-label-1 text-label-normal font-semibold">회의 요약</span>
         </div>
-        <p className="border-primary-40 text-body-1-reading text-label-neutral border-l-2 pl-3 whitespace-pre-wrap">
-          {summary}
-        </p>
+        <div className="border-primary-40 border-l-2 pl-3">
+          <div className="prose prose-sm max-w-none prose-headings:text-base prose-headings:font-bold prose-headings:my-2 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0 [&_.ProseMirror]:outline-none">
+            <EditorContent editor={editor} />
+          </div>
+        </div>
       </div>
       {mermaidCode && (
         <div className="mt-4 flex flex-col gap-2 pb-20">

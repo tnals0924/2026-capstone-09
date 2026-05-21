@@ -68,7 +68,9 @@ export const ProjectSidebar = ({
   const { openModal, closeModal } = useModal();
   const queryClient = useQueryClient();
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isCollapsedInternal, setIsCollapsedInternal] = useState(false);
+  const [isCollapsedInternal, setIsCollapsedInternal] = useState(
+    () => typeof window !== 'undefined' && localStorage.getItem('sidebar-collapsed') === 'true',
+  );
   const [isAlarmModalOpen, setIsAlarmModalOpen] = useState(false);
   const [projectImgError, setProjectImgError] = useState(false);
   const isProjectSelectionPage = pathname === '/projects';
@@ -139,7 +141,9 @@ export const ProjectSidebar = ({
     };
 
     void connect();
-    return () => { controller.abort(); };
+    return () => {
+      controller.abort();
+    };
   }, [isProjectIdValid, projectId]);
 
   // prop > query > storage > 빈 문자열 우선순위로 합성
@@ -176,6 +180,7 @@ export const ProjectSidebar = ({
   const handleToggleCollapsed = () => {
     setIsCollapsedInternal((prev) => {
       const nextIsCollapsed = !prev;
+      localStorage.setItem('sidebar-collapsed', String(nextIsCollapsed));
       setIsCollapseSettled(!nextIsCollapsed);
       if (nextIsCollapsed) {
         setIsAlarmModalOpen(false);
@@ -200,9 +205,7 @@ export const ProjectSidebar = ({
       variant: 'compact',
       closeOnBackdrop: true,
       closeOnEsc: true,
-      content: (
-        <SearchModalContent projectId={projectId} onResultClick={() => closeModal()} />
-      ),
+      content: <SearchModalContent projectId={projectId} onResultClick={() => closeModal()} />,
     });
   };
 
