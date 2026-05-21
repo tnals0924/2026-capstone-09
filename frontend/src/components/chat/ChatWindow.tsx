@@ -79,7 +79,20 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   // 외부 클릭 감지
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (chatWindowRef.current && !chatWindowRef.current.contains(event.target as Node)) {
+      const target = event.target as HTMLElement;
+
+      // 다이얼로그, 모달, 메뉴 클릭은 무시
+      if (
+        target.closest('[role="dialog"]') ||
+        target.closest('[role="menu"]') ||
+        target.closest('[data-wds-component="dialog"]') ||
+        target.closest('[aria-modal="true"]') ||
+        target.closest('.z-9999')
+      ) {
+        return;
+      }
+
+      if (chatWindowRef.current && !chatWindowRef.current.contains(target)) {
         onClose();
       }
     };
@@ -89,6 +102,27 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [onClose]);
+
+  // 컴포넌트 마운트 시 이전 세션 복원
+  useEffect(() => {
+    const savedSessionId = sessionStorage.getItem(`chat_session_${projectId}`);
+    if (savedSessionId) {
+      const sessionId = Number(savedSessionId);
+      setSelectedChatId(sessionId);
+      setChatSessionId(sessionId);
+      // 캐시된 데이터를 모두 제거하고 새로 가져오기
+      void queryClient.removeQueries({
+        queryKey: chatKeys.details(),
+      });
+    }
+  }, [projectId, queryClient]);
+
+  // 세션 ID 변경 시 sessionStorage에 저장
+  useEffect(() => {
+    if (chatSessionId !== null) {
+      sessionStorage.setItem(`chat_session_${projectId}`, String(chatSessionId));
+    }
+  }, [chatSessionId, projectId]);
 
   // 채팅 목록 조회
   const { data: chatSessionsData } = useGetAllChatSessions({
@@ -151,6 +185,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
       setMessages(serverMessages);
       setChatSessionId(selectedChatId);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatId, serverMessages.length]);
 
   // 화면에 표시할 메시지 (항상 messages 사용)
