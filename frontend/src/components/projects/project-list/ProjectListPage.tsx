@@ -159,7 +159,10 @@ export const ProjectListPage = () => {
             <ul className="bg-surface-canvas">
               {projects.map((project) => {
                 return (
-                  <li key={project.projectId} className="border-line-normal-neutral bg-surface-canvas border-b">
+                  <li
+                    key={project.projectId}
+                    className="border-line-normal-neutral bg-surface-canvas border-b"
+                  >
                     <button
                       type="button"
                       onClick={() => router.push(`/projects/${project.projectId}`)}
