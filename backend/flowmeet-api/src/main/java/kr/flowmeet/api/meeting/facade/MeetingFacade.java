@@ -146,7 +146,7 @@ public class MeetingFacade {
             throw new BusinessException(MeetingErrorCode.MEETING_NO_TRANSCRIPT);
         }
 
-        AiTask aiTask = aiTaskService.create(userId, meetingId, AiTaskType.SUB_SUMMARY);
+        AiTask aiTask = aiTaskService.create(userId, projectId, meetingId, AiTaskType.SUB_SUMMARY);
         eventPublisher.publishEvent(new MeetingEndedEvent(aiTask.getId(), mergedText));
 
         return EndMeetingResponse.from(aiTask.getId());

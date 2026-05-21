@@ -275,7 +275,7 @@ public class NodeFacade {
             throw new BusinessException(NodeErrorCode.NO_CHILD_SUMMARY);
         }
 
-        AiTask aiTask = aiTaskService.create(userId, nodeId, AiTaskType.MAIN_SUMMARY);
+        AiTask aiTask = aiTaskService.create(userId, projectId, nodeId, AiTaskType.MAIN_SUMMARY);
         eventPublisher.publishEvent(new NodeSummaryRequestEvent(aiTask.getId(), mergedText));
 
         return RequestNodeSummaryResponse.from(aiTask.getId());
