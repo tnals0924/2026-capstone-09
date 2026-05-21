@@ -25,7 +25,7 @@ import {
 } from '@/queries/member';
 import { cn } from '@/utils/cn';
 
-import { ProjectDeleteConfirmContent } from './ProjectDeleteConfirmContent';
+import { MemberDeleteConfirmContent } from './MemberDeleteConfirmContent';
 import type { ProjectMemberRole } from './SettingsModalContent';
 import { useMemberInviteForm } from './useMemberInviteForm';
 
@@ -139,8 +139,8 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
       closeOnBackdrop: true,
       closeOnEsc: true,
       content: (
-        <ProjectDeleteConfirmContent
-          projectName={member.nickname || member.email}
+        <MemberDeleteConfirmContent
+          memberName={member.nickname || member.email}
           onConfirm={async () => {
             try {
               await deleteMemberMutation.mutateAsync(member.memberId);

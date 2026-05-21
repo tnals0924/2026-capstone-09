@@ -18,6 +18,7 @@ interface ReferenceNodeModalContentProps {
   nodeOptions: readonly ReferenceNodeOption[];
   onClose: () => void;
   onCreate?: (payload: ReferenceNodeCreatePayload) => void;
+  onDeleteEdge?: (edgeId: number) => void;
 }
 
 export const ReferenceNodeModalContent = ({
@@ -26,6 +27,7 @@ export const ReferenceNodeModalContent = ({
   nodeOptions,
   onClose,
   onCreate,
+  onDeleteEdge,
 }: ReferenceNodeModalContentProps) => {
   const form = useReferenceNodeForm({ startNodeId, nodeOptions });
   const { handleSubmit, canCreate, buildPayload, viewMode, openAddView, closeAddView } = form;
@@ -51,7 +53,7 @@ export const ReferenceNodeModalContent = ({
       </header>
 
       <div className="flex w-full flex-col gap-6">
-        <ReferencedNodesList items={referencedNodes} variant={viewMode} />
+        <ReferencedNodesList items={referencedNodes} variant={viewMode} onDeleteEdge={onDeleteEdge} />
 
         {viewMode === 'list' ? (
           <div className="flex w-full justify-end">

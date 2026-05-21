@@ -26,8 +26,11 @@ import { NodeSidebar } from '@/components/node-datail/NodeSidebar';
 import { MultiNodeSummaryModalContent } from '@/components/projects/project-detail/multi-node-summary/MultiNodeSummaryModalContent';
 import type { MultiNodeSummaryNode, MultiNodeSummaryResult } from '@/components/projects/project-detail/multi-node-summary/types';
 import { useMultiNodeSummaryRequest } from '@/components/projects/project-detail/multi-node-summary/useMultiNodeSummaryRequest';
+import { EdgeDeleteConfirmContent } from '@/components/projects/project-detail/edge-delete/EdgeDeleteConfirmContent';
 import { nodeKeys } from '@/queries/keys/nodeKeys';
+import { useDeleteEdgeMutation } from '@/queries/edge';
 import { useFlowchartQuery } from '@/queries/node';
+import { useErrorToast } from '@/hooks/useErrorToast';
 import { convertToReactFlow } from '@/utils/flowchartToReactFlow';
 import { CustomNode } from './CustomNode';
 import { NodeButton } from './NodeButton';
@@ -81,6 +84,8 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
   const { setViewport, getViewport } = useReactFlow();
   const queryClient = useQueryClient();
   const { openModal, closeModal } = useModal();
+  const showErrorToast = useErrorToast();
+  const { mutate: deleteEdge } = useDeleteEdgeMutation(projectId);
   const { data: flowChart, isLoading: loading } = useFlowchartQuery(projectId);
   const [selectedNodeId, setSelectedNodeId] = useState<number | null>(null);
   const [sidebarNodeId, setSidebarNodeId] = useState<number | null>(null);
@@ -254,6 +259,40 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
     }
   }, [flowChart, updateFlowAndMoveToNode, projectId, isCreating, queryClient]);
 
+  // 점선(참조 엣지) 삭제 핸들러
+  const handleDeleteEdge = useCallback(
+    (edgeId: number) => {
+      openModal({
+        variant: 'small',
+        closeOnBackdrop: true,
+        content: (
+          <EdgeDeleteConfirmContent
+            onConfirm={() => {
+              deleteEdge(edgeId, {
+                onSuccess: () => {
+                  closeModal();
+                  void queryClient.invalidateQueries({ queryKey: nodeKeys.flowchart(projectId) });
+                },
+                onError: (err) => showErrorToast(err, '참조 연결 삭제에 실패했어요.'),
+              });
+            }}
+            onClose={closeModal}
+          />
+        ),
+      });
+    },
+    [openModal, closeModal, deleteEdge, projectId, queryClient, showErrorToast],
+  );
+
+  const edgesWithHandlers = useMemo(
+    () =>
+      edges.map((edge) => ({
+        ...edge,
+        data: { ...edge.data, onDeleteEdge: handleDeleteEdge },
+      })),
+    [edges, handleDeleteEdge],
+  );
+
   const nodesWithHandlers = useMemo(() => {
     return nodes.map((node) => ({
       ...node,
@@ -268,10 +307,10 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
 
   const visibleEdges = useMemo(() => {
     if (showDashedLines) {
-      return edges;
+      return edgesWithHandlers;
     }
-    return edges.filter((edge) => edge.type !== 'reference');
-  }, [edges, showDashedLines]);
+    return edgesWithHandlers.filter((edge) => edge.type !== 'reference');
+  }, [edgesWithHandlers, showDashedLines]);
 
   if (loading) {
     return <Loading />;

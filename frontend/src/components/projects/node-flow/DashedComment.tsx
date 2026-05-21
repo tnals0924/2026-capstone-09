@@ -1,12 +1,13 @@
 import { Avatar } from '@wanteddev/wds';
+import { IconTrash } from '@wanteddev/wds-icon';
 import { useState, useRef, useEffect } from 'react';
 
 import { EXAMPLE_PROJECT_SIDEBAR_PROFILE } from '@/constants/exampleConstant';
 import type { Edge } from '@/types/FlowChartTypes';
 
 type DashedCommentProps =
-  | { isCreateMode: true; edge?: never; onCommentCreate?: (comment: string) => void }
-  | { isCreateMode?: false; edge: Edge; onCommentCreate?: never };
+  | { isCreateMode: true; edge?: never; onCommentCreate?: (comment: string) => void; onDeleteEdge?: never }
+  | { isCreateMode?: false; edge: Edge; onCommentCreate?: never; onDeleteEdge?: () => void };
 
 interface CommentDisplayProps {
   avatarSrc?: string;
@@ -35,6 +36,7 @@ function CommentDisplay({ avatarSrc, nickname, timeText, comment }: CommentDispl
 
 export function DashedComment(props: DashedCommentProps) {
   const { isCreateMode, onCommentCreate } = props;
+  const onDeleteEdge = 'onDeleteEdge' in props ? props.onDeleteEdge : undefined;
   const [isEditing, setIsEditing] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [savedComment, setSavedComment] = useState<string | null>(null);
@@ -119,15 +121,30 @@ export function DashedComment(props: DashedCommentProps) {
     );
   }
 
-  // Default 상태 (코멘트가 있는 경우)
+  // Default 상태 (저장된 엣지 코멘트)
   const { edge } = props;
 
   return (
-    <CommentDisplay
-      avatarSrc={edge.createdBy.profileImageUrl}
-      nickname={edge.createdBy.nickname}
-      timeText="2일 전"
-      comment={edge.comment}
-    />
+    <div className="group relative">
+      <CommentDisplay
+        avatarSrc={edge.createdBy.profileImageUrl}
+        nickname={edge.createdBy.nickname}
+        timeText="2일 전"
+        comment={edge.comment}
+      />
+      {onDeleteEdge && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDeleteEdge();
+          }}
+          aria-label="참조 연결 삭제"
+          className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm opacity-0 transition-opacity duration-150 group-hover:opacity-100 hover:bg-status-negative/10"
+        >
+          <IconTrash className="text-status-negative h-3 w-3" aria-hidden="true" />
+        </button>
+      )}
+    </div>
   );
 }

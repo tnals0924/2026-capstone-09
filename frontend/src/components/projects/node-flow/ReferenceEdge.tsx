@@ -17,6 +17,7 @@ export function ReferenceEdge({
   data,
 }: EdgeProps) {
   const edgeData = data?.edgeData as FlowChartEdge | undefined;
+  const onDeleteEdge = data?.onDeleteEdge as ((edgeId: number) => void) | undefined;
   const nodes = useNodes();
 
   const midX = (sourceX + targetX) / 2;
@@ -127,7 +128,10 @@ export function ReferenceEdge({
             }}
             className="nodrag nopan"
           >
-            <DashedComment edge={edgeData} />
+            <DashedComment
+              edge={edgeData}
+              onDeleteEdge={onDeleteEdge && edgeData ? () => onDeleteEdge(edgeData.edgeId) : undefined}
+            />
           </div>
         </EdgeLabelRenderer>
       )}
