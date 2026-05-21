@@ -37,7 +37,7 @@ export function Footer() {
                 },
                 {
                   label: '개인정보처리방침',
-                  href: 'https://aerial-mule-b93.notion.site/flowMeet-361733adb1cf809dbe54c089d11702e1?source=copy_link',
+                  href: 'https://aerial-mule-b93.notion.site/Flowmeet-361733adb1cf805999edff2825aebe05?source=copy_link',
                 },
               ]}
             />
