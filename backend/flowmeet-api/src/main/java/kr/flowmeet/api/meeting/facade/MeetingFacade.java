@@ -27,6 +27,7 @@ import kr.flowmeet.external.meeting.dto.CreateMeetingRoomCommand;
 import kr.flowmeet.external.meeting.dto.MeetingRoom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,12 +66,11 @@ public class MeetingFacade {
         //Meeting 생성 실패 시, 외부로 호출해서 생성한 회의실 삭제
         try {
             meetingService.create(nodeId, userId, room.url(), room.externalEventId(), request.toCommand());
+        } catch (OptimisticLockingFailureException e) {
+            rollbackMeetingRoom(room.externalEventId(), e);
+            throw new BusinessException(MeetingErrorCode.MEETING_ALREADY_EXISTS);
         } catch (RuntimeException e) {
-            try {
-                meetingRoomProvider.delete(room.externalEventId(), null);
-            } catch (RuntimeException cleanupError) {
-                e.addSuppressed(cleanupError);
-            }
+            rollbackMeetingRoom(room.externalEventId(), e);
             throw e;
         }
     }
@@ -171,4 +171,11 @@ public class MeetingFacade {
         );
     }
 
+    private void rollbackMeetingRoom(String externalEventId, Exception e) {
+        try {
+            meetingRoomProvider.delete(externalEventId, null);
+        } catch (RuntimeException cleanupError) {
+            e.addSuppressed(cleanupError);
+        }
+    }
 }

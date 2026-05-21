@@ -12,6 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import kr.flowmeet.domain.common.BaseSoftDeleteEntity;
 import kr.flowmeet.domain.project.entity.Project;
 import lombok.AccessLevel;
@@ -39,6 +40,10 @@ public class Node extends BaseSoftDeleteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "node_id")
     private Long id;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 
     @Column(name = "project_id", nullable = false)
     private Long projectId;
