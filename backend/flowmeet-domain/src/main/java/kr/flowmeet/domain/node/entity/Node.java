@@ -32,7 +32,7 @@ import org.hibernate.annotations.SQLRestriction;
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE nodes SET deleted_at = CURRENT_TIMESTAMP WHERE node_id = ?")
+@SQLDelete(sql = "UPDATE nodes SET deleted_at = CURRENT_TIMESTAMP WHERE node_id = ? AND version = ?")
 @SQLRestriction("deleted_at IS NULL")
 public class Node extends BaseSoftDeleteEntity {
 
