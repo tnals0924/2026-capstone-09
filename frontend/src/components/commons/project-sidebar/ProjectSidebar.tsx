@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import {
   IconBell,
   IconChevronDoubleLeft,
@@ -8,7 +9,6 @@ import {
   IconSearch,
   IconSetting,
 } from '@wanteddev/wds-icon';
-import { useQueryClient } from '@tanstack/react-query';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -88,15 +88,19 @@ export const ProjectSidebar = ({
   const [hasNewSseNotification, setHasNewSseNotification] = useState(false);
 
   useEffect(() => {
+    if (!isProjectIdValid || projectId === undefined) return;
+
     const token = authStorage.getAccess();
     if (!token) return;
 
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? '';
+    const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '').replace(/\/$/, '');
     const controller = new AbortController();
+    const subscribeUrl = new URL(`${baseUrl}/v1/notifications/subscribe`, window.location.origin);
+    subscribeUrl.searchParams.set('projectId', String(projectId));
 
     const connect = async () => {
       try {
-        const response = await fetch(`${baseUrl}/v1/notifications/subscribe`, {
+        const response = await fetch(subscribeUrl, {
           headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal,
         });
@@ -136,7 +140,7 @@ export const ProjectSidebar = ({
 
     void connect();
     return () => { controller.abort(); };
-  }, []);
+  }, [isProjectIdValid, projectId]);
 
   // prop > query > storage > 빈 문자열 우선순위로 합성
   const projectName = projectNameProp ?? projectData?.name ?? '';
@@ -361,8 +365,9 @@ export const ProjectSidebar = ({
         </div>
       </motion.aside>
       <AnimatePresence>
-        {isAlarmModalOpen && !isCollapsed && (
+        {isAlarmModalOpen && !isCollapsed && isProjectIdValid && projectId !== undefined && (
           <SidebarAlarmModal
+            projectId={projectId}
             onClose={() => setIsAlarmModalOpen(false)}
             onNotificationClick={handleNotificationClick}
             onListLoaded={(unreadInList) => {

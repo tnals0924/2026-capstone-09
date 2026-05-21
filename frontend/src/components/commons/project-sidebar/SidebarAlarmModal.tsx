@@ -11,6 +11,7 @@ import { useErrorToast } from '@/hooks/useErrorToast';
 import { SidebarAlarmModalItem } from './SidebarAlarmModalItem';
 
 interface SidebarAlarmModalProps {
+  projectId: number;
   onClose: () => void;
   onNotificationClick?: (notification: NotificationSummaryResponse) => void;
   /** 리스트 로드 완료 시 실제 unread 개수 동기화용 콜백 */
@@ -78,6 +79,7 @@ const formatNotificationTime = (createdAt?: string) => {
 };
 
 export const SidebarAlarmModal = ({
+  projectId,
   onClose,
   onNotificationClick,
   onListLoaded,
@@ -92,7 +94,9 @@ export const SidebarAlarmModal = ({
       try {
         const response = await privateApi.notification.getAllNotifications();
         if (cancelled) return;
-        const items = response.data.data?.content ?? [];
+        const items = (response.data.data?.content ?? []).filter(
+          (notification) => notification.projectId === projectId,
+        );
         setNotifications(items);
         // 실제 리스트 기준 unread 개수를 부모로 전달해 뱃지 동기화
         const unreadInList = items.filter((n) => n.isRead === false).length;
@@ -106,7 +110,7 @@ export const SidebarAlarmModal = ({
     return () => {
       cancelled = true;
     };
-  }, [showErrorToast, onListLoaded]);
+  }, [projectId, showErrorToast, onListLoaded]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     setHasScrolled(event.currentTarget.scrollTop > 0);
