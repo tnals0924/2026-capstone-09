@@ -21,6 +21,8 @@
     "files": [
       "electron/**/*"
     ],
+    "icon" : "build/icon"
+    ,
     "publish": {
       "provider": "github",
       "owner": "kookmin-sw",
