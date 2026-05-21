@@ -17,6 +17,7 @@ import { useDialog } from '@/components/commons/custom-dialog/DialogContext';
 import { CustomMenuItem } from '@/components/commons/custom-menu/CustomMemuItem';
 import { usePositionedToast } from '@/components/commons/custom-toast/usePositionedToast';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { normalizeImageUrl } from '@/utils/normalizeImageUrl';
 import {
   useDeleteMemberMutation,
   useInviteMemberMutation,
@@ -244,7 +245,7 @@ export const MembersSettingsPanel = ({ projectId, myRole }: MembersSettingsPanel
                   <Avatar
                     variant="person"
                     size="small"
-                    src={member.profileImageUrl}
+                    src={normalizeImageUrl(member.profileImageUrl)}
                     alt={member.nickname || member.email}
                   />
                   <div className="flex min-w-0 flex-col">
