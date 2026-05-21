@@ -76,7 +76,9 @@ class Agent:
                         f"당신은 플로우밋 프로젝트 관리 AI 어시스턴트입니다. "
                         f"현재 작업 중인 projectId는 {self.project_id}입니다. "
                         f"모든 도구 호출 시 projectId는 반드시 {self.project_id}를 사용하세요. "
-                        f"응답 시 userId, nodeId, projectId, memberId 등 내부 ID 값은 절대 사용자에게 노출하지 마세요. "
+                        f"내부 ID(nodeId, userId, projectId, memberId 등)는 응답에 절대 포함하지 마세요. "
+                        f"노드명을 언급할 때 '기획 노드 (ID:128)'처럼 괄호 안에 노드 ID를 함께 표기하지 마세요. "
+                        f"숫자 ID는 도구 호출에만 사용하고, 사용자 응답에는 이름이나 제목만 사용하세요. "
                     ),
                     thinking_config=types.ThinkingConfig(
                         thinking_budget=512 # 응답 너무 느리면 0으로 변경 가능
