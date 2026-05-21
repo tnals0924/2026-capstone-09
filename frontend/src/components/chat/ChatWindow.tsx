@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { type MultiSelectInputValue, type NodeOption, type UserOption } from '@/components/commons/custom-input/MultiSelectInput';
 import { useStartChat, useSendMessage, useGetAllChatSessions, useGetChatSessionDetail, useGetReferenceNodes, useGetReferenceUsers, useAddChatNode, useRemoveChatNode } from '@/queries/chat';
 import { chatKeys } from '@/queries/keys/chatKeys';
@@ -39,6 +39,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   const params = useParams();
   const projectId = Number(params?.projectId);
   const queryClient = useQueryClient();
+  const chatWindowRef = useRef<HTMLDivElement>(null);
 
   // NodeSidebar 너비 계산
   useEffect(() => {
@@ -74,6 +75,20 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
       window.removeEventListener('sidebar-state-change', handleSidebarChange);
     };
   }, []);
+
+  // 외부 클릭 감지
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (chatWindowRef.current && !chatWindowRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [onClose]);
 
   // 채팅 목록 조회
   const { data: chatSessionsData } = useGetAllChatSessions({
@@ -118,19 +133,28 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   // 서버에서 로드된 채팅 메시지 (이전 채팅 조회용)
   const serverMessages: Message[] = !chatDetail?.data?.messages
     ? []
-    : chatDetail.data.messages.map((msg) => ({
-        id: msg.messageId?.toString() || '',
-        role: msg.messageType === 'USER' ? 'user' : 'assistant',
-        content: msg.content || '',
-        timestamp: msg.createdAt || new Date().toISOString(),
-      }));
+    : chatDetail.data.messages
+        .map((msg) => ({
+          id: msg.messageId?.toString() || '',
+          role: (msg.messageType === 'USER' ? 'user' : 'assistant') as 'user' | 'assistant',
+          content: msg.content || '',
+          timestamp: msg.createdAt || new Date().toISOString(),
+        }))
+        .reverse(); // 최신순 → 오래된 순으로 변경
 
   // 현재 세션 ID
   const currentChatSessionId = selectedChatId ?? chatSessionId;
 
-  // 화면에 표시할 메시지
-  const isViewingExistingChat = selectedChatId !== null && selectedChatId !== chatSessionId;
-  const visibleMessages = isViewingExistingChat ? serverMessages : messages;
+  // 채팅을 선택했을 때 서버 메시지를 로컬 messages로 복사
+  useEffect(() => {
+    if (selectedChatId !== null && serverMessages.length > 0) {
+      setMessages(serverMessages);
+      setChatSessionId(selectedChatId);
+    }
+  }, [selectedChatId, serverMessages.length]);
+
+  // 화면에 표시할 메시지 (항상 messages 사용)
+  const visibleMessages = messages.length > 0 ? messages : serverMessages;
 
   const startChatMutation = useStartChat();
   const sendMessageMutation = useSendMessage();
@@ -245,9 +269,12 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
     }
   };
 
+  const handleSelectChat = (chatId: number | null) => {
+    setSelectedChatId(chatId);
+  };
+
   const handleNewChat = () => {
-    // 세션을 생성하지 않고 상태만 초기화
-    // 실제 세션은 첫 메시지를 보낼 때 생성됨
+    // 세션을 생성하지 않고 상태만 초기화, 실제 세션은 첫 메시지를 보낼 때 생성됨
     setChatSessionId(null);
     setSelectedChatId(null);
     setMessages([]);
@@ -257,12 +284,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   return (
     <>
       <div
-        className="fixed inset-0 z-35"
-        onClick={onClose}
-        aria-label="채팅 닫기"
-      />
-
-      <div
+        ref={chatWindowRef}
         className={`fixed bottom-6 z-50 pointer-events-auto ${isSidebarOpen ? 'shadow-normal-small' : ''}`}
         style={{
           right: isNodeSidebarOpen ? 24 + sidebarWidth : 24,
@@ -280,7 +302,7 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
             hoveredChatId={hoveredChatId}
             menuOpenChatId={menuOpenChatId}
             currentChatSessionId={chatSessionId}
-            onSelectChat={setSelectedChatId}
+            onSelectChat={handleSelectChat}
             onHoverChange={setHoveredChatId}
             onMenuOpenChange={setMenuOpenChatId}
             onCurrentChatClear={() => {
