@@ -15,6 +15,7 @@ import kr.flowmeet.domain.meeting.repository.MeetingParticipantRepository;
 import kr.flowmeet.domain.meeting.repository.MeetingRepository;
 import kr.flowmeet.domain.meeting.service.vo.CreateMeetingCommand;
 import kr.flowmeet.domain.meeting.service.vo.UpdateMeetingCommand;
+import kr.flowmeet.domain.node.repository.NodeRepository;
 import kr.flowmeet.domain.project.entity.ProjectMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class MeetingService {
 
     private final MeetingRepository meetingRepository;
     private final MeetingParticipantRepository meetingParticipantRepository;
+    private final NodeRepository nodeRepository;
 
     public Meeting findById(final Long meetingId) {
         return meetingRepository.findById(meetingId)
@@ -97,6 +99,7 @@ public class MeetingService {
             final String externalEventId,
             final CreateMeetingCommand command
     ) {
+        nodeRepository.lockVersionById(nodeId);
         validateNoDuplicate(nodeId);
         validateFutureTime(command.startedAt());
 
