@@ -11,9 +11,6 @@
     <p>로고 클릭 시 소개 페이지로 이동합니다.</p>
 </div>
 
- </br >
-</br >
-
 <img src="https://github.com/user-attachments/assets/eee5321e-0206-404a-9058-4964b80f8c99" />
 
 </br>
