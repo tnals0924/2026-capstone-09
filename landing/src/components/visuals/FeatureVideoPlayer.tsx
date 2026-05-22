@@ -4,39 +4,28 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { asset } from '../../lib/asset';
 
-export function FeatureVideoPlayer({ src }: { src: string }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+interface Props {
+  src: string;
+  /** Externally controlled — set to true when the player should be playing. */
+  play: boolean;
+}
+
+export function FeatureVideoPlayer({ src, play }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [dark, setDark] = useState(false);
-  const [hasBeenVisible, setHasBeenVisible] = useState(false);
 
-  // Start playback only when the video first becomes visible
+  // Reset & play once parent says we are visible (and replay when src changes after that)
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasBeenVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  // Reset & play once visible (and whenever src changes after that)
-  useEffect(() => {
-    if (!hasBeenVisible) return;
     const video = videoRef.current;
     if (!video) return;
+    if (!play) {
+      video.pause();
+      return;
+    }
     setDark(false);
     video.currentTime = 0;
     video.play().catch(() => {});
-  }, [src, hasBeenVisible]);
+  }, [src, play]);
 
   const handleEnded = () => {
     setDark(true);
@@ -50,10 +39,7 @@ export function FeatureVideoPlayer({ src }: { src: string }) {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full overflow-hidden rounded-2xl border border-white/[0.10] bg-black"
-    >
+    <div className="relative w-full overflow-hidden rounded-2xl border border-white/[0.10] bg-black">
       <video
         ref={videoRef}
         src={asset(src)}

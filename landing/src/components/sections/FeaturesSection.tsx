@@ -76,7 +76,9 @@ const FEATURES: Feature[] = [
 
 export function FeaturesSection() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [desktopVisible, setDesktopVisible] = useState(false);
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const desktopStickyRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const observers = textRefs.current.map((el, i) => {
@@ -91,6 +93,23 @@ export function FeaturesSection() {
       return obs;
     });
     return () => observers.forEach((o) => o?.disconnect());
+  }, []);
+
+  // Trigger desktop sticky video to start only once it first scrolls into view
+  useEffect(() => {
+    const el = desktopStickyRef.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setDesktopVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
   }, []);
 
   return (
@@ -123,14 +142,7 @@ export function FeaturesSection() {
               <p className="text-[15px] leading-[1.7] text-[var(--color-text-muted)]">
                 {f.description}
               </p>
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.6 }}
-              >
-                <FeatureVideoPlayer src={f.video} />
-              </motion.div>
+              <MobileVideo src={f.video} />
               <ul className="mt-2 flex flex-col gap-3">
                 {f.bullets.map((b) => (
                   <li
@@ -162,7 +174,7 @@ export function FeaturesSection() {
               </div>
             ))}
           </div>
-          <div>
+          <div ref={desktopStickyRef}>
             <div
               className="sticky top-0 flex h-screen items-center"
               style={{
@@ -179,7 +191,10 @@ export function FeaturesSection() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <FeatureVideoPlayer src={FEATURES[activeIdx].video} />
+                  <FeatureVideoPlayer
+                    src={FEATURES[activeIdx].video}
+                    play={desktopVisible}
+                  />
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -227,6 +242,39 @@ function FeatureText({
         </ul>
       </div>
     </div>
+  );
+}
+
+function MobileVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6 }}
+    >
+      <FeatureVideoPlayer src={src} play={visible} />
+    </motion.div>
   );
 }
 
