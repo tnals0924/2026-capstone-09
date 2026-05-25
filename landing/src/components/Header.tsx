@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion, useScroll, useMotionValueEvent } from 'framer-motion';
 import { DownloadButton } from './ui/DownloadButton';
 import { GoogleLoginButton } from './ui/GoogleLoginButton';
+import { asset } from '@/lib/asset';
 
 const TABS = [
   { id: 'intro', label: '소개' },
@@ -22,17 +23,24 @@ export function Header() {
   });
 
   useEffect(() => {
-    const sections = TABS.map((t) => document.getElementById(t.id)).filter(Boolean) as HTMLElement[];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActive(entry.target.id);
-        });
-      },
-      { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
-    );
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
+    const updateActiveSection = () => {
+      const sections = TABS.map((tab) => document.getElementById(tab.id)).filter(Boolean) as HTMLElement[];
+      const scrollTarget = window.scrollY + window.innerHeight * 0.35;
+      const current = sections
+        .filter((section) => section.offsetTop <= scrollTarget)
+        .at(-1);
+
+      if (current) setActive(current.id);
+    };
+
+    updateActiveSection();
+    window.addEventListener('scroll', updateActiveSection, { passive: true });
+    window.addEventListener('resize', updateActiveSection);
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveSection);
+      window.removeEventListener('resize', updateActiveSection);
+    };
   }, []);
 
   return (
@@ -54,13 +62,13 @@ export function Header() {
           aria-label="flowMeet 홈"
         >
           <img
-            src="/flowmeet-logo.svg"
+            src={asset('/flowmeet-logo.svg')}
             alt="flowMeet"
             className="h-7 w-auto transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </a>
 
-        <nav className="mx-auto hidden items-center gap-3 lg:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-3 lg:flex">
           {TABS.map((tab) => (
             <a
               key={tab.id}
@@ -79,7 +87,7 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="absolute right-4 z-10 flex flex-none items-center justify-end gap-2.5 sm:right-6 lg:right-10">
+        <div className="absolute right-4 z-10 hidden flex-none items-center justify-end gap-2.5 md:flex sm:right-6 lg:right-10">
           <span className="hidden sm:inline-flex">
             <DownloadButton size="sm" />
           </span>

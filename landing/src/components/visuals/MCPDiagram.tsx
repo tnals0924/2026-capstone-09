@@ -2,201 +2,372 @@
 
 import { motion } from 'framer-motion';
 
-const LANES = [
-  { id: 'user', label: 'User', sub: '자연어 요청', accent: '#ffffff', pos: 80 },
-  { id: 'host', label: 'MCP Host', sub: '에이전트 + LLM', accent: '#04e6a2', pos: 320 },
-  { id: 'server', label: 'MCP Server', sub: 'Tool · Resource', accent: '#7BD3FF', pos: 620 },
-  { id: 'ext', label: 'External', sub: 'DB · API · Files', accent: '#C7B8FF', pos: 920 },
-];
+/**
+ * MCP architecture diagram.
+ * - `MCP Host` is an outer translucent container that wraps `MCP Client`.
+ * - All flow arrows originate from / terminate at the `MCP Client`.
+ * - Satellites: `User` (left), `MCP Server` (right), `LLM` (bottom).
+ */
 
-const MESSAGES = [
-  { id: 1, from: 'user', to: 'host', label: '“진행 정리해줘”', kind: 'req', y: 110 },
-  { id: 2, from: 'host', to: 'server', label: 'tool_call(list_nodes)', kind: 'req', y: 170 },
-  { id: 3, from: 'server', to: 'ext', label: 'SELECT * FROM nodes', kind: 'req', y: 230 },
-  { id: 4, from: 'ext', to: 'server', label: 'rows[…]', kind: 'res', y: 290 },
-  { id: 5, from: 'server', to: 'host', label: 'tool_result(nodes)', kind: 'res', y: 350 },
-  { id: 6, from: 'host', to: 'user', label: '맥락 정리된 답변', kind: 'res', y: 420 },
-];
+const W = 960;
+const VIEWBOX_Y = 55;
+const H = 430;
+
+// Node geometry (cx, cy, width, height)
+const HOST = { cx: 480, cy: 160, w: 260, h: 180 };
+const CLIENT = { cx: 480, cy: 180, w: 200, h: 64 };
+const USER = { cx: 110, cy: 180, w: 160, h: 64 };
+const SERVER = { cx: 850, cy: 180, w: 160, h: 64 };
+const LLM = { cx: 480, cy: 430, w: 160, h: 64 };
+
+interface Box {
+  cx: number;
+  cy: number;
+  w: number;
+  h: number;
+}
+
+function edgePoint(b: Box, side: 'top' | 'bottom' | 'left' | 'right', along = 0): { x: number; y: number } {
+  const x =
+    side === 'left' ? b.cx - b.w / 2 : side === 'right' ? b.cx + b.w / 2 : b.cx + along;
+  const y =
+    side === 'top' ? b.cy - b.h / 2 : side === 'bottom' ? b.cy + b.h / 2 : b.cy + along;
+  return { x, y };
+}
+
+interface ArrowSpec {
+  step: number;
+  label: string;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  /** Label anchor relative to midpoint */
+  labelDx: number;
+  labelDy: number;
+  labelWidth: number;
+}
+
+const STROKE = 'rgba(4,230,162,0.7)';
+const STROKE_SOFT = 'rgba(4,230,162,0.45)';
 
 export function MCPDiagram() {
+  // Compute endpoints at node faces; offset perpendicular slightly to separate paired arrows
+  const arrows: ArrowSpec[] = [
+    // 1. User → Client (bottom horizontal) — label sits below arrow
+    {
+      step: 1,
+      label: '자연어 요청',
+      from: { x: USER.cx + USER.w / 2, y: USER.cy + 14 },
+      to: { x: CLIENT.cx - CLIENT.w / 2, y: CLIENT.cy + 14 },
+      labelDx: 0,
+      labelDy: 26,
+      labelWidth: 84,
+    },
+    // 6. Client → User (top horizontal) — label sits above arrow
+    {
+      step: 6,
+      label: '최종 응답',
+      from: { x: CLIENT.cx - CLIENT.w / 2, y: CLIENT.cy - 14 },
+      to: { x: USER.cx + USER.w / 2, y: USER.cy - 14 },
+      labelDx: 0,
+      labelDy: -26,
+      labelWidth: 74,
+    },
+    // 4. Client → Server (bottom horizontal)
+    {
+      step: 4,
+      label: 'Tool 사용',
+      from: { x: CLIENT.cx + CLIENT.w / 2, y: CLIENT.cy + 14 },
+      to: { x: SERVER.cx - SERVER.w / 2, y: SERVER.cy + 14 },
+      labelDx: 0,
+      labelDy: 26,
+      labelWidth: 72,
+    },
+    // 5. Server → Client (top horizontal)
+    {
+      step: 5,
+      label: 'Tool 결과 반환',
+      from: { x: SERVER.cx - SERVER.w / 2, y: SERVER.cy - 14 },
+      to: { x: CLIENT.cx + CLIENT.w / 2, y: CLIENT.cy - 14 },
+      labelDx: 0,
+      labelDy: -26,
+      labelWidth: 98,
+    },
+    // 3. LLM → Client (vertical, right rail) — label to RIGHT of arrow, inline
+    {
+      step: 3,
+      label: 'Tool 선택',
+      from: { x: LLM.cx + 36, y: LLM.cy - LLM.h / 2 },
+      to: { x: CLIENT.cx + 36, y: HOST.cy + HOST.h / 2 },
+      labelDx: 77,
+      labelDy: 0,
+      labelWidth: 74,
+    },
+    // 2. Client → LLM (vertical, left rail) — label to LEFT of arrow, inline
+    {
+      step: 2,
+      label: 'Tool 리스트 전달',
+      from: { x: CLIENT.cx - 36, y: HOST.cy + HOST.h / 2 },
+      to: { x: LLM.cx - 36, y: LLM.cy - LLM.h / 2 },
+      labelDx: -96,
+      labelDy: 0,
+      labelWidth: 112,
+    },
+  ];
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0a0d12]">
-      <div className="flex items-center justify-between border-b border-white/[0.06] px-5 py-4">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.2em] text-[var(--color-primary-50)]">
-            Model Context Protocol
-          </p>
-          <p className="mt-0.5 text-[14px] text-white">
-            User → Host → Server → External, 양방향 메시지 흐름
+    <div className="relative overflow-hidden rounded-2xl border border-[var(--color-primary-50)]/15 bg-[#070b09]">
+      <div className="bg-grid-fine pointer-events-none absolute inset-0 opacity-[0.16]" />
+      <div className="pointer-events-none absolute -top-32 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-[var(--color-primary-50)]/[0.07] blur-[110px]" />
+
+      <div className="relative flex items-center justify-between border-b border-white/[0.05] px-6 py-5">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex h-2 w-2 rounded-full bg-[var(--color-primary-50)] shadow-[0_0_12px_rgba(4,230,162,0.8)]" />
+          <p className="text-[12px] uppercase tracking-[0.22em] text-[var(--color-primary-50)]">
+            <span className="sm:hidden">MCP</span>
+            <span className="hidden sm:inline">MCP · Model Context Protocol</span>
           </p>
         </div>
-        <span className="rounded-full border border-[var(--color-primary-50)]/30 bg-[var(--color-primary-50)]/[0.06] px-2.5 py-1 text-[10px] tracking-[0.15em] text-[var(--color-primary-50)]">
-          MCP
+        <span className="rounded-full border border-[var(--color-primary-50)]/25 bg-[var(--color-primary-50)]/[0.06] px-2.5 py-1 text-[10.5px] tracking-[0.18em] text-[var(--color-primary-50)]">
+          작동 방식
         </span>
       </div>
 
-      <div className="relative">
-        <div className="bg-grid-fine pointer-events-none absolute inset-0 opacity-25" />
-        <svg viewBox="0 0 1000 480" className="relative h-full w-full" preserveAspectRatio="xMidYMid meet">
+      <div className="relative px-4 pt-6 pb-2 sm:px-8">
+        <svg
+          viewBox={`0 ${VIEWBOX_Y} ${W} ${H}`}
+          preserveAspectRatio="xMidYMid meet"
+          className="block h-auto w-full"
+        >
           <defs>
-            <linearGradient id="mcp-arrow-req" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#04e6a2" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#04e6a2" stopOpacity="0.95" />
-            </linearGradient>
-            <linearGradient id="mcp-arrow-res" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#7BD3FF" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#7BD3FF" stopOpacity="0.3" />
-            </linearGradient>
-            <marker id="arrow-primary" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
-              <path d="M0 0 L8 4 L0 8 z" fill="#04e6a2" />
+            <marker
+              id="mcp-arrowhead"
+              viewBox="0 0 10 10"
+              refX="9"
+              refY="5"
+              markerWidth="7"
+              markerHeight="7"
+              orient="auto"
+            >
+              <path d="M0 0 L10 5 L0 10 z" fill="rgba(4,230,162,0.9)" />
             </marker>
-            <marker id="arrow-blue" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto">
-              <path d="M0 0 L8 4 L0 8 z" fill="#7BD3FF" />
-            </marker>
+            <linearGradient id="host-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgba(4,230,162,0.10)" />
+              <stop offset="100%" stopColor="rgba(4,230,162,0.04)" />
+            </linearGradient>
           </defs>
 
-          {/* Lane headers */}
-          {LANES.map((lane, i) => (
-            <motion.g
-              key={lane.id}
-              initial={{ opacity: 0, y: -6 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.5, delay: 0.1 + i * 0.08 }}
-            >
-              <rect
-                x={lane.pos - 60}
-                y={20}
-                width={120}
-                height={50}
-                rx={10}
-                fill={`${lane.accent}20`}
-                stroke={`${lane.accent}55`}
-                strokeWidth="1"
-              />
-              <circle cx={lane.pos - 48} cy={36} r="3" fill={lane.accent} />
-              <text x={lane.pos - 38} y={40} fontSize="11" fill="rgba(255,255,255,0.6)" fontFamily="Pretendard Variable, Pretendard, sans-serif">
-                {lane.id === 'host' ? 'HOST' : lane.id === 'server' ? 'SERVER' : lane.id.toUpperCase()}
-              </text>
-              <text x={lane.pos} y={58} textAnchor="middle" fontSize="13" fontWeight="600" fill="#fff" fontFamily="Pretendard Variable, Pretendard, sans-serif">
-                {lane.label}
-              </text>
-            </motion.g>
-          ))}
-
-          {/* Vertical lane lines */}
-          {LANES.map((lane) => (
-            <line
-              key={`line-${lane.id}`}
-              x1={lane.pos}
-              y1={70}
-              x2={lane.pos}
-              y2={460}
-              stroke="rgba(255,255,255,0.06)"
-              strokeDasharray="3 4"
+          {/* MCP Host outer container */}
+          <motion.g
+            initial={{ opacity: 0, y: 6 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5 }}
+          >
+            <rect
+              x={HOST.cx - HOST.w / 2}
+              y={HOST.cy - HOST.h / 2}
+              width={HOST.w}
+              height={HOST.h}
+              rx={18}
+              fill="url(#host-fill)"
+              stroke="rgba(4,230,162,0.45)"
+              strokeWidth="1.2"
+              strokeDasharray="4 4"
             />
-          ))}
+            <text
+              x={HOST.cx}
+              y={HOST.cy - HOST.h / 2 + 28}
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="600"
+              fill="#f3fff9"
+              fontFamily="Pretendard Variable, Pretendard, sans-serif"
+            >
+              MCP Host
+            </text>
+            <text
+              x={HOST.cx}
+              y={HOST.cy - HOST.h / 2 + 46}
+              textAnchor="middle"
+              fontSize="11.5"
+              fill="rgba(4,230,162,0.85)"
+              fontFamily="Pretendard Variable, Pretendard, sans-serif"
+            >
+              AI Agent
+            </text>
+          </motion.g>
 
-          {/* Messages */}
-          {MESSAGES.map((m, i) => {
-            const fromLane = LANES.find((l) => l.id === m.from)!;
-            const toLane = LANES.find((l) => l.id === m.to)!;
-            const x1 = fromLane.pos;
-            const x2 = toLane.pos;
-            const isReq = m.kind === 'req';
-            const stroke = isReq ? 'url(#mcp-arrow-req)' : 'url(#mcp-arrow-res)';
-            const marker = isReq ? 'arrow-primary' : 'arrow-blue';
-            const labelX = (x1 + x2) / 2;
-            const dir = x1 < x2 ? 1 : -1;
+          {/* Arrows */}
+          {arrows.map((a, i) => {
+            const midX = (a.from.x + a.to.x) / 2;
+            const midY = (a.from.y + a.to.y) / 2;
             return (
               <motion.g
-                key={m.id}
+                key={a.step}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: '-80px' }}
-                transition={{ duration: 0.5, delay: 0.4 + i * 0.18 }}
+                transition={{ duration: 0.45, delay: 0.2 + i * 0.07 }}
               >
-                {/* step number */}
-                <circle cx={x1 + dir * 14} cy={m.y} r="9" fill={isReq ? '#04e6a2' : '#7BD3FF'} />
-                <text x={x1 + dir * 14} y={m.y + 3} textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#062018" fontFamily="Pretendard Variable, Pretendard, sans-serif">
-                  {m.id}
-                </text>
-                {/* arrow line */}
                 <motion.line
-                  x1={x1 + dir * 26}
-                  y1={m.y}
-                  x2={x2 - dir * 8}
-                  y2={m.y}
-                  stroke={stroke}
-                  strokeWidth="1.4"
-                  markerEnd={`url(#${marker})`}
+                  x1={a.from.x}
+                  y1={a.from.y}
+                  x2={a.to.x}
+                  y2={a.to.y}
+                  stroke={STROKE}
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  markerEnd="url(#mcp-arrowhead)"
                   initial={{ pathLength: 0 }}
                   whileInView={{ pathLength: 1 }}
                   viewport={{ once: true, margin: '-80px' }}
-                  transition={{ duration: 0.7, delay: 0.5 + i * 0.18 }}
+                  transition={{ duration: 0.55, delay: 0.25 + i * 0.07, ease: [0.22, 1, 0.36, 1] }}
                 />
-                {/* label */}
-                <rect
-                  x={labelX - 95}
-                  y={m.y - 24}
-                  width={190}
-                  height={18}
-                  rx={5}
-                  fill="rgba(10,13,18,0.85)"
-                  stroke={isReq ? 'rgba(4,230,162,0.30)' : 'rgba(123,211,255,0.30)'}
-                />
-                <text
-                  x={labelX}
-                  y={m.y - 11}
-                  textAnchor="middle"
-                  fontSize="10.5"
-                  fill="#fff"
-                  fontFamily="Pretendard Variable, Pretendard, sans-serif"
-                >
-                  {m.label}
-                </text>
+                {/* Inline label with backing plate so arrows never cut through the text */}
+                <g transform={`translate(${midX + a.labelDx}, ${midY + a.labelDy})`}>
+                  <rect
+                    x={-a.labelWidth / 2}
+                    y={-12}
+                    width={a.labelWidth}
+                    height={24}
+                    rx={12}
+                    fill="rgba(2,18,14,0.92)"
+                  />
+                  <circle cx={-a.labelWidth / 2 + 13} cy={0} r={9} fill="#04e6a2" />
+                  <text
+                    x={-a.labelWidth / 2 + 13}
+                    y={3.4}
+                    textAnchor="middle"
+                    fontSize="10.5"
+                    fontWeight="700"
+                    fill="#03241b"
+                    fontFamily="Pretendard Variable, Pretendard, sans-serif"
+                  >
+                    {a.step}
+                  </text>
+                  <text
+                    x={-a.labelWidth / 2 + 28}
+                    y={4}
+                    textAnchor="start"
+                    fontSize="11.5"
+                    fontWeight="500"
+                    fill="#eafff4"
+                    fontFamily="Pretendard Variable, Pretendard, sans-serif"
+                  >
+                    {a.label}
+                  </text>
+                </g>
               </motion.g>
             );
           })}
 
-          {/* Side labels for direction */}
-          <motion.text
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 1.5 }}
-            x={20}
-            y={170}
-            fontSize="9.5"
-            fill="rgba(4,230,162,0.7)"
-            fontFamily="Pretendard Variable, Pretendard, sans-serif"
-            transform="rotate(-90, 20, 170)"
-            textAnchor="middle"
-          >
-            REQUEST ↓
-          </motion.text>
-          <motion.text
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 1.7 }}
-            x={20}
-            y={350}
-            fontSize="9.5"
-            fill="rgba(123,211,255,0.7)"
-            fontFamily="Pretendard Variable, Pretendard, sans-serif"
-            transform="rotate(-90, 20, 350)"
-            textAnchor="middle"
-          >
-            RESPONSE ↑
-          </motion.text>
+          {/* MCP Client (inside Host) */}
+          <Pill box={CLIENT} label="MCP Client" hub delay={0.15} />
+
+          {/* Satellites */}
+          <Pill box={USER} label="User" sub="사용자" delay={0.1} />
+          <Pill box={SERVER} label="MCP Server" sub="Tool 제공" delay={0.1} />
+          <Pill box={LLM} label="LLM" sub="추론 모델" delay={0.1} />
         </svg>
       </div>
 
-      <div className="border-t border-white/[0.06] px-5 py-4 text-[12.5px] leading-[1.7] text-[var(--color-text-muted)]">
-        flowMeet은 노드·회의록·외부 통합을 <span className="text-[var(--color-primary-50)]">MCP Server</span>로 노출합니다.
-        에이전트(Host)는 표준 MCP 메시지로 LLM과 대화하며, 결과를 사용자에게 다시 돌려줍니다.
+      <div className="relative grid gap-3 px-4 pb-6 pt-2 sm:px-8 sm:pb-8">
+        {CARDS.map((c, i) => (
+          <motion.div
+            key={c.title}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.5, delay: 0.6 + i * 0.08 }}
+            className="rounded-xl border border-[var(--color-primary-50)]/15 bg-[var(--color-primary-50)]/[0.04] px-5 py-4"
+          >
+            <div className="flex items-baseline gap-3">
+              <span className="text-[13px] font-semibold tracking-tight text-[var(--color-primary-50)]">
+                {c.title}
+              </span>
+              <span className="block h-px flex-1 bg-[var(--color-primary-50)]/15" />
+            </div>
+            <p className="mt-2 text-[12.5px] leading-[1.7] text-[var(--color-text-muted)]">
+              {c.desc}
+            </p>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
 }
+
+function Pill({
+  box,
+  label,
+  sub,
+  hub,
+  delay = 0,
+}: {
+  box: Box;
+  label: string;
+  sub?: string;
+  hub?: boolean;
+  delay?: number;
+}) {
+  const r = box.h / 2;
+  const x = box.cx - box.w / 2;
+  const y = box.cy - box.h / 2;
+  return (
+    <motion.g
+      initial={{ opacity: 0, y: 6 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.5, delay }}
+    >
+      <rect
+        x={x}
+        y={y}
+        width={box.w}
+        height={box.h}
+        rx={r}
+        fill={hub ? 'rgba(4,230,162,0.20)' : 'rgba(4,230,162,0.08)'}
+        stroke={hub ? 'rgba(4,230,162,0.85)' : STROKE_SOFT}
+        strokeWidth={hub ? 1.4 : 1}
+      />
+      <text
+        x={box.cx}
+        y={sub ? box.cy - 4 : box.cy + 4}
+        textAnchor="middle"
+        fontSize="14"
+        fontWeight="600"
+        fill="#f3fff9"
+        fontFamily="Pretendard Variable, Pretendard, sans-serif"
+      >
+        {label}
+      </text>
+      {sub && (
+        <text
+          x={box.cx}
+          y={box.cy + 14}
+          textAnchor="middle"
+          fontSize="11"
+          fill="rgba(4,230,162,0.85)"
+          fontFamily="Pretendard Variable, Pretendard, sans-serif"
+        >
+          {sub}
+        </text>
+      )}
+    </motion.g>
+  );
+}
+
+const CARDS = [
+  {
+    title: 'MCP Host',
+    desc: 'LLM을 사용해 외부 데이터·도구가 필요한 요청을 처리해요. 사용자와 상호작용하는 지점으로, AI 기반 IDE나 대화형 AI 같은 환경 자체를 의미해요.',
+  },
+  {
+    title: 'MCP Client',
+    desc: 'Host 안에서 LLM과 MCP Server 사이의 통신을 중개해요. LLM의 요청을 MCP 형식으로 변환하고, 응답을 LLM이 이해할 수 있게 되돌려줘요.',
+  },
+  {
+    title: 'MCP Server',
+    desc: 'LLM에 컨텍스트·데이터·기능을 제공하는 외부 시스템(DB, API, 파일 등)에 연결돼요. 표준화된 형식으로 다양한 도구를 LLM에 노출해줘요.',
+  },
+];

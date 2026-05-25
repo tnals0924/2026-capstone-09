@@ -40,7 +40,7 @@ export function GoogleLoginButton({ size = 'md', compact = false }: GoogleLoginB
   return (
     <motion.a
       ref={ref}
-      href={`${APP_URL}/auth/google`}
+      href="https://app.flowmeet.kr/auth/login"
       onMouseMove={onMove}
       onMouseLeave={onLeave}
       style={{ x: sx, y: sy }}

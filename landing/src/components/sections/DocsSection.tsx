@@ -3,11 +3,21 @@
 import { motion } from 'framer-motion';
 import { Eyebrow } from '../ui/Eyebrow';
 import { SectionHeader } from '../ui/SectionHeader';
+import { ArchitectureDiagram } from '../visuals/ArchitectureDiagram';
+import { CRDTDiagram } from '../visuals/CRDTDiagram';
 import { DocSkeleton } from '../visuals/DocSkeleton';
+import { MCPDiagram } from '../visuals/MCPDiagram';
 import { PPTCarousel } from '../visuals/PPTCarousel';
 import { PosterCard } from '../visuals/PosterCard';
 
-const ITEMS = [
+interface DocItem {
+  id: string;
+  eyebrow: string;
+  title: string;
+  image?: string;
+}
+
+const ITEMS: DocItem[] = [
   { id: 'arch', eyebrow: 'Doc 01', title: 'Architecture' },
   { id: 'mcp', eyebrow: 'Doc 02', title: 'MCP' },
   { id: 'crdt', eyebrow: 'Doc 03', title: 'CRDT' },
@@ -39,7 +49,24 @@ export function DocsSection() {
               포스터 및 발표 자료
             </h3>
           </div>
-          <div className="mt-16 grid gap-6 lg:grid-cols-2">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.6 }}
+            className="mt-16 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]"
+          >
+            <div className="relative aspect-video w-full">
+              <iframe
+                src="https://www.youtube.com/embed/eSjDWheBlbU?rel=0"
+                title="flowMeet 발표 영상"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                className="absolute inset-0 h-full w-full"
+              />
+            </div>
+          </motion.div>
+          <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <PosterCard />
             <PPTCarousel />
           </div>
@@ -49,7 +76,25 @@ export function DocsSection() {
   );
 }
 
-function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number }) {
+function DocVisual({ item }: { item: DocItem }) {
+  if (item.id === 'arch') return <ArchitectureDiagram />;
+  if (item.id === 'mcp') return <MCPDiagram />;
+  if (item.id === 'crdt') return <CRDTDiagram />;
+  if (item.image) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-2">
+        <img
+          src={item.image}
+          alt={`${item.title} diagram`}
+          className="block h-auto w-full rounded-xl"
+        />
+      </div>
+    );
+  }
+  return <DocSkeleton />;
+}
+
+function DocBlock({ item, index }: { item: DocItem; index: number }) {
   // Doc 01 (Architecture) — centered text + skeleton below (was special-cased earlier)
   if (index === 0) {
     return (
@@ -66,8 +111,8 @@ function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number
             {item.title}
           </h3>
         </div>
-        <div className="w-full max-w-[860px]">
-          <DocSkeleton />
+        <div className="w-full max-w-[1100px]">
+          <DocVisual item={item} />
         </div>
       </motion.div>
     );
@@ -89,31 +134,20 @@ function DocBlock({ item, index }: { item: (typeof ITEMS)[number]; index: number
           : 'lg:grid-cols-[minmax(280px,1fr)_minmax(0,900px)]',
       ].join(' ')}
     >
-      {reverse ? (
-        <>
-          <div className="w-full max-w-[900px]">
-            <DocSkeleton />
-          </div>
-          <div className="flex flex-col items-end gap-4 text-right">
-            <Eyebrow>{item.eyebrow}</Eyebrow>
-            <h3 className="text-[clamp(48px,7vw,104px)] font-semibold leading-[1] tracking-[-0.03em] text-white">
-              {item.title}
-            </h3>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="flex flex-col gap-4">
-            <Eyebrow>{item.eyebrow}</Eyebrow>
-            <h3 className="text-[clamp(48px,7vw,104px)] font-semibold leading-[1] tracking-[-0.03em] text-white">
-              {item.title}
-            </h3>
-          </div>
-          <div className="w-full max-w-[900px]">
-            <DocSkeleton />
-          </div>
-        </>
-      )}
+      <div
+        className={[
+          'flex flex-col gap-4',
+          reverse ? 'lg:order-2 lg:items-end lg:text-right' : '',
+        ].join(' ')}
+      >
+        <Eyebrow>{item.eyebrow}</Eyebrow>
+        <h3 className="text-[clamp(48px,7vw,104px)] font-semibold leading-[1] tracking-[-0.03em] text-white">
+          {item.title}
+        </h3>
+      </div>
+      <div className={['w-full max-w-[900px]', reverse ? 'lg:order-1' : ''].join(' ')}>
+        <DocVisual item={item} />
+      </div>
     </motion.div>
   );
 }

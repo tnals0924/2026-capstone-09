@@ -2,6 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { asset } from '@/lib/asset';
 import { SectionHeader } from '../ui/SectionHeader';
 
 interface Member {
@@ -9,18 +10,21 @@ interface Member {
   role: string;
   area: string;
   email: string;
+  github: string;
   photo: string;
   initials: string;
   accent: string;
   isLead?: boolean;
+  photoPosition?: string;
 }
 
 const TEAM: Member[] = [
   {
     name: '황수민',
     role: 'Team Lead · Backend',
-    area: '서비스 백본 · 회의 / Meet 연동',
+    area: '아키텍처 설계 · CI/CD 파이프라인 · API 구현 · MCP 서버',
     email: 'thals655@kookmin.ac.kr',
+    github: 'https://github.com/tnals0924',
     photo: '/team/hwangsumin.jpg',
     initials: 'HSM',
     accent: 'from-[#04e6a2]/35 to-[#04e6a2]/5',
@@ -29,8 +33,9 @@ const TEAM: Member[] = [
   {
     name: '윤성욱',
     role: 'Backend',
-    area: 'CRDT · 실시간 동기화',
+    area: 'SQS 비동기 파이프라인 · MCP 서버 · SSE 알림',
     email: 'seonguk3553@kookmin.ac.kr',
+    github: 'https://github.com/wngktjd13',
     photo: '/team/yunseonguk.jpg',
     initials: 'YSU',
     accent: 'from-[#04e6a2]/35 to-[#04e6a2]/5',
@@ -38,8 +43,9 @@ const TEAM: Member[] = [
   {
     name: '박정은',
     role: 'AI',
-    area: '에이전트 · RAG · MCP',
-    email: 'ovepje2004@gmail.com',
+    area: '에이전트 · LLM · MCP',
+    email: 'ovepje2004@kookmin.ac.kr',
+    github: 'https://github.com/ovepje2004',
     photo: '/team/parkjeongeun.jpg',
     initials: 'PJE',
     accent: 'from-[#FF8FA3]/35 to-[#FF8FA3]/5',
@@ -47,29 +53,33 @@ const TEAM: Member[] = [
   {
     name: '박건민',
     role: 'Frontend',
-    area: '노드 플로우 · 노드 디테일',
+    area: '디자인 · 랜딩페이지 · 모달 · 사이드바 · 헤더',
     email: 'pkm021118@kookmin.ac.kr',
+    github: 'https://github.com/pkm021118',
     photo: '/team/parkgunmin.jpg',
     initials: 'PGM',
     accent: 'from-[#7BD3FF]/35 to-[#7BD3FF]/5',
   },
   {
-    name: '백채린',
-    role: 'Frontend',
-    area: '랜딩 · 디자인 시스템',
-    email: 'cofls00@kookmin.ac.kr',
-    photo: '/team/baekchaerin.jpg',
-    initials: 'BCR',
-    accent: 'from-[#FFB78A]/35 to-[#FFB78A]/5',
-  },
-  {
     name: '윤신지',
     role: 'Frontend',
-    area: '실시간 협업 · 회의 UI',
+    area: '동시성 처리(CRDT) · Chrome Extension',
     email: 'sinji1012@kookmin.ac.kr',
+    github: 'https://github.com/sinji2102',
     photo: '/team/yunsinji.jpg',
     initials: 'YSJ',
     accent: 'from-[#C7B8FF]/35 to-[#C7B8FF]/5',
+  },
+  {
+    name: '백채린',
+    role: 'Frontend',
+    area: '로그인/회원가입 · 노드 플로우 · AI 채팅 플로팅',
+    email: 'cofls00@kookmin.ac.kr',
+    github: 'https://github.com/chael-in',
+    photo: '/team/baekchaerin.jpg',
+    initials: 'BCR',
+    accent: 'from-[#FFB78A]/35 to-[#FFB78A]/5',
+    photoPosition: '50% 65%',
   },
 ];
 
@@ -88,38 +98,7 @@ export function TeamSection() {
           description="국민대학교 2026 캡스톤디자인 Team 09"
         />
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.8 }}
-          className="relative mt-16 overflow-hidden rounded-3xl border border-white/[0.08] bg-gradient-to-br from-white/[0.04] to-transparent"
-        >
-          <div className="relative h-[360px] w-full overflow-hidden">
-            <img
-              src="/team/group.jpg"
-              alt="flowMeet 팀 단체사진"
-              className="absolute inset-0 h-full w-full object-cover opacity-90"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = 'none';
-              }}
-            />
-            <TeamBackdropFallback />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/40" />
-            <div className="absolute inset-0 flex items-end justify-between gap-6 p-8 lg:p-10">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.25em] text-[var(--color-primary-50)]">
-                  Team Photo
-                </p>
-                <p className="mt-2 max-w-[460px] text-[15px] leading-[1.7] text-white">
-                  6명이 모여 노드라는 단위로 팀 협업의 흐름을 새로 짜고 있어요.
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {TEAM.map((m, i) => (
             <MemberCard key={m.name} member={m} index={i} />
           ))}
@@ -163,18 +142,14 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
     >
       <div className={`relative aspect-[4/3] w-full bg-gradient-to-br ${member.accent}`}>
         <img
-          src={member.photo}
+          src={asset(member.photo)}
           alt={member.name}
           className="absolute inset-0 h-full w-full object-cover"
+          style={member.photoPosition ? { objectPosition: member.photoPosition } : undefined}
           onError={(e) => {
             (e.currentTarget as HTMLImageElement).style.display = 'none';
           }}
         />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-medium text-[36px] font-semibold tracking-[0.05em] text-white/30">
-            {member.initials}
-          </span>
-        </div>
         {member.isLead && (
           <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-[var(--color-primary-50)]/45 bg-black/60 px-2 py-0.5 text-[10.5px] font-medium text-[var(--color-primary-50)] backdrop-blur">
             ★ Team Lead
@@ -191,40 +166,36 @@ function MemberCard({ member, index }: { member: Member; index: number }) {
         <p className="text-[13px] leading-[1.55] text-[var(--color-text-muted)]">{member.area}</p>
         <a
           href={`mailto:${member.email}`}
-          className="mt-1 inline-flex items-center gap-1.5 text-[12px] text-[var(--color-text-dim)] transition-colors hover:text-[var(--color-primary-50)]"
+          className="relative z-20 mt-1 inline-flex w-fit items-center gap-1.5 text-[12px] text-[var(--color-text-dim)] transition-colors hover:text-[var(--color-primary-50)]"
         >
           <MailIcon />
           {member.email}
         </a>
       </div>
+
+      <a
+        href={member.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`${member.name}의 GitHub 프로필 열기`}
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-50)]/60"
+      />
+      <span className="pointer-events-none absolute right-3 top-3 z-20 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/[0.12] bg-black/55 text-white/70 opacity-0 backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
+        <GithubIcon />
+      </span>
     </motion.article>
   );
 }
 
-function TeamBackdropFallback() {
+function GithubIcon() {
   return (
-    <div className="absolute inset-0">
-      <div className="bg-grid-fine absolute inset-0 opacity-30" />
-      <svg
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 1100 360"
-        preserveAspectRatio="xMidYMid slice"
-        aria-hidden
-      >
-        <defs>
-          <radialGradient id="team-orb-1" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#04e6a2" stopOpacity="0.50" />
-            <stop offset="100%" stopColor="#04e6a2" stopOpacity="0" />
-          </radialGradient>
-          <radialGradient id="team-orb-2" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#7BD3FF" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#7BD3FF" stopOpacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="200" cy="180" r="280" fill="url(#team-orb-1)" />
-        <circle cx="900" cy="140" r="320" fill="url(#team-orb-2)" />
-      </svg>
-    </div>
+    <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+      />
+    </svg>
   );
 }
 
