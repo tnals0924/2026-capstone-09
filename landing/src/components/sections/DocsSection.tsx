@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { Eyebrow } from '../ui/Eyebrow';
 import { SectionHeader } from '../ui/SectionHeader';
 import { ArchitectureDiagram } from '../visuals/ArchitectureDiagram';
@@ -83,9 +84,12 @@ function DocVisual({ item }: { item: DocItem }) {
   if (item.image) {
     return (
       <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-2">
-        <img
+        <Image
           src={item.image}
           alt={`${item.title} diagram`}
+          width={1200}
+          height={800}
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="block h-auto w-full rounded-xl"
         />
       </div>
