@@ -17,7 +17,7 @@ import { authStorage } from '@/api/authStorage';
 import { userStorage } from '@/api/userStorage';
 import { useModal } from '@/components/commons/modal/ModalContext';
 import { notificationKeys } from '@/queries/keys/notificationKeys';
-import { useUnreadCountQuery } from '@/queries/notification';
+import { prefetchNotificationSetting, useUnreadCountQuery } from '@/queries/notification';
 import { useProjectListQuery, useProjectQuery } from '@/queries/project';
 import { useCurrentUserQuery } from '@/queries/user';
 import { cn } from '@/utils/cn';
@@ -219,6 +219,8 @@ export const ProjectSidebar = ({
     setIsProjectMenuOpen(false);
     onSettingClick?.();
     if (!isProjectIdValid || projectId === undefined) return;
+    // 알림 탭 토글 깜빡임 방지를 위해 모달 열기 전에 알림 설정을 미리 받아둔다.
+    void prefetchNotificationSetting(queryClient, projectId);
     openModal({
       variant: 'default',
       closeOnBackdrop: true,
