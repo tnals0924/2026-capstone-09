@@ -22,9 +22,11 @@ interface Message {
 
 interface ChatWindowProps {
   onClose: () => void;
+  isNodeSidebarOpen: boolean;
+  sidebarWidth: number;
 }
 
-export function ChatWindow({ onClose }: ChatWindowProps) {
+export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<MultiSelectInputValue>({
     text: '',
@@ -33,49 +35,12 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [chatSessionId, setChatSessionId] = useState<number | null>(null);
-  const [isNodeSidebarOpen, setIsNodeSidebarOpen] = useState(false);
-  const [sidebarWidth, setSidebarWidth] = useState(0);
   const [hoveredChatId, setHoveredChatId] = useState<number | null>(null);
   const [menuOpenChatId, setMenuOpenChatId] = useState<number | null>(null);
   const params = useParams();
   const projectId = Number(params?.projectId);
   const queryClient = useQueryClient();
   const chatWindowRef = useRef<HTMLDivElement>(null);
-
-  // NodeSidebar 너비 계산
-  useEffect(() => {
-    const updateSidebarWidth = () => {
-      const width = window.innerWidth * 0.4;
-      setSidebarWidth(width);
-    };
-
-    updateSidebarWidth();
-    window.addEventListener('resize', updateSidebarWidth);
-    return () => window.removeEventListener('resize', updateSidebarWidth);
-  }, []);
-
-  // NodeSidebar 열림 상태 감지 (custom event 사용)
-  useEffect(() => {
-    const checkSidebar = () => {
-      const sidebarState = sessionStorage.getItem('node_sidebar_open');
-      setIsNodeSidebarOpen(!!sidebarState);
-    };
-
-    checkSidebar();
-
-    // custom event 리스너 등록
-    const handleSidebarChange = () => {
-      checkSidebar();
-    };
-
-    window.addEventListener('storage', handleSidebarChange);
-    window.addEventListener('sidebar-state-change', handleSidebarChange);
-
-    return () => {
-      window.removeEventListener('storage', handleSidebarChange);
-      window.removeEventListener('sidebar-state-change', handleSidebarChange);
-    };
-  }, []);
 
   // 외부 클릭 감지
   useEffect(() => {
@@ -133,10 +98,10 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
 
   const chatSessions = chatSessionsData?.data?.content || [];
 
-  // 선택된 채팅 상세 조회
+  // 선택된 채팅 상세 조회 
   const { data: chatDetail } = useGetChatSessionDetail({
     projectId,
-    chatSessionId: selectedChatId ?? 0,
+    chatSessionId: selectedChatId ?? chatSessionId ?? 0,
   });
 
   // 참조 가능한 노드 조회
@@ -232,7 +197,6 @@ export function ChatWindow({ onClose }: ChatWindowProps) {
               const newChatSessionId = data.data.chatSessionId;
               if (newChatSessionId) {
                 setChatSessionId(newChatSessionId);
-                setSelectedChatId(newChatSessionId);
               }
 
               // AI 응답 추가
