@@ -43,6 +43,16 @@ interface NodeFlowViewProps {
   projectId: number;
 }
 
+const SUMMARY_LOADING_MESSAGES = [
+  '선택한 노드를 모으고 있어요',
+  'AI가 회의 내용을 분석하고 있어요',
+  '회의 간 관계를 정리하고 있어요',
+  '액션 아이템을 추출하고 있어요',
+  '거의 다 됐어요, 잠시만 기다려 주세요',
+];
+
+const SUMMARY_MESSAGE_INTERVAL_MS = 3000;
+
 const nodeTypes: NodeTypes = {
   mainNode: CustomNode,
   subNode: CustomNode,
@@ -69,6 +79,20 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
   const [showDashedLines, setShowDashedLines] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
+  const [summaryMessageIndex, setSummaryMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!isSummaryPending) {
+      setSummaryMessageIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setSummaryMessageIndex((prev) =>
+        Math.min(prev + 1, SUMMARY_LOADING_MESSAGES.length - 1),
+      );
+    }, SUMMARY_MESSAGE_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [isSummaryPending]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -123,6 +147,21 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
   useEffect(() => {
     localStorage.setItem('showDashedLines', JSON.stringify(showDashedLines));
   }, [showDashedLines]);
+
+  // 뷰포트 위치 복원 (refetch 후에도 마지막 위치 유지)
+  useEffect(() => {
+    const saved = localStorage.getItem(`flowchart_viewport_${projectId}`);
+    if (saved) {
+      try {
+        const viewport = JSON.parse(saved);
+        requestAnimationFrame(() => {
+          setViewport(viewport, { duration: 0 });
+        });
+      } catch {
+        // JSON 파싱 실패 시 무시
+      }
+    }
+  }, [projectId, setViewport]);
 
   // 알림 클릭으로 넘어온 openNode param 처리
   useEffect(() => {
@@ -410,6 +449,9 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
         onNodeMouseEnter={onNodeMouseEnter}
         onPaneClick={clearSelection}
         onSelectionChange={onSelectionChange}
+        onMove={(_event, viewport) => {
+          localStorage.setItem(`flowchart_viewport_${projectId}`, JSON.stringify(viewport));
+        }}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         nodesDraggable={false}
@@ -461,11 +503,20 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
       </ReactFlow>
 
       {isSummaryPending && (
-        <div className="fixed inset-0 z-9998 flex items-center justify-center bg-material-dimmer">
-          <div
-            className="h-12 w-12 animate-spin rounded-full border-4 border-primary-90 border-t-primary-40"
-            aria-label="AI 요약 생성 중"
-          />
+        <div
+          className="fixed inset-0 z-9998 flex items-center justify-center bg-material-dimmer"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex flex-col items-center gap-4">
+            <div
+              className="h-12 w-12 animate-spin rounded-full border-4 border-primary-90 border-t-primary-40"
+              aria-label="AI 요약 생성 중"
+            />
+            <span className="text-body-1 text-static-white font-medium">
+              {SUMMARY_LOADING_MESSAGES[summaryMessageIndex]}
+            </span>
+          </div>
         </div>
       )}
 
