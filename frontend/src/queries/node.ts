@@ -106,11 +106,19 @@ export function useUpdateNodeTitleMutation(projectId: number, nodeId: number | n
       queryClient.setQueryData(queryKey, (old: GetNodeResponse | undefined) =>
         old ? { ...old, title } : old,
       );
-      return { previous };
+      const flowchartKey = nodeKeys.flowchart(projectId);
+      const previousFlowchart = queryClient.getQueryData<GetFlowchartResponse>(flowchartKey);
+      queryClient.setQueryData<GetFlowchartResponse>(flowchartKey, (old) =>
+        old ? { ...old, nodes: old.nodes?.map((n) => (n.nodeId === nodeId ? { ...n, title } : n)) } : old,
+      );
+      return { previous, previousFlowchart };
     },
     onError: (_err, _title, context) => {
       if (context?.previous !== undefined) {
         queryClient.setQueryData(queryKey, context.previous);
+      }
+      if (context?.previousFlowchart !== undefined) {
+        queryClient.setQueryData(nodeKeys.flowchart(projectId), context.previousFlowchart);
       }
     },
   });
