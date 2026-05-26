@@ -154,6 +154,29 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedChatId, serverMessages.length]);
 
+  // 채팅 상세에서 참조 노드/사용자 복원
+  useEffect(() => {
+    if (selectedChatId !== null && chatDetail?.data) {
+      const mentions: MultiSelectInputValue['mentions'] = [];
+
+      const referencedNodes = chatDetail.data.referencedNodes || [];
+      referencedNodes.forEach((node: { nodeId?: number; number?: string; title?: string }) => {
+        if (node.nodeId) {
+          mentions.push({
+            type: 'node',
+            id: node.nodeId.toString(),
+          });
+        }
+      });
+
+      // TODO: referencedUsers가 API에 추가되면 복원 로직 추가
+
+      if (mentions.length > 0) {
+        setInputValue((prev) => ({ ...prev, mentions }));
+      }
+    }
+  }, [selectedChatId, chatDetail]);
+
   // 화면에 표시할 메시지 (항상 messages 사용)
   const visibleMessages = messages.length > 0 ? messages : serverMessages;
 
@@ -315,9 +338,14 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
             onSelectChat={handleSelectChat}
             onHoverChange={setHoveredChatId}
             onMenuOpenChange={setMenuOpenChatId}
-            onCurrentChatClear={() => {
+            onCurrentChatClear={(deletedChatSessionId) => {
               setChatSessionId(null);
+              setSelectedChatId(null);
               setMessages([]);
+              
+              if (deletedChatSessionId) {
+                sessionStorage.removeItem(`chat_session_${projectId}`);
+              }
             }}
           />
 
