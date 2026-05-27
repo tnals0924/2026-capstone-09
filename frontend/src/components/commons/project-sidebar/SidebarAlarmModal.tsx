@@ -87,6 +87,9 @@ export const SidebarAlarmModal = ({
   const showErrorToast = useErrorToast();
   const [hasScrolled, setHasScrolled] = useState(false);
   const [notifications, setNotifications] = useState<NotificationSummaryResponse[]>([]);
+  // 최초 fetch 완료 여부. 로딩 중에는 빈 상태('받은 알림이 없어요')를 그리지 않아
+  // 알림이 뒤늦게 나타나는 깜빡임을 막는다.
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -104,6 +107,8 @@ export const SidebarAlarmModal = ({
       } catch (caught) {
         if (cancelled) return;
         showErrorToast(caught, '알림 목록을 불러오지 못했어요.');
+      } finally {
+        if (!cancelled) setIsLoaded(true);
       }
     };
     void fetchNotifications();
@@ -146,7 +151,7 @@ export const SidebarAlarmModal = ({
             aria-hidden="true"
           />
           <div className="min-h-0 flex-1 overflow-hidden px-2">
-            {notifications.length === 0 ? (
+            {!isLoaded ? null : notifications.length === 0 ? (
               <div className="text-label-alternative flex h-full flex-col items-center justify-start gap-2 pt-40">
                 <IconInbox className="text-label-disable h-10 w-10" aria-hidden="true" />
                 <p className="text-body-2 font-medium">받은 알림이 없어요</p>
