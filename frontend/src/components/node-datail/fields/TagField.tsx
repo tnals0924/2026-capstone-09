@@ -50,7 +50,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
   const { data: allTags = [] } = useProjectTagsQuery(projectId);
   const { mutate: addTag } = useAddNodeTagMutation(projectId, nodeId);
   const { mutate: removeTag } = useRemoveNodeTagMutation(projectId, nodeId);
-  const { mutate: createTag } = useCreateTagMutation(projectId);
+  const { mutate: createTag, isPending: isCreating } = useCreateTagMutation(projectId);
   const { mutate: deleteTag } = useDeleteTagMutation(projectId);
   const { mutate: updateTagColor } = useUpdateTagColorMutation(projectId);
 
@@ -123,7 +123,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
 
   const handleCreateTag = () => {
     const trimmed = inputValue.trim();
-    if (!trimmed) return;
+    if (!trimmed || isCreating) return;
 
     const exactMatch = allTags.find((t) => t.name?.toLowerCase() === trimmed.toLowerCase());
     if (exactMatch) {
@@ -131,6 +131,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
       return;
     }
 
+    resetInput();
     createTag(
       { name: trimmed, color: randomColor() },
       {
@@ -143,7 +144,6 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
               showErrorToast(err, '태그 추가에 실패했어요.');
             },
           });
-          resetInput();
         },
         onError: (err) => showErrorToast(err, '태그 생성에 실패했어요.'),
       },
