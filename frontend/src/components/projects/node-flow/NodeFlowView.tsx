@@ -30,6 +30,7 @@ import { EdgeDeleteConfirmContent } from '@/components/projects/project-detail/e
 import { MultiNodeSummaryModalContent } from '@/components/projects/project-detail/multi-node-summary/MultiNodeSummaryModalContent';
 import type { MultiNodeSummaryNode } from '@/components/projects/project-detail/multi-node-summary/types';
 import { useErrorToast } from '@/hooks/useErrorToast';
+import { useNodeMenuActions } from '@/hooks/useNodeMenuActions';
 import { useDeleteEdgeMutation } from '@/queries/edge';
 import { nodeKeys } from '@/queries/keys/nodeKeys';
 import { useFlowchartQuery } from '@/queries/node';
@@ -435,6 +436,15 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
 
   const isMultiNodeSelected = selectedNodes.length > 1;
 
+  const selectedNodeData = !isMultiNodeSelected ? selectedNodes[0]?.data : null;
+  const { onCreateMeeting } = useNodeMenuActions({
+    nodeId: selectedNodeId ?? 0,
+    projectId,
+    nodeTitle: selectedNodeData?.title ?? '',
+    nodeNumber: selectedNodeData?.number,
+    onBeforeAction: clearSelection,
+  });
+
   const visibleEdges = useMemo(() => {
     if (showDashedLines) {
       return edgesWithHandlers;
@@ -496,10 +506,7 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
             }
             onAddMeeting={
               selectedNodeId && !isMultiNodeSelected && !selectedNodes[0]?.data.isMainNode
-                ? () => {
-                    clearSelection();
-                    /* TODO: 모달 열기 */
-                  }
+                ? onCreateMeeting
                 : undefined
             }
             onAISummary={selectedNodes.length > 1 ? handleAISummary : undefined}
