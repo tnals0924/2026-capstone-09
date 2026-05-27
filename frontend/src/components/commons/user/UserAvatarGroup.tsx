@@ -39,15 +39,11 @@ interface UserAvatarWithTooltipProps {
 
 const UserAvatarWithTooltip = ({ user, position, size }: UserAvatarWithTooltipProps) => {
   const profileImageUrl = normalizeImageUrl(user.profileImageUrl ?? undefined);
-  const borderStyle =
-    !profileImageUrl && user.color
-      ? { outline: `2.5px solid ${user.color}`, borderRadius: '50%' }
-      : undefined;
 
   return (
     <Tooltip>
       <TooltipTrigger>
-        <div style={borderStyle}>
+        <div>
           <Avatar
             variant="person"
             size={size}

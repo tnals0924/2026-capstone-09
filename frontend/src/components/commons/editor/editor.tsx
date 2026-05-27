@@ -8,7 +8,9 @@ import { useEffect, useRef } from 'react';
 import { Markdown, type MarkdownStorage } from 'tiptap-markdown';
 import type { XmlFragment } from 'yjs';
 
+import { useYjsContext } from '@/contexts/YjsContext';
 import { useYjsFragmentInit } from '@/hooks/useYjsFragmentInit';
+import { TypingProfilePresence } from './TypingProfilePresence';
 
 const SAVE_DEBOUNCE_MS = 1000;
 
@@ -20,9 +22,18 @@ interface EditorProps {
   onUpdate?: (markdown: string) => void;
   /** false 전달 시 읽기 전용 (기본값: true) */
   editable?: boolean;
+  /** Yjs awareness typing profile 표시 대상 필드 */
+  collaborationField?: string;
 }
 
-export default function Editor({ content, fragment, onUpdate, editable = true }: EditorProps) {
+export default function Editor({
+  content,
+  fragment,
+  onUpdate,
+  editable = true,
+  collaborationField,
+}: EditorProps) {
+  const yjsCtx = useYjsContext();
   const onUpdateRef = useRef(onUpdate);
 
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -46,12 +57,13 @@ export default function Editor({ content, fragment, onUpdate, editable = true }:
 
         if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
         saveTimerRef.current = setTimeout(() => {
-          const mdStorage = (e.storage as unknown as Record<string, unknown>).markdown as MarkdownStorage;
+          const mdStorage = (e.storage as unknown as Record<string, unknown>)
+            .markdown as MarkdownStorage;
           onUpdateRef.current?.(mdStorage.getMarkdown());
         }, SAVE_DEBOUNCE_MS);
       },
       editorProps: {
-        attributes: { class: 'prose focus:outline-none m-5 pb-40' },
+        attributes: { class: 'prose focus:outline-none m-5 pb-40 pl-5' },
       },
       immediatelyRender: false,
     },
@@ -66,8 +78,14 @@ export default function Editor({ content, fragment, onUpdate, editable = true }:
   }, [content, editor, fragment]);
 
   return (
-    <div className="prose [&_.ProseMirror]:leading-[1.4] [&_.ProseMirror_p]:my-0">
+    <div
+      className="prose relative [&_.ProseMirror]:leading-[1.4] [&_.ProseMirror_p]:my-0"
+      data-typing-profile-container
+    >
       <EditorContent editor={editor} />
+      {fragment && collaborationField && editable && (
+        <TypingProfilePresence editor={editor} yjsCtx={yjsCtx} field={collaborationField} />
+      )}
     </div>
   );
 }
