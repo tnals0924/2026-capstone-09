@@ -8,7 +8,6 @@ import { DashedComment } from './DashedComment';
  * React Flow의 getBezierPath를 활용하여 두 개의 곡선으로 구성
  */
 export function ReferenceEdge({
-  id,
   sourceX,
   sourceY,
   targetX,
@@ -101,7 +100,7 @@ export function ReferenceEdge({
     targetX: referenceNodeX,
     targetY: referenceNodeY,
     targetPosition: getOppositePosition(sourcePosition),
-    curvature: 0.5,
+    curvature: 0.25,
   });
 
   const [path2] = getBezierPath({
@@ -111,7 +110,7 @@ export function ReferenceEdge({
     targetX,
     targetY,
     targetPosition,
-    curvature: 0.5,
+    curvature: 0.25,
   });
 
   const commentX = mousePos?.x ?? referenceNodeX;

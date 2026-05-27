@@ -195,14 +195,6 @@ export function convertToReactFlow(flowchart: GetFlowchartResponse | null): {
   if (flowchart.edges) {
     flowchart.edges.forEach((edge) => {
       if (edge.startNodeId && edge.endNodeId) {
-        const startNode = nodeMap.get(edge.startNodeId);
-        const endNode = nodeMap.get(edge.endNodeId);
-
-        // 메인 노드가 포함되어 있는지 확인
-        const isStartMain = startNode && !startNode.parentId;
-        const isEndMain = endNode && !endNode.parentId;
-        const hasMainNode = isStartMain || isEndMain;
-
         edges.push({
           id: `edge-${edge.edgeId}`,
           source: String(edge.startNodeId),
