@@ -442,6 +442,7 @@ function NodeFlowContent({ projectId }: NodeFlowViewProps) {
     projectId,
     nodeTitle: selectedNodeData?.title ?? '',
     nodeNumber: selectedNodeData?.number,
+    isMeetingEnded: selectedNodeData?.isMeetingEnded,
     onBeforeAction: clearSelection,
   });
 

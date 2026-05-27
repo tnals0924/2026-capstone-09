@@ -211,7 +211,7 @@ interface NodeMenuActionsOptions {
   projectId: number;
   nodeTitle?: string;
   nodeNumber?: number | string;
-  meetingStatus?: string;
+  isMeetingEnded?: boolean;
   onBeforeAction?: () => void;
   onDeleteSuccess?: () => void;
 }
@@ -221,7 +221,7 @@ export function useNodeMenuActions({
   projectId,
   nodeTitle = '',
   nodeNumber,
-  meetingStatus,
+  isMeetingEnded,
   onBeforeAction,
   onDeleteSuccess,
 }: NodeMenuActionsOptions) {
@@ -252,7 +252,7 @@ export function useNodeMenuActions({
         ),
       });
     },
-    ...(meetingStatus !== 'ENDED' && {
+    ...(!isMeetingEnded && {
       onEditMeeting: () => {
         before();
         openModal({
