@@ -63,7 +63,7 @@ export default function Editor({
         }, SAVE_DEBOUNCE_MS);
       },
       editorProps: {
-        attributes: { class: 'prose focus:outline-none m-5 pb-40' },
+        attributes: { class: 'prose focus:outline-none m-5 pb-40 pl-5' },
       },
       immediatelyRender: false,
     },
@@ -78,7 +78,10 @@ export default function Editor({
   }, [content, editor, fragment]);
 
   return (
-    <div className="prose [&_.ProseMirror]:leading-[1.4] [&_.ProseMirror_p]:my-0">
+    <div
+      className="prose relative [&_.ProseMirror]:leading-[1.4] [&_.ProseMirror_p]:my-0"
+      data-typing-profile-container
+    >
       <EditorContent editor={editor} />
       {fragment && collaborationField && editable && (
         <TypingProfilePresence editor={editor} yjsCtx={yjsCtx} field={collaborationField} />

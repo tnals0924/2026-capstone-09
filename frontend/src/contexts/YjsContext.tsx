@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { WebsocketProvider } from 'y-websocket';
 import * as Y from 'yjs';
 
+import { userStorage } from '@/api/userStorage';
 import { useCurrentUserQuery } from '@/queries/user';
 
 /** awareness에 저장하는 현재 유저 상태 */
@@ -100,19 +101,22 @@ function YjsInstance({
 
   useEffect(() => {
     if (!value || !currentUser) return;
-    const existingColor =
-      (value.provider.awareness.getLocalState() as Partial<YjsAwarenessState> | null)?.user
-        ?.color ?? AWARENESS_COLORS[0];
-    const activeNodeId =
-      (value.provider.awareness.getLocalState() as Partial<YjsAwarenessState> | null)?.user
-        ?.activeNodeId ?? null;
+    const storedUser = userStorage.get();
+    const currentAwarenessUser = (
+      value.provider.awareness.getLocalState() as Partial<YjsAwarenessState> | null
+    )?.user;
+    const existingColor = currentAwarenessUser?.color ?? AWARENESS_COLORS[0];
+    const activeNodeId = currentAwarenessUser?.activeNodeId ?? null;
+    const typing = currentAwarenessUser?.typing ?? null;
+
     value.provider.awareness.setLocalStateField('user', {
       userId: value.provider.awareness.clientID,
-      email: currentUser.email ?? '',
-      nickname: currentUser.nickname ?? '',
-      profileImageUrl: currentUser.profileImageUrl ?? null,
+      email: currentUser.email ?? storedUser?.email ?? '',
+      nickname: currentUser.nickname ?? storedUser?.nickname ?? '',
+      profileImageUrl: currentUser.profileImageUrl ?? storedUser?.profileImageUrl ?? null,
       color: existingColor,
       activeNodeId,
+      typing,
     });
   }, [value, currentUser]);
 

@@ -7,7 +7,7 @@ import type { YjsAwarenessState, YjsContextValue } from '@/contexts/YjsContext';
 import { normalizeImageUrl } from '@/utils/normalizeImageUrl';
 
 const AVATAR_SIZE = 24;
-const AVATAR_GAP = 8;
+const AVATAR_GAP = 16;
 const TYPING_PRESENCE_MAX_AGE_MS = 30000;
 
 interface TypingProfilePresenceProps {
@@ -55,7 +55,7 @@ const setLocalTypingState = (
   });
 };
 
-const getRemoteTypingProfiles = (yjsCtx: YjsContextValue, field: string): TypingProfile[] => {
+const getTypingProfiles = (yjsCtx: YjsContextValue, field: string): TypingProfile[] => {
   const localClientId = yjsCtx.provider.awareness.clientID;
   const now = Date.now();
   const profiles: TypingProfile[] = [];
@@ -88,9 +88,14 @@ const getProfilePositions = (
 
   try {
     const view = editor.view;
+    const container =
+      (view.dom.closest('[data-typing-profile-container]') as HTMLElement | null) ??
+      view.dom.parentElement ??
+      view.dom;
+    const containerRect = container.getBoundingClientRect();
     const editorRect = view.dom.getBoundingClientRect();
 
-    return profiles.flatMap((profile, index) => {
+    return profiles.flatMap((profile) => {
       try {
         const docSize = editor.state.doc.content.size;
         const safeHead = Math.max(0, Math.min(profile.head, docSize));
@@ -99,8 +104,12 @@ const getProfilePositions = (
         return [
           {
             ...profile,
-            top: coords.top + (coords.bottom - coords.top) / 2 - AVATAR_SIZE / 2,
-            left: editorRect.left - AVATAR_SIZE - AVATAR_GAP - index * (AVATAR_SIZE + 4),
+            top: coords.top + (coords.bottom - coords.top) / 2 - AVATAR_SIZE / 2 - containerRect.top,
+            // 컨테이너 왼쪽 바깥(음수)으로 나가면 상위 overflow에 잘리므로 안쪽으로 클램프한다.
+            left: Math.max(
+              2,
+              editorRect.left - containerRect.left - AVATAR_SIZE - AVATAR_GAP,
+            ),
           },
         ];
       } catch {
@@ -146,7 +155,7 @@ export function TypingProfilePresence({ editor, yjsCtx, field }: TypingProfilePr
     }
 
     const updateProfiles = () => {
-      const typingProfiles = getRemoteTypingProfiles(yjsCtx, field);
+      const typingProfiles = getTypingProfiles(yjsCtx, field);
       setProfiles(getProfilePositions(editor, typingProfiles));
     };
 
@@ -170,8 +179,8 @@ export function TypingProfilePresence({ editor, yjsCtx, field }: TypingProfilePr
         return (
           <div
             key={profile.clientId}
-            className="border-static-white shadow-normal-small pointer-events-none fixed z-90 h-6 w-6 overflow-hidden rounded-full border"
-            style={{ top: profile.top, left: profile.left, backgroundColor: profile.color }}
+            className="border-static-white shadow-normal-small pointer-events-none absolute z-50 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border bg-gray-200"
+            style={{ top: profile.top, left: profile.left }}
             title={profile.nickname}
           >
             {profileImageUrl ? (
@@ -183,7 +192,7 @@ export function TypingProfilePresence({ editor, yjsCtx, field }: TypingProfilePr
                 draggable={false}
               />
             ) : (
-              <span className="text-caption-2 text-static-white flex h-full w-full items-center justify-center font-medium">
+              <span className="text-caption-2 text-label-alternative font-medium">
                 {getInitial(profile.nickname)}
               </span>
             )}

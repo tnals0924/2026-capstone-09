@@ -49,7 +49,9 @@ export function useNodeDetailQuery(projectId: number, nodeId: number | null) {
     queryFn: () => privateApi.node.getNode(projectId, nodeId!).then((res) => res.data.data),
     enabled: !!projectId && !!nodeId,
     placeholderData: () => {
-      const flowchart = queryClient.getQueryData<GetFlowchartResponse>(nodeKeys.flowchart(projectId));
+      const flowchart = queryClient.getQueryData<GetFlowchartResponse>(
+        nodeKeys.flowchart(projectId),
+      );
       const node = flowchart?.nodes?.find((item) => item.nodeId === nodeId);
 
       return node ? ({ ...node, projectId } satisfies GetNodeResponse) : undefined;
@@ -76,9 +78,27 @@ export function useUpdateNodeStatusMutation(projectId: number, nodeId: number) {
 }
 
 export function useUpdateNodeNoteMutation(projectId: number, nodeId: number) {
+  const queryClient = useQueryClient();
+  const queryKey = nodeKeys.detail(projectId, nodeId);
+
   return useMutation({
     mutationFn: (noteContent: string) =>
       privateApi.node.updateNodeNote(projectId, nodeId, { noteContent }),
+    onMutate: async (noteContent) => {
+      await queryClient.cancelQueries({ queryKey });
+      const previous = queryClient.getQueryData<GetNodeResponse>(queryKey);
+
+      queryClient.setQueryData(queryKey, (old: GetNodeResponse | undefined) =>
+        old ? { ...old, noteContent } : old,
+      );
+
+      return { previous };
+    },
+    onError: (_err, _noteContent, context) => {
+      if (context?.previous !== undefined) {
+        queryClient.setQueryData(queryKey, context.previous);
+      }
+    },
   });
 }
 
@@ -98,8 +118,7 @@ export function useUpdateNodeTitleMutation(projectId: number, nodeId: number | n
   const queryKey = nodeKeys.detail(projectId, nodeId);
 
   return useMutation({
-    mutationFn: (title: string) =>
-      privateApi.node.updateNodeTitle(projectId, nodeId!, { title }),
+    mutationFn: (title: string) => privateApi.node.updateNodeTitle(projectId, nodeId!, { title }),
     onMutate: async (title) => {
       await queryClient.cancelQueries({ queryKey });
       const previous = queryClient.getQueryData<GetNodeResponse>(queryKey);
@@ -109,7 +128,9 @@ export function useUpdateNodeTitleMutation(projectId: number, nodeId: number | n
       const flowchartKey = nodeKeys.flowchart(projectId);
       const previousFlowchart = queryClient.getQueryData<GetFlowchartResponse>(flowchartKey);
       queryClient.setQueryData<GetFlowchartResponse>(flowchartKey, (old) =>
-        old ? { ...old, nodes: old.nodes?.map((n) => (n.nodeId === nodeId ? { ...n, title } : n)) } : old,
+        old
+          ? { ...old, nodes: old.nodes?.map((n) => (n.nodeId === nodeId ? { ...n, title } : n)) }
+          : old,
       );
       return { previous, previousFlowchart };
     },

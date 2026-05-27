@@ -139,8 +139,10 @@ export function NodeDetailLayout({
       </div>
 
       <div className="flex flex-col gap-6 pb-5">
-        <EditorContent editor={titleEditor} />
-        <TypingProfilePresence editor={titleEditor} yjsCtx={yjsCtx} field={YJS_FIELDS.title} />
+        <div className="relative" data-typing-profile-container>
+          <EditorContent editor={titleEditor} />
+          <TypingProfilePresence editor={titleEditor} yjsCtx={yjsCtx} field={YJS_FIELDS.title} />
+        </div>
 
         <div className="flex flex-col gap-5">
           <MetaRow icon={<IconTag />} label="태그">
