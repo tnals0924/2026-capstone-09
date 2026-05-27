@@ -131,19 +131,12 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
       return;
     }
 
-    resetInput();
     createTag(
       { name: trimmed, color: randomColor() },
       {
         onSuccess: (newTag) => {
           if (!newTag?.tagId) return;
-          yAddTag(newTag);
-          addTag(newTag.tagId, {
-            onError: (err) => {
-              yRemoveTag(newTag.tagId!);
-              showErrorToast(err, '태그 추가에 실패했어요.');
-            },
-          });
+          handleAdd(newTag);
         },
         onError: (err) => showErrorToast(err, '태그 생성에 실패했어요.'),
       },
@@ -151,6 +144,7 @@ export function TagField({ projectId, nodeId, initialTags }: TagFieldProps) {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing) return;
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setSelectedIndex((prev) => Math.min(prev + 1, totalItems - 1));
