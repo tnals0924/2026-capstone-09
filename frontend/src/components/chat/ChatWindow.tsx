@@ -3,6 +3,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
+import { privateApi } from '@/api';
 import { type MultiSelectInputValue, type NodeOption, type UserOption } from '@/components/commons/custom-input/MultiSelectInput';
 import { useStartChat, useSendMessage, useGetAllChatSessions, useGetChatSessionDetail, useGetReferenceNodes, useGetReferenceUsers, useAddChatNode, useRemoveChatNode } from '@/queries/chat';
 import { chatKeys } from '@/queries/keys/chatKeys';
@@ -214,7 +215,7 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
           referenceUserIds: referenceUserIds.length > 0 ? referenceUserIds : undefined,
         },
         {
-          onSuccess: (data) => {
+          onSuccess: async (data) => {
             if (data.data) {
               // 세션 ID 설정
               const newChatSessionId = data.data.chatSessionId;
@@ -235,8 +236,17 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
               // 채팅 목록 새로고침 (AI가 생성한 제목이 반영됨)
               void queryClient.invalidateQueries({ queryKey: chatKeys.lists() });
 
-              // 노드 뷰 새로고침
-              void queryClient.invalidateQueries({ queryKey: nodeKeys.flowchart(projectId) });
+              // 백그라운드에서 깜빡임 없이 업데이트
+              try {
+                const flowchartResponse = await privateApi.node.getFlowchart(projectId);
+                if (flowchartResponse.data.data) {
+                  queryClient.setQueryData(nodeKeys.flowchart(projectId), flowchartResponse.data.data);
+                }
+              } catch (error) {
+                console.error('Failed to update flowchart:', error);
+              }
+
+              // 노드 리스트와 칸반도 백그라운드에서 업데이트
               void queryClient.invalidateQueries({ queryKey: nodeKeys.list(projectId) });
               void queryClient.invalidateQueries({ queryKey: nodeKeys.kanban(projectId) });
             }
@@ -263,7 +273,7 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
           referenceUserIds: referenceUserIds.length > 0 ? referenceUserIds : undefined,
         },
         {
-          onSuccess: (data) => {
+          onSuccess: async (data) => {
             // AI 응답 추가
             if (data.data) {
               const assistantMessage: Message = {
@@ -276,15 +286,28 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
               setMessages((prev) => [...prev, assistantMessage]);
             }
 
-            // 선택된 채팅의 메시지 목록 새로고침
-            if (currentChatSessionId) {
-              void queryClient.invalidateQueries({
-                queryKey: chatKeys.detail(projectId, currentChatSessionId),
-              });
+            try {
+              const flowchartResponse = await privateApi.node.getFlowchart(projectId);
+              if (flowchartResponse.data.data) {
+                queryClient.setQueryData(nodeKeys.flowchart(projectId), flowchartResponse.data.data);
+              }
+            } catch (error) {
+              console.error('Failed to update flowchart:', error);
             }
 
-            // 노드 뷰 새로고침 
-            void queryClient.invalidateQueries({ queryKey: nodeKeys.flowchart(projectId) });
+            // 선택된 채팅의 메시지 목록도 백그라운드에서 조용히 업데이트
+            if (currentChatSessionId) {
+              try {
+                const chatDetailResponse = await privateApi.chat.getChatSessionDetail(projectId, currentChatSessionId);
+                if (chatDetailResponse.data.data) {
+                  queryClient.setQueryData(chatKeys.detail(projectId, currentChatSessionId), chatDetailResponse.data.data);
+                }
+              } catch (error) {
+                console.error('Failed to update chat detail:', error);
+              }
+            }
+
+            // 노드 리스트와 칸반은 invalidate
             void queryClient.invalidateQueries({ queryKey: nodeKeys.list(projectId) });
             void queryClient.invalidateQueries({ queryKey: nodeKeys.kanban(projectId) });
           },
@@ -342,7 +365,7 @@ export function ChatWindow({ onClose, isNodeSidebarOpen, sidebarWidth }: ChatWin
               setChatSessionId(null);
               setSelectedChatId(null);
               setMessages([]);
-              
+
               if (deletedChatSessionId) {
                 sessionStorage.removeItem(`chat_session_${projectId}`);
               }
