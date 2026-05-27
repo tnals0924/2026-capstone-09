@@ -1,30 +1,21 @@
-import { privateApi } from '@/api';
+import { authStorage } from '@/api/authStorage';
 
 export async function uploadImage(file: File): Promise<string> {
-  const extension = file.name.split('.').pop() ?? '';
+  const token = authStorage.getAccess();
 
-  const presignRes = await privateApi.file.createPresignedUrl({
-    fileName: file.name,
-    fileSize: file.size,
-    contentType: file.type,
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch('/api/upload-image', {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
   });
 
-  const { fileKey, presignedUrl, uploadUrl } = presignRes.data.data ?? {};
-  if (!fileKey || !presignedUrl || !uploadUrl) throw new Error('Presigned URL 발급 실패');
+  if (!res.ok) throw new Error('이미지 업로드에 실패했습니다.');
 
-  await fetch(presignedUrl, {
-    method: 'PUT',
-    body: file,
-    headers: { 'Content-Type': file.type },
-  });
+  const json = (await res.json()) as { url?: string };
+  if (!json.url) throw new Error('업로드 URL을 받지 못했습니다.');
 
-  await privateApi.file.confirmUpload({
-    fileKey,
-    fileName: file.name,
-    fileSize: file.size,
-    extension,
-    contentType: file.type,
-  });
-
-  return uploadUrl;
+  return json.url;
 }
