@@ -13,7 +13,7 @@ export const NodeNumberBadge = ({ number }: { number: string }) => {
   const isMain = !number.includes('.');
   return isMain ? (
     <ContentBadge
-      size="medium"
+      size="small"
       variant="solid"
       color="accent"
       className="!bg-primary-40/10 !text-primary-40 shrink-0"
@@ -21,7 +21,7 @@ export const NodeNumberBadge = ({ number }: { number: string }) => {
       #{number}
     </ContentBadge>
   ) : (
-    <ContentBadge size="medium" variant="outlined" color="neutral" className="shrink-0">
+    <ContentBadge size="small" variant="outlined" color="neutral" className="shrink-0">
       #{number}
     </ContentBadge>
   );
