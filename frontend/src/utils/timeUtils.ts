@@ -31,15 +31,18 @@ export function getRelativeTime(isoString: string): string {
     return `${diffHours}시간 전`;
   }
 
-  // 7일 미만
-  if (diffDays < 7) {
+  // 30일 미만
+  if (diffDays < 30) {
     return `${diffDays}일 전`;
   }
 
-  // 7일 이상 - 날짜 표시
-  return date.toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  // 365일 미만 - 개월 단위
+  if (diffDays < 365) {
+    const diffMonths = Math.floor(diffDays / 30);
+    return `${diffMonths}개월 전`;
+  }
+
+  // 365일 이상 - 년 단위
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears}년 전`;
 }
