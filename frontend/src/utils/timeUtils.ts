@@ -43,29 +43,3 @@ export function getRelativeTime(isoString: string): string {
     day: 'numeric',
   });
 }
-
-/**
- * ISO 8601 날짜 문자열을 짧은 상대 시간으로 변환 (간결한 버전)
- * @param isoString - ISO 8601 형식의 날짜 문자열
- * @returns 짧은 상대 시간 텍스트 (예: "3분", "2일")
- */
-export function getShortRelativeTime(isoString: string): string {
-  const date = new Date(isoString);
-  const now = new Date();
-
-  const diffMs = now.getTime() - date.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMs / 3600000);
-  const diffDays = Math.floor(diffMs / 86400000);
-
-  if (diffMinutes < 1) return '지금';
-  if (diffMinutes < 60) return `${diffMinutes}분`;
-  if (diffHours < 24) return `${diffHours}시간`;
-  if (diffDays < 30) return `${diffDays}일`;
-
-  const diffMonths = Math.floor(diffDays / 30);
-  if (diffMonths < 12) return `${diffMonths}개월`;
-
-  const diffYears = Math.floor(diffDays / 365);
-  return `${diffYears}년`;
-}
